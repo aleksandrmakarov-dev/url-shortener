@@ -11,4 +11,18 @@ require (
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3
 )
 
-require github.com/mattn/go-sqlite3 v1.14.21 // indirect
+require (
+	github.com/ajg/form v1.5.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	github.com/go-chi/chi/v5 v5.0.11 // indirect
+	github.com/go-chi/render v1.0.3 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator/v10 v10.17.0 // indirect
+	github.com/leodido/go-urn v1.3.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.21 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
+	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+)
