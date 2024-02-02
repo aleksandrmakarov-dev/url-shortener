@@ -1,5 +1,6 @@
 env: "local"
 storage_path: "./storage/str.db"
+salt: "salt123salt"
 http_server:
   address: "localhost:8080"
   timeout: "5s"

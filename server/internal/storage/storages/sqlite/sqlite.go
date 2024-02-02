@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	emailveriftoken "url-shortener/internal/lib/random/emailVerifToken"
 	"url-shortener/internal/storage"
 	storagetypes "url-shortener/internal/storage/storageTypes"
 
@@ -47,6 +48,14 @@ var queries = []string{
 	);
 	CREATE INDEX IF NOT EXISTS idx_url_userId ON Url(userId);
 	CREATE INDEX IF NOT EXISTS idx_url_alias ON Url(alias);`,
+
+	`CREATE TABLE IF NOT EXISTS EmailVerification (
+		email TEXT NOT NULL,
+		token TEXT NOT NULL,
+		expiresAt DATETIME NULL
+	);
+	CREATE INDEX IF NOT EXISTS idx_EmailVerification_token ON EmailVerification(token);
+	`,
 }
 
 func New(storagePath string) (*Storage, error) {
@@ -137,7 +146,7 @@ func (s *Storage) GetURL(alias string) (storagetypes.Url, error) {
 
 	if url.IsExpired() {
 		s.DeleteURL(url.Alias)
-		return storagetypes.Url{}, fmt.Errorf("%s: %w", opr, storage.ErrURLExpired)
+		return storagetypes.Url{}, fmt.Errorf("%s: %w", opr, storage.ErrorURLExpired)
 	}
 
 	return url, nil
@@ -152,6 +161,114 @@ func (s *Storage) DeleteURL(alias string) error {
 	}
 
 	_, err = stmt.Exec(alias)
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) Register(email string, passHash string) error {
+	opr := "storage.storages.sqlite.DeleteURL"
+
+	stmt, err := s.db.Prepare("INSERT INTO Users(email,password,createdAt) VALUES(?,?,?)")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(email, passHash, time.Now())
+	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return fmt.Errorf("%s: %w", opr, storage.ErrorEmailExists)
+		}
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) VerifEmailCreate(email string) error {
+	opr := "storage.storages.sqlite.VerifEmail"
+
+	stmt, err := s.db.Prepare("INSERT INTO EmailVerification VALUES(?,?,?)")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	token, err := emailveriftoken.GenerateRefreshToken()
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	fmt.Println("token:", token)
+
+	_, err = stmt.Exec(email, token, time.Now().Add(time.Hour*1))
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) VerifEmail(token string) error {
+	opr := "storage.storages.sqlite.VerifEmail"
+	stmt, err := s.db.Prepare("SELECT email,expiresAt FROM EmailVerification WHERE token = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	var email string
+	var expiresAt time.Time
+
+	err = stmt.QueryRow(token).Scan(&email, &expiresAt)
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	if time.Now().Compare(expiresAt) == 1 {
+		stmt, err := s.db.Prepare("DELETE FROM EmailVerification WHERE token = ?")
+		if err != nil {
+			fmt.Println(1)
+			return fmt.Errorf("%s: %w", opr, err)
+		}
+
+		_, err = stmt.Exec(token)
+		if err != nil {
+			fmt.Println(2)
+			return fmt.Errorf("%s: %w", opr, err)
+		}
+
+		stmt, err = s.db.Prepare("DELETE FROM Users WHERE email = ?")
+		if err != nil {
+			fmt.Println(1)
+			return fmt.Errorf("%s: %w", opr, err)
+		}
+
+		_, err = stmt.Exec(email)
+		if err != nil {
+			fmt.Println(2)
+			return fmt.Errorf("%s: %w", opr, err)
+		}
+
+		return fmt.Errorf("%s: %w", opr, storage.ErrorEmailVerifTokenExpired)
+	}
+
+	stmt, err = s.db.Prepare("UPDATE Users SET emailVerifiedAt = ? WHERE email = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(time.Now(), email)
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	stmt, err = s.db.Prepare("DELETE FROM EmailVerification WHERE email = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(email)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opr, err)
 	}

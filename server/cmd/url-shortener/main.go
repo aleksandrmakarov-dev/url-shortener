@@ -4,9 +4,14 @@ import (
 	"log/slog"
 	"net/http"
 	"url-shortener/internal/config"
-	"url-shortener/internal/http-server/router"
+	"url-shortener/internal/http-server/handlers/emailverif"
+	"url-shortener/internal/http-server/handlers/signup"
+	"url-shortener/internal/lib/hashgen"
 	"url-shortener/internal/lib/logger"
 	"url-shortener/internal/storage/storages/sqlite"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
@@ -23,16 +28,28 @@ func main() {
 	}
 	log.Info("Storage is initialized")
 
+	//в конфиг
+	hasher := hashgen.SHA1Hasher{
+		Salt: cfg.Salt,
+	}
+
 	_ = storage
 
-	router := router.New()
-	router.InitMiddlewares()
-	router.InitRoutePatterns()
+	router := chi.NewRouter()
 
-	log.Info("Starting server")
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
+
+	router.Post("/signup", signup.New(*log, storage, hasher, true))
+	router.Get("/email-verification/{veriftoken}", emailverif.New(*log, storage))
+
+	log.Info("Starting server", slog.String("addr", cfg.Address))
 	srv := &http.Server{
 		Addr:         cfg.Address,
-		Handler:      router.Router,
+		Handler:      router,
 		ReadTimeout:  cfg.Timeout,
 		WriteTimeout: cfg.Timeout,
 		IdleTimeout:  cfg.IdleTimeout,
