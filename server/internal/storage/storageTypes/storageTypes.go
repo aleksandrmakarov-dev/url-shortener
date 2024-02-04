@@ -7,36 +7,34 @@ type Url struct {
 	Alias       string
 	RedirectUrl string
 	UserID      int
-	CreatedAt   time.Time
 	ExpiresAt   time.Time
 	Navigations int
 }
 
 type User struct {
-	ID              int
-	Email           string
-	Pass            string
-	CreatedAt       time.Time
-	EmailVerifiedAt time.Time
+	ID            int
+	Email         string
+	Pass          string
+	CreatedAt     time.Time
+	EmailVerified bool
 }
 
-type Account struct {
+type Sessions struct {
 	ID           int
 	UserID       int
 	RefreshToken string
-	CreatedAt    time.Time
 	ExpiresAt    time.Time
 }
 
 func (u *Url) IsExpired() bool {
-	if u.CreatedAt.Compare(u.ExpiresAt) == -1 {
+	if time.Now().Compare(u.ExpiresAt) == -1 {
 		return true
 	}
 	return false
 }
 
-func (a *Account) IsExpired() bool {
-	if a.CreatedAt.Compare(a.ExpiresAt) == -1 {
+func (a *Sessions) IsExpired() bool {
+	if time.Now().Compare(a.ExpiresAt) == -1 {
 		return true
 	}
 	return false

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"url-shortener/internal/config"
 	"url-shortener/internal/http-server/handlers/emailverif"
+	resendverification "url-shortener/internal/http-server/handlers/resendVerification"
 	"url-shortener/internal/http-server/handlers/signup"
 	"url-shortener/internal/lib/hashgen"
 	"url-shortener/internal/lib/logger"
@@ -28,7 +29,6 @@ func main() {
 	}
 	log.Info("Storage is initialized")
 
-	//в конфиг
 	hasher := hashgen.SHA1Hasher{
 		Salt: cfg.Salt,
 	}
@@ -45,6 +45,7 @@ func main() {
 
 	router.Post("/signup", signup.New(*log, storage, hasher, true))
 	router.Get("/email-verification/{veriftoken}", emailverif.New(*log, storage))
+	router.Post("/email-verification/resend-verification", resendverification.New(*log, storage))
 
 	log.Info("Starting server", slog.String("addr", cfg.Address))
 	srv := &http.Server{

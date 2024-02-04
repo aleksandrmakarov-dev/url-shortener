@@ -21,6 +21,7 @@ require (
 	github.com/go-playground/validator/v10 v10.17.0 // indirect
 	github.com/leodido/go-urn v1.3.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.21 // indirect
+	github.com/resend/resend-go/v2 v2.5.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect

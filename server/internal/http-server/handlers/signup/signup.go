@@ -65,12 +65,6 @@ func New(log slog.Logger, userSignup UserSignup, passHasher PassHasher, emailver
 		}
 
 		if emailverif {
-			if err != nil {
-				render.JSON(w, r, response.Error("internal error"))
-				log.Error("internal error", slog.String("opr", opr), slog.String("err", err.Error()))
-				return
-			}
-
 			err := userSignup.VerifEmailCreate(req.Email)
 			if err != nil {
 				render.JSON(w, r, response.Error("internal error"))
