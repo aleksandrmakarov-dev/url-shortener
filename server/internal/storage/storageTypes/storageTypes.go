@@ -27,14 +27,14 @@ type Sessions struct {
 }
 
 func (u *Url) IsExpired() bool {
-	if time.Now().Compare(u.ExpiresAt) == -1 {
+	if time.Now().Compare(u.ExpiresAt) == 1 {
 		return true
 	}
 	return false
 }
 
 func (a *Sessions) IsExpired() bool {
-	if time.Now().Compare(a.ExpiresAt) == -1 {
+	if time.Now().Compare(a.ExpiresAt) == 1 {
 		return true
 	}
 	return false

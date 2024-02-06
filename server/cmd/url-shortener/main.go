@@ -7,6 +7,8 @@ import (
 	"url-shortener/internal/http-server/handlers/emailverif"
 	resendverification "url-shortener/internal/http-server/handlers/resendVerification"
 	"url-shortener/internal/http-server/handlers/signup"
+	"url-shortener/internal/http-server/handlers/url/redirect"
+	shorturlunauthorized "url-shortener/internal/http-server/handlers/url/shortURLunauthorized"
 	"url-shortener/internal/lib/hashgen"
 	"url-shortener/internal/lib/logger"
 	"url-shortener/internal/storage/storages/sqlite"
@@ -43,9 +45,11 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Post("/signup", signup.New(*log, storage, hasher, true))
+	router.Get("/{alias}", redirect.New(*log, storage))
 	router.Get("/email-verification/{veriftoken}", emailverif.New(*log, storage))
-	router.Post("/email-verification/resend-verification", resendverification.New(*log, storage))
+	router.Post("/api/v1/signup", signup.New(*log, storage, hasher, true))
+	router.Post("/api/v1/email-verification/resend-verification", resendverification.New(*log, storage))
+	router.Post("/api/v1/create-short-url/unauthorized", shorturlunauthorized.New(*log, storage))
 
 	log.Info("Starting server", slog.String("addr", cfg.Address))
 	srv := &http.Server{

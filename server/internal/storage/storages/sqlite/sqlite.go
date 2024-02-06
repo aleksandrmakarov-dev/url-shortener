@@ -7,6 +7,7 @@ import (
 	"time"
 	emailverificationsender "url-shortener/internal/lib/messageSender/emailVerificationSender"
 	emailveriftoken "url-shortener/internal/lib/random/emailVerifToken"
+	randomalias "url-shortener/internal/lib/random/randomAlias"
 	"url-shortener/internal/storage"
 	storagetypes "url-shortener/internal/storage/storageTypes"
 
@@ -82,6 +83,53 @@ func New(storagePath string) (*Storage, error) {
 
 }
 
+func (s *Storage) SaveUrlUnauthorized(URLtoSave string) (string, error) {
+	const opr = "storage.storages.sqlite.SaveUrlUnauthorized"
+
+	stmt, err := s.db.Prepare("INSERT INTO Urls(alias, redirect, expiresAt, navigations) VALUES(?,?,?,?)")
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", opr, err)
+	}
+
+	for {
+
+		alias, err := randomalias.GenRandomAlias()
+		if err != nil {
+			return "", fmt.Errorf("%s: %w", opr, err)
+		}
+
+		existingAlias, err := s.checkAliasExists(alias)
+		if err != nil {
+			return "", fmt.Errorf("%s: %w", opr, err)
+		}
+
+		if !existingAlias {
+			_, err = stmt.Exec(alias, URLtoSave, time.Now().Add(time.Hour*72), 0)
+			if err != nil {
+				return "", fmt.Errorf("%s: %w", opr, err)
+			}
+			return alias, nil
+		}
+	}
+}
+
+func (s *Storage) checkAliasExists(alias string) (bool, error) {
+	const opr = "storage.storages.sqlite.checkAliasExists"
+
+	stmt, err := s.db.Prepare("SELECT COUNT(*) FROM Urls WHERE alias = ?")
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	var count int
+	err = stmt.QueryRow(alias).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return count > 0, nil
+}
+
 func (s *Storage) SaveURL(UrlToSave storagetypes.Url) error {
 	const opr = "storage.storages.sqlite.SaveURL"
 
@@ -115,29 +163,27 @@ func (s *Storage) SaveURL(UrlToSave storagetypes.Url) error {
 func (s *Storage) GetURL(alias string) (storagetypes.Url, error) {
 	const opr = "storage.storages.sqlite.GetURL"
 
-	stmt, err := s.db.Prepare("SELECT redirect, userId, createdAt, expiresAt, navigations FROM Urls WHERE alias = ?")
+	stmt, err := s.db.Prepare("SELECT redirect, expiresAt, navigations FROM Urls WHERE alias = ?")
 	if err != nil {
 		return storagetypes.Url{}, fmt.Errorf("%s: %w", opr, err)
 	}
 
 	var (
 		redirect    string
-		userId      int
-		createdAt   time.Time
 		expiresAt   time.Time
 		navigations int
 	)
-	err = stmt.QueryRow(alias).Scan(&redirect, &userId, &createdAt, &expiresAt, &navigations)
+	err = stmt.QueryRow(alias).Scan(&redirect, &expiresAt, &navigations)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return storagetypes.Url{}, fmt.Errorf("%s: %w", opr, err)
+			return storagetypes.Url{}, fmt.Errorf("%s: %w", opr, storage.ErrorURLNotFound)
 		}
 		return storagetypes.Url{}, fmt.Errorf("%s: %w", opr, err)
 	}
 
 	url := storagetypes.Url{
 		Alias:       alias,
-		UserID:      userId,
+		RedirectUrl: redirect,
 		ExpiresAt:   expiresAt,
 		Navigations: navigations,
 	}
@@ -203,9 +249,6 @@ func (s *Storage) VerifEmailCreate(email string) error {
 	if err != nil {
 		return fmt.Errorf("%s: %w", opr, err)
 	}
-
-	fmt.Println("token:", token)
-
 	_, err = stmt.Exec(email, token, time.Now().Add(time.Hour*1))
 	if err != nil {
 		return fmt.Errorf("%s: %w", opr, err)
