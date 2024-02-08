@@ -94,7 +94,6 @@ For endpoints requiring authentication, include an access token in the request h
   "message": "Invalid credentials"
 }
 ```
-
 ### Verify Email
 - **Method:** POST
 - **Route:** `/verify-email`
@@ -107,6 +106,24 @@ For endpoints requiring authentication, include an access token in the request h
 }
 ```
 - **Response Body:** None
+
+#### Error Responses:
+- **Status Code:** 404 Not Found
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "User or verification token not found"
+}
+```
+- **Status Code:** 401 Unauthorized
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Verification token has expired"
+}
+```
 
 ### Refresh Token
 - **Method:** POST
