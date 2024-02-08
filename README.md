@@ -1,2 +1,157 @@
-# url-shortener
-Simple and fast URL shortener!
+# API Documentation
+
+## Common
+
+### Models
+
+#### Message Response
+```json
+{
+  "title": "Message Title",
+  "message": "Message Content"
+}
+```
+
+#### Error Response
+```json
+{
+  "status": "Error Status Code",
+  "error": "Error Type",
+  "message": "Error Message"
+}
+```
+
+
+## Base URL
+`https://api.example.com/api/v1`
+
+## Authentication
+For endpoints requiring authentication, include an access token in the request headers.
+
+## Endpoints
+
+### Sign Up with Email and Password
+- **Method:** POST
+- **Route:** `/sign-up`
+- **Description:** Create a new user account with email and password.
+- **Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+- **Response Body:** None
+
+#### Error Responses:
+- **Status Code:** 400 Bad Request
+```json
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Invalid email format or password strength"
+}
+```
+- **Status Code:** 409 Conflict
+```json
+{
+  "status": 409,
+  "error": "Conflict",
+  "message": "User with this email already exists"
+}
+```
+
+
+### Sign In with Email and Password
+- **Method:** POST
+- **Route:** `/sign-in`
+- **Description:** Authenticate a user with email and password.
+- **Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+- **Response Body:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+- **Response Cookie:**
+  - **Name:** refreshToken
+  - **Value:** [Refresh Token Value]
+  - **HttpOnly:** true
+
+#### Error Responses:
+- **Status Code:** 401 Unauthorized
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Invalid credentials"
+}
+```
+
+### Verify Email
+- **Method:** POST
+- **Route:** `/verify-email`
+- **Description:** Verify user's email with a verification token.
+- **Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "token": "verification_token"
+}
+```
+- **Response Body:** None
+
+### Refresh Token
+- **Method:** POST
+- **Route:** `/refresh-token`
+- **Description:** Refresh access token using refresh token stored in cookie.
+- **Request Cookie:**
+  - **Name:** refreshToken
+  - **Value:** [Refresh Token Value]
+- **Response Body (Success):**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 123,
+    "email": "user@example.com",
+    "name": "User Name"
+  }
+}
+```
+- **Response Body (Error):**
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Invalid or expired refresh token"
+}
+```
+
+### Create Short URL
+- **Method:** POST
+- **Route:** `/shorten-url`
+- **Description:** Create a shortened URL with an optional alias.
+- **Request Body:**
+```json
+{
+  "original": "https://www.example.com/long/url",
+  "alias": "custom_alias"
+}
+```
+- **Request Headers:** (Optional) Access Token
+- **Response Body:**
+```json
+{
+  "original": "https://www.example.com/long/url",
+  "shortened": "https://example.com/abc123",
+  "alias": "custom_alias"
+}
+``` 
