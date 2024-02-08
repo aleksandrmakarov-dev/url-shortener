@@ -29,7 +29,7 @@ func (h *Handler) InitRoutes() *chi.Mux {
 	router.Route("/api/v1", func(r chi.Router) {
 		r.Post("/test", func(w http.ResponseWriter, r *http.Request) {
 
-			render.JSON(w, r, "test works!")
+			render.JSON(w, r, "test work!")
 		})
 	})
 
