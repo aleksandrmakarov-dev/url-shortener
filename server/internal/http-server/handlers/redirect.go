@@ -1,10 +1,10 @@
-package redirect
+package handlers
 
 import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"url-shortener/internal/lib/api/response"
+	resp "url-shortener/internal/lib/api/response"
 	"url-shortener/internal/storage"
 	storagetypes "url-shortener/internal/storage/storageTypes"
 
@@ -16,26 +16,26 @@ type URLGetter interface {
 	GetURL(alias string) (storagetypes.Url, error)
 }
 
-func New(log slog.Logger, URLGetter URLGetter) http.HandlerFunc {
+func Redirect(log slog.Logger, URLGetter URLGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		alias := chi.URLParam(r, "alias")
 		if alias == "" {
-			render.JSON(w, r, response.Error("not found"))
+			render.JSON(w, r, resp.Error("not found"))
 			return
 		}
 
 		url, err := URLGetter.GetURL(alias)
 		if err != nil {
 			if errors.Is(err, storage.ErrorURLNotFound) {
-				render.JSON(w, r, response.Error("url does not exist"))
+				render.JSON(w, r, resp.Error("url does not exist"))
 				return
 			}
 			if errors.Is(err, storage.ErrorURLExpired) {
-				render.JSON(w, r, response.Error("url expired"))
+				render.JSON(w, r, resp.Error("url expired"))
 				return
 			}
 			log.Error("internal err", slog.String("err", err.Error()))
-			render.JSON(w, r, response.Error("internal error"))
+			render.JSON(w, r, resp.Error("internal error"))
 		}
 
 		log.Info("test", slog.String("url", url.RedirectUrl))

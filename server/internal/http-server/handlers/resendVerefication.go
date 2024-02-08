@@ -1,4 +1,4 @@
-package shorturlunauthorized
+package handlers
 
 import (
 	"log/slog"
@@ -9,22 +9,18 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type URLSaver interface {
-	SaveUrlUnauthorized(URLtoSave string) (string, error)
+type EmailVerifCreator interface {
+	VerifEmailCreate(email string) error
 }
 
-type Request struct {
-	Url string `json:"url" validate:"required,url"`
+type ResendVerificationReq struct {
+	Email string `json:"email" validate:"required,email"`
 }
 
-type Response struct {
-	response.Response
-	Alias string
-}
-
-func New(log slog.Logger, URLSaver URLSaver) http.HandlerFunc {
+func (h *Handler) ResendVerification(log slog.Logger, emailVerifCreator EmailVerifCreator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req Request
+		var req ResendVerificationReq
+
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			render.JSON(w, r, response.Error("invalid request"))
@@ -34,18 +30,17 @@ func New(log slog.Logger, URLSaver URLSaver) http.HandlerFunc {
 		if err := validator.New().Struct(req); err != nil {
 			valErr := err.(validator.ValidationErrors)
 			render.JSON(w, r, response.ValidationError(valErr))
+
 			return
 		}
 
-		alias, err := URLSaver.SaveUrlUnauthorized(req.Url)
+		err = emailVerifCreator.VerifEmailCreate(req.Email)
 		if err != nil {
 			render.JSON(w, r, response.Error("internal error"))
 			return
 		}
 
-		render.JSON(w, r, Response{
-			Response: response.OK(),
-			Alias:    alias,
-		})
+		render.JSON(w, r, response.OK())
+
 	}
 }

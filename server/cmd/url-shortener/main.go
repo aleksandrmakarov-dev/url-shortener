@@ -4,17 +4,9 @@ import (
 	"log/slog"
 	"net/http"
 	"url-shortener/internal/config"
-	"url-shortener/internal/http-server/handlers/emailverif"
-	resendverification "url-shortener/internal/http-server/handlers/resendVerification"
-	"url-shortener/internal/http-server/handlers/signup"
-	"url-shortener/internal/http-server/handlers/url/redirect"
-	shorturlunauthorized "url-shortener/internal/http-server/handlers/url/shortURLunauthorized"
-	"url-shortener/internal/lib/hashgen"
+	"url-shortener/internal/http-server/handlers"
 	"url-shortener/internal/lib/logger"
 	"url-shortener/internal/storage/storages/sqlite"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
@@ -31,25 +23,14 @@ func main() {
 	}
 	log.Info("Storage is initialized")
 
-	hasher := hashgen.SHA1Hasher{
-		Salt: cfg.Salt,
-	}
+	//hasher := hashgen.SHA1Hasher{
+	//	Salt: cfg.Salt,
+	//}
 
 	_ = storage
 
-	router := chi.NewRouter()
-
-	router.Use(middleware.RequestID)
-	router.Use(middleware.RealIP)
-	router.Use(middleware.Logger)
-	router.Use(middleware.Recoverer)
-	router.Use(middleware.URLFormat)
-
-	router.Get("/{alias}", redirect.New(*log, storage))
-	router.Get("/email-verification/{veriftoken}", emailverif.New(*log, storage))
-	router.Post("/api/v1/signup", signup.New(*log, storage, hasher, true))
-	router.Post("/api/v1/email-verification/resend-verification", resendverification.New(*log, storage))
-	router.Post("/api/v1/create-short-url/unauthorized", shorturlunauthorized.New(*log, storage))
+	handler := handlers.Handler{}
+	router := handler.InitRoutes()
 
 	log.Info("Starting server", slog.String("addr", cfg.Address))
 	srv := &http.Server{

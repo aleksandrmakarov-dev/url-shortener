@@ -1,10 +1,10 @@
-package signup
+package handlers
 
 import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"url-shortener/internal/lib/api/response"
+	resp "url-shortener/internal/lib/api/response"
 	"url-shortener/internal/storage"
 
 	"github.com/go-chi/render"
@@ -20,32 +20,32 @@ type PassHasher interface {
 	GenHash(pass string) string
 }
 
-type Request struct {
+type signupReq struct {
 	Email string `json:"email" validate:"required,email"`
 	Pass  string `json:"pass"`
 }
 
-type Response struct {
-	response.Response
+type signupRes struct {
+	resp.Response
 	Email              string `json:"email"`
 	EmailVerifRequired bool
 }
 
-func New(log slog.Logger, userSignup UserSignup, passHasher PassHasher, emailverif bool) http.HandlerFunc {
+func (h *Handler) Signup(log slog.Logger, userSignup UserSignup, passHasher PassHasher, emailverif bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		opr := "handlers.signup.New"
 
 		log.With(slog.String("opr", opr))
 
-		var req Request
+		var req signupReq
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
-			render.JSON(w, r, response.Error("invalid request"))
+			render.JSON(w, r, resp.Error("invalid request"))
 			return
 		}
 		if err := validator.New().Struct(req); err != nil {
 			valErr := err.(validator.ValidationErrors)
-			render.JSON(w, r, response.ValidationError(valErr))
+			render.JSON(w, r, resp.ValidationError(valErr))
 
 			return
 		}
@@ -53,11 +53,11 @@ func New(log slog.Logger, userSignup UserSignup, passHasher PassHasher, emailver
 		err = userSignup.Register(req.Email, passHasher.GenHash(req.Pass))
 		if err != nil {
 			if errors.Is(err, storage.ErrorEmailExists) {
-				render.JSON(w, r, response.Error("email already exists"))
+				render.JSON(w, r, resp.Error("email already exists"))
 				return
 			}
 
-			render.JSON(w, r, response.Error("internal error"))
+			render.JSON(w, r, resp.Error("internal error"))
 
 			log.Error("internal error", slog.String("opr", opr), slog.String("err", err.Error()))
 
@@ -67,21 +67,21 @@ func New(log slog.Logger, userSignup UserSignup, passHasher PassHasher, emailver
 		if emailverif {
 			err := userSignup.VerifEmailCreate(req.Email)
 			if err != nil {
-				render.JSON(w, r, response.Error("internal error"))
+				render.JSON(w, r, resp.Error("internal error"))
 				log.Error("internal error", slog.String("opr", opr), slog.String("err", err.Error()))
 				return
 			}
 
-			render.JSON(w, r, Response{
-				Response:           response.OK(),
+			render.JSON(w, r, signupRes{
+				Response:           resp.OK(),
 				Email:              req.Email,
 				EmailVerifRequired: true,
 			})
 			return
 		}
 
-		render.JSON(w, r, Response{
-			Response:           response.OK(),
+		render.JSON(w, r, signupRes{
+			Response:           resp.OK(),
 			Email:              req.Email,
 			EmailVerifRequired: false,
 		})
