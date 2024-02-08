@@ -212,3 +212,67 @@ For endpoints requiring authentication, include an access token in the request h
 }
 ```
 
+#### Update Short URL
+- **Method:** `PUT`
+- **Route:** `/short-url/:id`
+- **Description:** Update the original URL or alias of a shortened URL.
+- **Request Parameters:**
+  - **id:** The ID of the short URL to be updated.
+- **Request Body:**
+```json
+{
+  "original": "https://www.example.com/new/long/url",
+  "alias": "new_alias"
+}
+```
+- **Request Headers:** `Access Token` (Optional)
+- **Response Body:**
+```json
+{
+  "original": "https://www.example.com/new/long/url",
+  "shortened": "https://example.com/abc123",
+  "alias": "new_alias"
+}
+```
+
+#### Error Responses:
+
+- **Status Code:** `401 Unauthorized`
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Access token required to update short URL"
+}
+```
+- **Status Code:** `404 Not Found`
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Short URL not found"
+}
+```
+
+#### Delete Short URL
+- **Method:** `DELETE`
+- **Route:** `/short-url/:id`
+- **Description:** Delete a shortened URL.
+
+#### Error Responses:
+- **Status Code:** `401 Unauthorized`
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Access token required to delete short URL"
+}
+```
+- **Status Code:** `404 Not Found`
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Short URL not found"
+}
+```
