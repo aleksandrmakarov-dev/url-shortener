@@ -1,5 +1,27 @@
 # API Documentation
 
+## Structure
+
+```
+.
+└── src
+    ├── controllers
+    │   ├── ShortURLsController
+    │   ├── AuthController
+    │   └── UsersController
+    ├── models
+    │   ├── ShortURL
+    │   ├── Auth
+    │   └── User
+    ├── services
+    │   ├── ShortURLsService
+    │   ├── AuthService
+    │   └── UsersService
+    └── routes
+        └── index
+```
+
+
 ## Common
 
 ### Models
