@@ -17,8 +17,6 @@
     │   ├── ShortURLsService
     │   ├── AuthService
     │   └── UsersService
-    └── routes
-        └── index
 ```
 
 
