@@ -154,7 +154,7 @@ For endpoints requiring authentication, include an access token in the request h
 
 ### Create Short URL
 - **Method:** POST
-- **Route:** `/shorten-url`
+- **Route:** `/short-url`
 - **Description:** Create a shortened URL with an optional alias.
 - **Request Body:**
 ```json
@@ -172,3 +172,22 @@ For endpoints requiring authentication, include an access token in the request h
   "alias": "custom_alias"
 }
 ``` 
+
+#### Error Responses:
+- **Status Code:** 400 Bad Request
+```json
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Invalid URL format"
+}
+```
+- **Status Code:** 401 Unauthorized
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Access token required to set custom alias"
+}
+```
+
