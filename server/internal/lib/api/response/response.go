@@ -2,31 +2,39 @@ package response
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
 
-type Response struct {
-	Status string `json:"status"`
-	Error  string `json:"error,omitempty"`
-}
-
 const (
-	StatusOK    = "OK"
-	StatusError = "Error"
+	ErrBadReq   = "Bad Request"
+	ErrInternal = "Internal error"
+	ErrConflict = "Conflict"
+	ErrUnauth   = "Unauthorized"
+	ErrNotFound = "Not Found"
 )
 
-func OK() Response {
+type Response struct {
+	Title   string `json:"title,omitempty"`
+	Status  int    `json:"status,omitempty"`
+	Error   string `json:"error,omitempty"`
+	Message string `json:"message"`
+}
+
+func ErrorResp(status int, errTitle string, errMessage string) Response {
 	return Response{
-		Status: StatusOK,
+		Status:  status,
+		Error:   errTitle,
+		Message: errMessage,
 	}
 }
 
-func Error(msg string) Response {
+func Resp(title, message string) Response {
 	return Response{
-		Status: StatusError,
-		Error:  msg,
+		Title:   title,
+		Message: message,
 	}
 }
 
@@ -47,7 +55,8 @@ func ValidationError(errs validator.ValidationErrors) Response {
 	}
 
 	return Response{
-		Status: StatusError,
-		Error:  strings.Join(errMsgs, ", "),
+		Status:  http.StatusBadRequest,
+		Error:   ErrBadReq,
+		Message: strings.Join(errMsgs, ", "),
 	}
 }

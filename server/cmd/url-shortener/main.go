@@ -6,6 +6,9 @@ import (
 	"url-shortener/internal/config"
 	"url-shortener/internal/http-server/handlers"
 	"url-shortener/internal/lib/logger"
+	"url-shortener/internal/repository"
+	"url-shortener/internal/repository/sqlite"
+	"url-shortener/internal/service"
 )
 
 func main() {
@@ -15,18 +18,18 @@ func main() {
 	log := logger.StartLogger(cfg.Env)
 	log.Info("Logger is started")
 
-	//storage, err := sqlite.New(cfg.StoragePath)
-	//if err != nil {
-	//log.Error("filed to init storage", slog.String("error", err.Error()))
-
-	//}
-	//log.Info("Storage is initialized")
+	db, err := sqlite.NewSqliteDB(cfg.StoragePath)
+	if err != nil {
+		log.Error("filed to init storage", slog.String("error", err.Error()))
+	}
+	log.Info("Storage is initialized")
 
 	//hasher := hashgen.SHA1Hasher{
 	//	Salt: cfg.Salt,
 	//}
-
-	handler := handlers.Handler{}
+	repos := repository.NewRepository(db)
+	services := service.NewService(repos)
+	handler := handlers.NewHandler(*log, services)
 	router := handler.InitRoutes()
 
 	log.Info("Starting server", slog.String("addr", cfg.Address))

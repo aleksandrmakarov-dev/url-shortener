@@ -3,7 +3,6 @@ package handlers
 import (
 	"log/slog"
 	"net/http"
-	"url-shortener/internal/lib/api/response"
 
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
@@ -23,24 +22,24 @@ func (h *Handler) ResendVerification(log slog.Logger, emailVerifCreator EmailVer
 
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
-			render.JSON(w, r, response.Error("invalid request"))
+			//render.JSON(w, r, response.Error("invalid request"))
 			return
 		}
 
 		if err := validator.New().Struct(req); err != nil {
-			valErr := err.(validator.ValidationErrors)
-			render.JSON(w, r, response.ValidationError(valErr))
+			//valErr := err.(validator.ValidationErrors)
+			//render.JSON(w, r, response.ValidationError(valErr))
 
 			return
 		}
 
 		err = emailVerifCreator.VerifEmailCreate(req.Email)
 		if err != nil {
-			render.JSON(w, r, response.Error("internal error"))
+			//render.JSON(w, r, response.Error("internal error"))
 			return
 		}
 
-		render.JSON(w, r, response.OK())
+		//render.JSON(w, r, response.OK())
 
 	}
 }

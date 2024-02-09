@@ -2,33 +2,36 @@ package handlers
 
 import (
 	"log/slog"
-	"net/http"
+	"url-shortener/internal/service"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 type Handler struct {
-	Log slog.Logger
+	Log      slog.Logger
+	Services *service.Service
 }
 
-func NewHandler(log slog.Logger) *Handler {
+func NewHandler(log slog.Logger, services *service.Service) *Handler {
 	return &Handler{
-		Log: log,
+		Log:      log,
+		Services: services,
 	}
 }
 
 func (h *Handler) InitRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
+
 	router.Route("/api/v1", func(r chi.Router) {
-		r.Post("/test", func(w http.ResponseWriter, r *http.Request) {
-			render.JSON(w, r, "test work!")
-		})
-
-		//r.Post("/sign-up", h.Signup())
+		r.Post("/sign-up", h.Signup())
 		//r.Post("/sign-in")
-
 	})
 
 	return router

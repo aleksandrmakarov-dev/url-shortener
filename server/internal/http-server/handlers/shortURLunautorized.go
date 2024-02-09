@@ -28,7 +28,7 @@ func (h *Handler) ShortUrl(log slog.Logger, URLSaver URLSaver) http.HandlerFunc 
 		var req shortUrlReq
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
-			render.JSON(w, r, resp.Error("invalid request"))
+			//render.JSON(w, r, resp.Error("invalid request"))
 			return
 		}
 
@@ -40,13 +40,13 @@ func (h *Handler) ShortUrl(log slog.Logger, URLSaver URLSaver) http.HandlerFunc 
 
 		alias, err := URLSaver.SaveUrlUnauthorized(req.Url)
 		if err != nil {
-			render.JSON(w, r, resp.Error("internal error"))
+			///render.JSON(w, r, resp.Error("internal error"))
 			return
 		}
 
 		render.JSON(w, r, shortUrlRes{
-			Response: resp.OK(),
-			Alias:    alias,
+			//Response: resp.OK(),
+			Alias: alias,
 		})
 	}
 }
