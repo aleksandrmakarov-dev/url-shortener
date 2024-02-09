@@ -26,8 +26,6 @@ func main() {
 	//	Salt: cfg.Salt,
 	//}
 
-	//_ = storage
-
 	handler := handlers.Handler{}
 	router := handler.InitRoutes()
 
