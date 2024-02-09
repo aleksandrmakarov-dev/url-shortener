@@ -5,15 +5,15 @@ import (
 	"log/slog"
 	"net/http"
 	resp "url-shortener/internal/lib/api/response"
-	"url-shortener/internal/storage"
-	storagetypes "url-shortener/internal/storage/storageTypes"
+	"url-shortener/internal/models"
+	"url-shortener/internal/repository"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
 type URLGetter interface {
-	GetURL(alias string) (storagetypes.Url, error)
+	GetURL(alias string) (models.Url, error)
 }
 
 func Redirect(log slog.Logger, URLGetter URLGetter) http.HandlerFunc {
@@ -26,11 +26,11 @@ func Redirect(log slog.Logger, URLGetter URLGetter) http.HandlerFunc {
 
 		url, err := URLGetter.GetURL(alias)
 		if err != nil {
-			if errors.Is(err, storage.ErrorURLNotFound) {
+			if errors.Is(err, repository.ErrorURLNotFound) {
 				render.JSON(w, r, resp.Error("url does not exist"))
 				return
 			}
-			if errors.Is(err, storage.ErrorURLExpired) {
+			if errors.Is(err, repository.ErrorURLExpired) {
 				render.JSON(w, r, resp.Error("url expired"))
 				return
 			}

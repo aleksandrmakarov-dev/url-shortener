@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	resp "url-shortener/internal/lib/api/response"
-	"url-shortener/internal/storage"
+	"url-shortener/internal/repository"
 
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
@@ -52,7 +52,7 @@ func (h *Handler) Signup(log slog.Logger, userSignup UserSignup, passHasher Pass
 
 		err = userSignup.Register(req.Email, passHasher.GenHash(req.Pass))
 		if err != nil {
-			if errors.Is(err, storage.ErrorEmailExists) {
+			if errors.Is(err, repository.ErrorEmailExists) {
 				render.JSON(w, r, resp.Error("email already exists"))
 				return
 			}

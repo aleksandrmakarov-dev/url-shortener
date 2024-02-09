@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	resp "url-shortener/internal/lib/api/response"
-	"url-shortener/internal/storage"
+	"url-shortener/internal/repository"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -26,7 +26,7 @@ func (h *Handler) EmailVerification(log slog.Logger, emailVerifer EmailVerifer) 
 
 		err := emailVerifer.VerifEmail(verifToken)
 		if err != nil {
-			if errors.Is(err, storage.ErrorEmailVerifTokenExpired) {
+			if errors.Is(err, repository.ErrorEmailVerifTokenExpired) {
 				render.JSON(w, r, resp.Error("verification expired"))
 				return
 			}
