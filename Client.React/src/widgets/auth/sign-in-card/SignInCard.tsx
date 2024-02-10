@@ -1,10 +1,18 @@
 import { SignInForm } from "@/entities/auth";
+import { useSignInLocal } from "@/features/auth/sign-in";
 import { SignInDto } from "@/lib/dto/auth/sign-in.dto";
+import { FormAlert } from "@/shared/components/FormAlert";
 import { Button } from "@/shared/ui/button";
 
 export function SignInCard() {
+  const { mutate, isError, error, isSuccess, isPending } = useSignInLocal();
+
   const onSubmit = (data: SignInDto) => {
-    console.log(data);
+    mutate(data, {
+      onSuccess: (response) => {
+        console.log(response);
+      },
+    });
   };
 
   return (
@@ -21,7 +29,17 @@ export function SignInCard() {
           <span className="relative bg-white px-4">OR</span>
         </div>
       </div>
-      <SignInForm onSubmit={onSubmit} />
+      <FormAlert
+        className="mb-3"
+        isSuccess={isSuccess}
+        success={{
+          title: "Signed in to your account",
+          message: "You succesfully signed in to your account.",
+        }}
+        isError={isError}
+        error={error?.response?.data}
+      />
+      <SignInForm isLoading={isPending} onSubmit={onSubmit} />
       <div className="text-center mt-5">
         <p>
           Don't have an account?{" "}

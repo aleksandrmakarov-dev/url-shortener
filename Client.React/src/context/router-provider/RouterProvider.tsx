@@ -3,6 +3,7 @@ import MainLayout from "@/pages/(main)/layout";
 import AuthLayout from "@/pages/auth/layout";
 import SignInPage from "@/pages/auth/sign-in/page";
 import SignUpPage from "@/pages/auth/sign-up/page";
+import VerifyEmailPage from "@/pages/auth/verify-email/page";
 import FullPageWrapper from "@/shared/components/FullPageWrapper";
 import { Suspense } from "react";
 import {
@@ -21,6 +22,7 @@ const router = createBrowserRouter(
       <Route path="/auth" element={<AuthLayout />}>
         <Route path="sign-in" element={<SignInPage />} />
         <Route path="sign-up" element={<SignUpPage />} />
+        <Route path="verify-email" element={<VerifyEmailPage />} />
       </Route>
     </>
   )

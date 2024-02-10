@@ -1,10 +1,14 @@
 import { SignUpForm } from "@/entities/auth";
+import { useSignUpLocal } from "@/features/auth/sign-up";
 import { SignUpDto } from "@/lib/dto/auth/sign-up.dto";
+import { FormAlert } from "@/shared/components/FormAlert";
 import { Button } from "@/shared/ui/button";
 
 export function SignUpCard() {
+  const { mutate, isError, error, isSuccess, isPending } = useSignUpLocal();
+
   const onSubmit = (data: SignUpDto) => {
-    console.log(data);
+    mutate(data);
   };
 
   return (
@@ -21,7 +25,18 @@ export function SignUpCard() {
           <span className="relative bg-white px-4">OR</span>
         </div>
       </div>
-      <SignUpForm onSubmit={onSubmit} />
+      <FormAlert
+        className="mb-3"
+        isSuccess={isSuccess}
+        success={{
+          title: "Account created",
+          message:
+            "You have been send verification link to your email. Use it to verify your account.",
+        }}
+        isError={isError}
+        error={error?.response?.data}
+      />
+      <SignUpForm isLoading={isPending} onSubmit={onSubmit} />
       <div className="text-center mt-5">
         <p>
           Already have an account?{" "}
