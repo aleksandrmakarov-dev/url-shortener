@@ -3,7 +3,7 @@
 ## Contributers
 
 - Server.Golang - [Crysta1Cat](https://github.com/Crysta1Cat)
-- Client.React - [Alex](https://github.com/aleksandrmakarov-dev)
+- Client.React and Server.Csharp - [Alex](https://github.com/aleksandrmakarov-dev)
 
 ## Application Structure
 
