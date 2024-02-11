@@ -25,7 +25,7 @@ type signupReq struct {
 
 func (h *Handler) Signup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		opr := "internal.http-server.handlers.Signup"
+		const opr = "internal.http-server.handlers.Signup"
 
 		h.Log.With(slog.String("opr", opr))
 

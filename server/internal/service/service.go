@@ -11,6 +11,7 @@ type Auth interface {
 }
 
 type Url interface {
+	CreateShortUrl(u *models.Url) (string, error)
 }
 
 type Service struct {
@@ -21,5 +22,6 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Auth: NewAuthService(repos),
+		Url:  NewUrlService(repos),
 	}
 }

@@ -13,6 +13,7 @@ type Auth interface {
 }
 
 type Url interface {
+	CreateShortUrl(u *models.Url) (string, error)
 }
 
 type Repository struct {
