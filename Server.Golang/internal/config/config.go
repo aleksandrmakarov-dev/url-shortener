@@ -10,10 +10,13 @@ import (
 )
 
 type Config struct {
-	Env         string `yaml:"env" env-default:"local"`
-	StoragePath string `yaml:"storage_path" env-required:"true"`
-	Salt        string `yaml:"salt" env-default:"defsalt"`
-	HTTPServer  `yaml:"http_server"`
+	Env                  string        `yaml:"env" env-default:"local"`
+	StoragePath          string        `yaml:"storage_path" env-required:"true"`
+	Salt                 string        `yaml:"salt" env-default:"salt"`
+	SigningKey           string        `yaml:"signingKey" env-default:"signingKey"`
+	AccsesTokenTokenTTL  time.Duration `yaml:"accsesTokenTokenTTL" env-default:"3600s"`
+	RefreshTokenTokenTTL time.Duration `yaml:"refreshTokenTokenTTL" env-default:"720h"`
+	HTTPServer           `yaml:"http_server"`
 }
 
 type HTTPServer struct {
@@ -24,7 +27,6 @@ type HTTPServer struct {
 
 func LoadConfig() *Config {
 	opr := "internal.config.LoadConfig"
-
 	godotenv.Load(".env")
 
 	cfgPath := os.Getenv("CONFIG_PATH")

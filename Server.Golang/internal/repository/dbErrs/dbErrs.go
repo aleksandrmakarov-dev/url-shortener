@@ -3,8 +3,11 @@ package dberrs
 import "errors"
 
 var (
-	ErrorEmailExists            = errors.New("email already exists")
-	ErrorInvalidCredentials     = errors.New("Invalid credentials")
+	ErrorEmailExists        = errors.New("email already exists")
+	ErrorInvalidCredentials = errors.New("Invalid credentials")
+
+	ErrorInvalidOrExpToken = errors.New("Invalid or expired refresh token")
+
 	ErrorEmailDoesNotVerified   = errors.New("email does not verified")
 	ErrorEmailVerifTokenExpired = errors.New("email verif token expired")
 

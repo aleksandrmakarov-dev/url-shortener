@@ -4,27 +4,28 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"time"
 	resp "url-shortener/internal/lib/api/response"
 	"url-shortener/internal/lib/hashgen"
-	"url-shortener/internal/models"
 	dberrs "url-shortener/internal/repository/dbErrs"
 
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 )
 
-type signupReq struct {
+type signinReq struct {
 	Email string `json:"email" validate:"required,email"`
 	Pass  string `json:"password" validate:"required"`
 }
 
-func (h *Handler) Signup() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		const opr = "internal.http-server.handlers.Signup"
-		h.Log.With(slog.String("opr", opr))
+type signinRes struct {
+	AccsesToken string
+	UserID      int
+}
 
-		var req signupReq
+func (h *Handler) Singin() http.HandlerFunc {
+	const opr = "internal.http-server.handlers.Singin"
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req signinReq
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -41,28 +42,37 @@ func (h *Handler) Signup() http.HandlerFunc {
 
 		hs := hashgen.New(h.Cfg.Salt)
 
-		user := models.User{
-			Email:         req.Email,
-			PassHash:      hs.GenHash(req.Pass),
-			CreatedAt:     time.Now(),
-			EmailVerified: false,
-		}
+		session, accToken, err := h.Services.Auth.Signin(
+			req.Email,
+			hs.GenHash(req.Pass),
+			h.Cfg.SigningKey,
+			h.Cfg.RefreshTokenTokenTTL,
+			h.Cfg.AccsesTokenTokenTTL,
+		)
 
-		err = h.Services.CreateUser(&user)
 		if err != nil {
-			if errors.Is(err, dberrs.ErrorEmailExists) {
-				w.WriteHeader(http.StatusConflict)
-				render.JSON(w, r, resp.ErrorResp(http.StatusConflict, resp.ErrConflict, "User with this email already exists"))
+			if errors.Is(err, dberrs.ErrorInvalidCredentials) {
+				w.WriteHeader(http.StatusUnauthorized)
+				render.JSON(w, r, resp.ErrorResp(http.StatusUnauthorized, resp.ErrUnauth, "Invalid credentials"))
 				return
 			}
-
 			w.WriteHeader(http.StatusInternalServerError)
 			render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal Server Error"))
 			h.Log.Error("Internal error", slog.String("opr", opr), slog.String("err", err.Error()))
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-		return
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refreshToken",
+			Value:    session.RefreshToken,
+			HttpOnly: true,
+			Expires:  session.ExpiresAt,
+		})
+
+		render.JSON(w, r, signinRes{
+			AccsesToken: accToken,
+			UserID:      session.UserID,
+		})
+
 	}
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"time"
 
 	"url-shortener/internal/models"
 	"url-shortener/internal/repository/sqlite"
@@ -10,9 +11,12 @@ import (
 type Auth interface {
 	CreateUser(u *models.User) error
 	GetUser(email, passHash string) (models.User, error)
+	GenRefreshToken(u *models.User, tokenExp time.Duration) (models.Session, error)
+	CheckRefreshToken(token string) (int, error)
 }
 
 type Url interface {
+	CreateShortUrl(u *models.Url) (string, error)
 }
 
 type Repository struct {

@@ -29,7 +29,7 @@ func main() {
 	//
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
-	handler := handlers.NewHandler(*log, services)
+	handler := handlers.NewHandler(*log, services, *cfg)
 	router := handler.InitRoutes()
 
 	log.Info("Starting server", slog.String("addr", cfg.Address))

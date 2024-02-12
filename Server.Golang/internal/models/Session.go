@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type Sessions struct {
+type Session struct {
 	ID           int
 	UserID       int
 	RefreshToken string

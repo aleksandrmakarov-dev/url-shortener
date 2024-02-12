@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
+	refreshtoken "url-shortener/internal/lib/random/refreshToken"
 	"url-shortener/internal/models"
 	dberrs "url-shortener/internal/repository/dbErrs"
 
@@ -43,7 +45,7 @@ func (r *AuthSqlite) CreateUser(u *models.User) error {
 func (r *AuthSqlite) GetUser(email, passHash string) (models.User, error) {
 	const opr = "repository.sqlite.authSqlite.GetUser"
 
-	stmt, err := r.db.Prepare("SELECT ID, Email, PassHash, CreatedAt, EmailVerified FROM users WHERE Email = ? AND PassHash = ?")
+	stmt, err := r.db.Prepare("SELECT ID, Email, passwordHash, CreatedAt, EmailVerified FROM Users WHERE Email = ? AND passwordHash = ?")
 	if err != nil {
 		return models.User{}, fmt.Errorf("%s: %w", opr, err)
 	}
@@ -59,4 +61,57 @@ func (r *AuthSqlite) GetUser(email, passHash string) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *AuthSqlite) GenRefreshToken(u *models.User, tokenExp time.Duration) (models.Session, error) {
+	const opr = "repository.sqlite.authSqlite.GenRefreshToken"
+	reftoken, err := refreshtoken.GenerateRefreshToken()
+	if err != nil {
+		return models.Session{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	session := models.Session{
+		UserID:       u.ID,
+		RefreshToken: reftoken,
+		ExpiresAt:    time.Now().Add(tokenExp),
+	}
+
+	stmt, err := r.db.Prepare("INSERT INTO Sessions(userId,refreshToken,expiresAt) VALUES(?,?,?)")
+	if err != nil {
+		return models.Session{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(session.UserID, session.RefreshToken, session.ExpiresAt)
+	if err != nil {
+		return models.Session{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return session, nil
+}
+
+func (r *AuthSqlite) CheckRefreshToken(token string) (int, error) {
+	const opr = "repository.sqlite.authSqlite.RefreshToken"
+
+	stmt, err := r.db.Prepare("SELECT userId, expiresAt FROM Sessions WHERE refreshToken = ?")
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	session := models.Session{
+		RefreshToken: token,
+	}
+
+	err = stmt.QueryRow(token).Scan(&session.UserID, &session.ExpiresAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
+		}
+		return 0, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	if session.ExpiresAt.Compare(time.Now()) == -1 {
+		return 0, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
+	}
+
+	return session.UserID, nil
 }
