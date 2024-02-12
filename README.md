@@ -113,7 +113,8 @@ For endpoints requiring authentication, include an access token in the request h
 - **Response Body:**
 ```json
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user_id": "ab1cd2ef3"
 }
 ```
 
@@ -173,11 +174,7 @@ For endpoints requiring authentication, include an access token in the request h
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": 123,
-    "email": "user@example.com",
-    "name": "User Name"
-  }
+  "user_id": "ab1cd2ef3"
 }
 ```
 - **Response Body (Error):**

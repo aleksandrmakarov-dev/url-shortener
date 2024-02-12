@@ -1,0 +1,10 @@
+env: "local"
+storage_path: "./storage/str.db"
+salt: "salt"
+signingKey: "signingKey"
+accsesTokenTokenTTL: 3600s
+refreshTokenTokenTTL: 17280s
+http_server:
+  address: "localhost:8080"
+  timeout: "5s"
+  idle_timeout: "60s"

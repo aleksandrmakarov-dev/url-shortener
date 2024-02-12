@@ -14,10 +14,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface SignInFormProps {
+  isLoading?: boolean;
   onSubmit: (data: SignInDto) => void;
 }
 
-export function SignInForm({ onSubmit }: SignInFormProps) {
+export function SignInForm({ isLoading, onSubmit }: SignInFormProps) {
   const [show, setShow] = useState<boolean>(false);
 
   const form = useForm<SignInDto>({
@@ -73,7 +74,9 @@ export function SignInForm({ onSubmit }: SignInFormProps) {
             Forgot Password?
           </a>
         </div>
-        <Button className="w-full">Sign in</Button>
+        <Button className="w-full" loading={isLoading}>
+          Sign in
+        </Button>
       </form>
     </Form>
   );
