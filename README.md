@@ -1,5 +1,12 @@
 # App
 
+## Contributers
+
+- Server.Golang - [Crysta1Cat](https://github.com/Crysta1Cat)
+- Client.React and Server.Csharp - [Alex](https://github.com/aleksandrmakarov-dev)
+
+## Application Structure
+
 ```
 ------------------                         --------------------
 | React Client  | ------ HTTP Requests --> |    Web API        |

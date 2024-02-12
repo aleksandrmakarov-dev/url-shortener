@@ -34,7 +34,7 @@ export default function MainLayout() {
           </div>
           <div className="space-x-2">
             <Button size="sm" variant="ghost" asChild>
-              <a href="/auth/sign-up">Sign up Free</a>
+              <a href="/auth/sign-up">Sign up</a>
             </Button>
             <Button size="sm" asChild>
               <a href="/auth/sign-in">Sign in</a>
