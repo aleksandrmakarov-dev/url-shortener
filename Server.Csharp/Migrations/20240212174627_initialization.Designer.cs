@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Csharp.Data.Database;
 
@@ -10,9 +11,11 @@ using Server.Csharp.Data.Database;
 namespace Server.Csharp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240212174627_initialization")]
+    partial class initialization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
@@ -100,10 +103,10 @@ namespace Server.Csharp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("EmailVerificationToken")
+                    b.Property<DateTime?>("EmailVerificationExpiresAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("EmailVerificationTokenExpiresAt")
+                    b.Property<string>("EmailVerificationToken")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("EmailVerifiedAt")

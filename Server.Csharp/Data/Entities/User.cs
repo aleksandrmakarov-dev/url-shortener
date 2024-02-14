@@ -6,8 +6,8 @@
         public string PasswordHash { get; set; }
         public DateTime? EmailVerifiedAt { get; set; }
         public string? EmailVerificationToken { get; set; }
-        public DateTime? EmailVerificationExpiresAt { get; set; }
-        public ICollection<Token> Tokens { get; set; } = new List<Token>();
+        public DateTime? EmailVerificationTokenExpiresAt { get; set; }
+        public ICollection<Session> Sessions { get; set; } = new List<Session>();
         public ICollection<ShortUrl> ShortUrls { get; set; } = new List<ShortUrl>();
     }
 }

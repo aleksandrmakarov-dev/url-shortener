@@ -4,16 +4,22 @@ import { AxiosError } from "axios";
 import axios from "@/lib/axios";
 import { ErrorResponseDto } from "@/lib/dto/common/error-response.dto";
 import { authKeys } from "@/entities/auth/api";
+import { MessageResponseDto } from "@/lib/dto/common/message-response.dto";
 
 async function signUpLocal(dto: SignUpDto) {
-  await axios.post("/auth/sign-up", dto);
+  const response = await axios.post<MessageResponseDto>("/auth/sign-up", dto);
+  return response.data;
 }
 
 export const useSignUpLocal = () => {
-  return useMutation<unknown, AxiosError<ErrorResponseDto>, SignUpDto>({
+  return useMutation<
+    MessageResponseDto,
+    AxiosError<ErrorResponseDto>,
+    SignUpDto
+  >({
     mutationKey: authKeys.mutations.signUpLocal(),
     mutationFn: async (data) => {
-      await signUpLocal(data);
+      return await signUpLocal(data);
     },
   });
 };

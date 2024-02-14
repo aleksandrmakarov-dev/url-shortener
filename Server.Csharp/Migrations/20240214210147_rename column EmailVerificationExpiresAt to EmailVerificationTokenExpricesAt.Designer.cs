@@ -11,8 +11,8 @@ using Server.Csharp.Data.Database;
 namespace Server.Csharp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240212171120_init")]
-    partial class init
+    [Migration("20240214210147_rename column EmailVerificationExpiresAt to EmailVerificationTokenExpricesAt")]
+    partial class renamecolumnEmailVerificationExpiresAttoEmailVerificationTokenExpricesAt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,13 +29,39 @@ namespace Server.Csharp.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RoleName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Server.Csharp.Data.Models.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("RefreshTokenExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("Server.Csharp.Data.Models.ShortUrl", b =>
@@ -64,32 +90,6 @@ namespace Server.Csharp.Migrations
                     b.ToTable("ShortUrl");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.Token", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("RefreshTokenExpiresAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Tokens");
-                });
-
             modelBuilder.Entity("Server.Csharp.Data.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -103,10 +103,10 @@ namespace Server.Csharp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("EmailVerificationExpiresAt")
+                    b.Property<string>("EmailVerificationToken")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("EmailVerificationToken")
+                    b.Property<DateTime?>("EmailVerificationTokenExpiresAt")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("EmailVerifiedAt")
@@ -126,22 +126,22 @@ namespace Server.Csharp.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Server.Csharp.Data.Models.Session", b =>
+                {
+                    b.HasOne("Server.Csharp.Data.Models.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Server.Csharp.Data.Models.ShortUrl", b =>
                 {
                     b.HasOne("Server.Csharp.Data.Models.User", "User")
                         .WithMany("ShortUrls")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Server.Csharp.Data.Models.Token", b =>
-                {
-                    b.HasOne("Server.Csharp.Data.Models.User", "User")
-                        .WithMany("Tokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -160,9 +160,9 @@ namespace Server.Csharp.Migrations
 
             modelBuilder.Entity("Server.Csharp.Data.Models.User", b =>
                 {
-                    b.Navigation("ShortUrls");
+                    b.Navigation("Sessions");
 
-                    b.Navigation("Tokens");
+                    b.Navigation("ShortUrls");
                 });
 #pragma warning restore 612, 618
         }

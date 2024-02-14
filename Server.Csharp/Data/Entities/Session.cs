@@ -2,7 +2,7 @@
 
 namespace Server.Csharp.Data.Models
 {
-    public class Token:DomainObject
+    public class Session:DomainObject
     {
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiresAt { get; set; }
