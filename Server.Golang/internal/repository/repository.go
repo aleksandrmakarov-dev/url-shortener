@@ -17,6 +17,7 @@ type Auth interface {
 
 type Url interface {
 	CreateShortUrl(u *models.Url) (string, error)
+	GetUrl(alias string) (models.Url, error)
 }
 
 type Repository struct {

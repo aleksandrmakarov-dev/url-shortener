@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	randomalias "url-shortener/internal/lib/random/randomAlias"
 	"url-shortener/internal/models"
@@ -62,6 +63,36 @@ func (r *UrlSqlite) CreateShortUrl(u *models.Url) (string, error) {
 	}
 
 	return u.Alias, nil
+}
+
+func (r *UrlSqlite) GetUrl(alias string) (models.Url, error) {
+	const opr = "repository.sqlite.authSqlite.CreateShortUrl"
+	stmt, err := r.db.Prepare("SELECT id,alias,redirect,userId,expiresAt,navigations FROM Urls WHERE alias = ?")
+	if err != nil {
+		return models.Url{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	var url models.Url
+
+	err = stmt.QueryRow(alias).Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.ExpiresAt, &url.Navigations)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Url{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		}
+		return models.Url{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	if url.IsExpired() {
+		r.DeleteUrlByID(url.ID)
+		return models.Url{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorURLExpired)
+	}
+
+	return url, nil
+}
+
+func (r *UrlSqlite) DeleteUrlByID(id int) error {
+	//TODO
+	return nil
 }
 
 func (r *UrlSqlite) checkAliasExists(alias string) (bool, error) {
