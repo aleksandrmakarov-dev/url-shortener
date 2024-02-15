@@ -43,7 +43,7 @@ func (r *UrlSqlite) CreateShortUrl(u *models.Url) (string, error) {
 
 			if !existingAlias {
 				u.Alias = alias
-				_, err = stmt.Exec(u.Alias, u.RedirectUrl, u.ExpiresAt, u.Navigations)
+				_, err = stmt.Exec(u.Alias, u.RedirectUrl, u.UserID, u.ExpiresAt, u.Navigations)
 				if err != nil {
 					return "", fmt.Errorf("%s: %w", opr, err)
 				}
