@@ -1,11 +1,17 @@
 package service
 
 import (
+	"errors"
 	"time"
 	"url-shortener/internal/models"
 	"url-shortener/internal/repository"
 
 	"github.com/dgrijalva/jwt-go"
+)
+
+var (
+	ErrorInvalidSigningMethod = errors.New("invalid signing method")
+	ErrorTokenFormat          = errors.New("Error token format")
 )
 
 type tokenClaims struct {
@@ -15,6 +21,10 @@ type tokenClaims struct {
 
 type AuthService struct {
 	repo repository.Auth
+}
+
+type AccessTokenData struct {
+	UserID int
 }
 
 func NewAuthService(repo repository.Auth) *AuthService {
@@ -77,4 +87,25 @@ func (s *AuthService) RefreshToken(token string, signingKey string, AccessTokenE
 
 	return userId, AccessTokenString, nil
 
+}
+
+func (s *AuthService) ParseToken(token string, signingKey string) (AccessTokenData, error) {
+	t, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrorInvalidSigningMethod
+		}
+
+		return []byte(signingKey), nil
+	})
+
+	if err != nil {
+		return AccessTokenData{}, err
+	}
+
+	claims, ok := t.Claims.(*tokenClaims)
+	if !ok {
+		return AccessTokenData{}, ErrorTokenFormat
+	}
+
+	return AccessTokenData{UserID: claims.UserId}, nil
 }

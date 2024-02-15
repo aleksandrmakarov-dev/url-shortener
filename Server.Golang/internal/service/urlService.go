@@ -16,5 +16,9 @@ func NewUrlService(repo repository.Url) *UrlService {
 }
 
 func (s *UrlService) CreateShortUrl(u *models.Url) (string, error) {
-	return s.CreateShortUrl(u)
+	return s.repo.CreateShortUrl(u)
+}
+
+func (s *UrlService) GetUrl(alias string) (models.Url, error) {
+	return s.repo.GetUrl(alias)
 }

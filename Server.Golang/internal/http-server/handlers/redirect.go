@@ -1,41 +1,48 @@
 package handlers
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
-	"url-shortener/internal/models"
+	resp "url-shortener/internal/lib/api/response"
+	dberrs "url-shortener/internal/repository/dbErrs"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 )
 
-type URLGetter interface {
-	GetURL(alias string) (models.Url, error)
-}
-
-func Redirect(log slog.Logger, URLGetter URLGetter) http.HandlerFunc {
+func (h *Handler) Redirect() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		const opr = "internal.http-server.handlers.Redirect"
 		alias := chi.URLParam(r, "alias")
 		if alias == "" {
-			//render.JSON(w, r, resp.Error("not found"))
+			w.WriteHeader(http.StatusNotFound)
+			render.JSON(w, r, resp.ErrorResp(http.StatusNotFound, resp.ErrNotFound, "Url does not exist"))
 			return
 		}
 
-		url, err := URLGetter.GetURL(alias)
+		url, err := h.Services.Url.GetUrl(alias)
 		if err != nil {
-			//if errors.Is(err, repository.ErrorURLNotFound) {
-			//	render.JSON(w, r, resp.Error("url does not exist"))
-			//	return
-			//}
-			//if errors.Is(err, repository.ErrorURLExpired) {
-			//	render.JSON(w, r, resp.Error("url expired"))
-			//	return
-			//}
-			//log.Error("internal err", slog.String("err", err.Error()))
-			//render.JSON(w, r, resp.Error("internal error"))
+			if errors.Is(err, dberrs.ErrorURLNotFound) {
+				w.WriteHeader(http.StatusNotFound)
+				render.JSON(w, r, resp.ErrorResp(http.StatusNotFound, resp.ErrNotFound, "Url does not exist"))
+				return
+			}
+
+			if errors.Is(err, dberrs.ErrorURLExpired) {
+				w.WriteHeader(http.StatusNotFound)
+				render.JSON(w, r, resp.ErrorResp(http.StatusNotFound, resp.ErrNotFound, "Url expired"))
+				return
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal Server Error"))
+			h.Log.Error("Internal error", slog.String("opr", opr), slog.String("err", err.Error()))
+			return
 		}
 
-		//log.Info("test", slog.String("url", url.RedirectUrl))
-		http.Redirect(w, r, url.RedirectUrl, http.StatusFound)
+		//Логика добавления статистики после перехода todo
 
+		http.Redirect(w, r, url.RedirectUrl, http.StatusFound)
 	}
 }
