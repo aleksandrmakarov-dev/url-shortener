@@ -5,7 +5,7 @@ using Server.Csharp.Business.Models.Common;
 using Server.Csharp.Business.Models.Requests;
 using Server.Csharp.Business.Models.Responses;
 using Server.Csharp.Data.Database;
-using Server.Csharp.Data.Models;
+using Server.Csharp.Data.Entities;
 using Server.Csharp.Data.Repositories;
 using Server.Csharp.Presentation.Exceptions;
 
@@ -17,18 +17,23 @@ namespace Server.Csharp.Business.Services
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
         private readonly IPasswordService _passwordService;
+        private readonly ISessionsService _sessionsService;
+        private readonly ISessionsRepository _sessionsRepository;
 
         public EfAuthService(
             IMapper mapper, 
             ITokenService tokenService, 
             IEmailService emailService, 
             IUsersRepository usersRepository, 
-            IPasswordService passwordService)
+            IPasswordService passwordService, 
+            ISessionsService sessionsService, ISessionsRepository sessionsRepository)
         {
             _mapper = mapper;
             _tokenService = tokenService;
             _usersRepository = usersRepository;
             _passwordService = passwordService;
+            _sessionsService = sessionsService;
+            _sessionsRepository = sessionsRepository;
         }
 
         public async Task<EmailVerificationToken> SignUpAsync(SignUpRequest request)
@@ -72,7 +77,7 @@ namespace Server.Csharp.Business.Services
 
             if (!isPasswordCorrect)
             {
-                throw new UnauthorizedException("Invalid email or password");
+                throw new UnauthorizedException("Invalid email or password.");
             }
 
             if (foundUser.EmailVerifiedAt == null)
@@ -80,10 +85,13 @@ namespace Server.Csharp.Business.Services
                 throw new UnauthorizedException("You must verify your email address before signing in.");
             }
 
+            Session createdSession = await _sessionsService.CreateAsync(foundUser.Id);
+
             TokenResponse tokenResponse = new TokenResponse
             {
                 AccessToken = _tokenService.GetJwtToken(foundUser),
-                RefreshToken = _tokenService.GetToken(256)
+                RefreshToken = createdSession.RefreshToken,
+                UserId = foundUser.Id
             };
 
             return tokenResponse;
@@ -96,7 +104,7 @@ namespace Server.Csharp.Business.Services
 
             if (foundUser == null)
             {
-                throw new NotFoundException($"Invalid email or token");
+                throw new NotFoundException($"Invalid email or token.");
             }
 
             foundUser.EmailVerifiedAt = DateTime.Now;
@@ -104,6 +112,36 @@ namespace Server.Csharp.Business.Services
             foundUser.EmailVerificationTokenExpiresAt = null;
 
             await _usersRepository.UpdateAsync(foundUser);
+        }
+
+        public async Task<SessionResponse> RefreshTokenAsync(RefreshTokenRequest request)
+        {
+            Session? foundSession = await _sessionsRepository.GetByRefreshTokenAsync(request.Token);
+
+            if (foundSession == null)
+            {
+                throw new UnauthorizedException("Invalid refresh token.");
+            }
+
+            if (foundSession.IsExpired)
+            {
+                throw new UnauthorizedException("Session expired. Try sing in with credentials.");
+            }
+
+            User? foundUser = await _usersRepository.GetByIdAsync(foundSession.UserId);
+
+            if (foundUser == null)
+            {
+                throw new NotFoundException($"User '{foundSession.UserId.ToString()}' not found.");
+            }
+
+            SessionResponse response = new SessionResponse
+            {
+                AccessToken = _tokenService.GetJwtToken(foundUser),
+                UserId = foundUser.Id
+            };
+
+            return response;
         }
     }
 }

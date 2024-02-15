@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Server.Csharp.Business.Models.Responses;
-using Server.Csharp.Data.Models;
+using Server.Csharp.Data.Entities;
 using Server.Csharp.Data.Repositories;
 
 namespace Server.Csharp.Business.Services;
@@ -25,7 +25,7 @@ public class EfUsersService:IUsersService
         return default(TModel);
     }
 
-    public async Task<IEnumerable<TModel>> GetAllAsync<TModel>()
+    public async Task<IEnumerable<TModel>> GetAllAsync<TModel>() 
     {
         IEnumerable<TModel> foundUsers = await _usersRepository.GetAllAsync<TModel>();
 

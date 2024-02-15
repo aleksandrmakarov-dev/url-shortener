@@ -17,7 +17,7 @@ namespace Server.Csharp.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.Role", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,7 +35,7 @@ namespace Server.Csharp.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.Session", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.Session", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace Server.Csharp.Migrations
                     b.ToTable("Sessions");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.ShortUrl", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.ShortUrl", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,10 +84,10 @@ namespace Server.Csharp.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ShortUrl");
+                    b.ToTable("ShortUrls");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.User", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -113,7 +113,7 @@ namespace Server.Csharp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("RoleId")
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -123,9 +123,9 @@ namespace Server.Csharp.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.Session", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.Session", b =>
                 {
-                    b.HasOne("Server.Csharp.Data.Models.User", "User")
+                    b.HasOne("Server.Csharp.Data.Entities.User", "User")
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -134,28 +134,32 @@ namespace Server.Csharp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.ShortUrl", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.ShortUrl", b =>
                 {
-                    b.HasOne("Server.Csharp.Data.Models.User", "User")
+                    b.HasOne("Server.Csharp.Data.Entities.User", "User")
                         .WithMany("ShortUrls")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.User", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.User", b =>
                 {
-                    b.HasOne("Server.Csharp.Data.Models.Role", null)
+                    b.HasOne("Server.Csharp.Data.Entities.Role", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId");
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.Role", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Server.Csharp.Data.Models.User", b =>
+            modelBuilder.Entity("Server.Csharp.Data.Entities.User", b =>
                 {
                     b.Navigation("Sessions");
 

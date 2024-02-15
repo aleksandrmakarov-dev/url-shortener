@@ -1,5 +1,5 @@
 ﻿using Server.Csharp.Business.Models.Common;
-using Server.Csharp.Data.Models;
+using Server.Csharp.Data.Entities;
 
 namespace Server.Csharp.Business.Services
 {

@@ -1,4 +1,4 @@
-﻿namespace Server.Csharp.Data.Models
+﻿namespace Server.Csharp.Data.Entities
 {
     public class ShortUrl:DomainObject
     {

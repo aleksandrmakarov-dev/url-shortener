@@ -9,5 +9,6 @@ namespace Server.Csharp.Business.Services
         Task<EmailVerificationToken> SignUpAsync(SignUpRequest request);
         Task<TokenResponse> SignInAsync(SignInRequest request);
         Task VerifyEmailAsync(VerifyEmailRequest request);
+        Task<SessionResponse> RefreshTokenAsync(RefreshTokenRequest request);
     }
 }

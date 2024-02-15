@@ -1,23 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Server.Csharp.Data.Database;
+using Server.Csharp.Data.Entities;
 using Server.Csharp.Data.Exceptions;
-using Server.Csharp.Data.Models;
 
 namespace Server.Csharp.Data.Repositories;
 
-public class GenericRepository<TModel>:IGenericRepository<TModel> where TModel : DomainObject
+public class GenericRepository<TModel>:IGenericRepository<TModel> where TModel : ObjectId
 {
-    protected readonly ApplicationDbContext _context;
+    protected readonly ApplicationDbContext Context;
+    protected readonly IMapper Mapper;
 
-    public GenericRepository(ApplicationDbContext context)
+    public GenericRepository(ApplicationDbContext context, IMapper mapper)
     {
-        _context = context;
+        Context = context;
+        Mapper = mapper;
     }
 
 
-    public async Task<TModel> CreateAsync(TModel model)
+    public virtual async Task<TModel> CreateAsync(TModel model)
     {
-        await _context.Set<TModel>().AddAsync(model);
+        await Context.Set<TModel>().AddAsync(model);
         bool isCreated = await SaveChangesAsync();
 
         if (!isCreated) throw new DataException($"Exception occured while creating {nameof(TModel)} in database");
@@ -25,9 +29,9 @@ public class GenericRepository<TModel>:IGenericRepository<TModel> where TModel :
         return model;
     }
 
-    public async Task<TModel> UpdateAsync(TModel? model)
+    public virtual async Task<TModel> UpdateAsync(TModel model)
     {
-        _context.Set<TModel>().Update(model);
+        Context.Set<TModel>().Update(model);
         bool isUpdated = await SaveChangesAsync();
 
         if (!isUpdated) throw new DataException($"Exception occured while updating {nameof(TModel)} in database");
@@ -35,28 +39,39 @@ public class GenericRepository<TModel>:IGenericRepository<TModel> where TModel :
         return model;
     }
 
-    public async Task DeleteAsync(TModel model)
+    public virtual async Task DeleteAsync(TModel model)
     {
-        _context.Set<TModel>().Remove(model);
+        Context.Set<TModel>().Remove(model);
         bool isDeleted = await SaveChangesAsync();
 
         if (!isDeleted) throw new DataException($"Exception occured while deleting {nameof(TModel)} in database");
 
     }
 
-    public async Task<TModel?> GetByIdAsync(Guid id)
+    public virtual async Task<TModel?> GetByIdAsync(Guid id)
     {
-        return await _context.Set<TModel>().FirstOrDefaultAsync(e => e.Id.Equals(id));
+        return await Context.Set<TModel>().FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task<IEnumerable<TModel>> GetAllAsync()
+    public virtual async Task<TMapModel?> GetByIdAsync<TMapModel>(Guid id) where TMapModel : ObjectId
     {
-        return await _context.Set<TModel>().ToListAsync();
+        return await Context.Set<TModel>().ProjectTo<TMapModel>(Mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(e => e.Id == id);
+    }
+
+    public virtual async Task<IEnumerable<TModel>> GetAllAsync()
+    {
+        return await Context.Set<TModel>().ToListAsync();
+    }
+
+    public virtual async Task<IEnumerable<TMapModel>> GetAllAsync<TMapModel>()
+    {
+        return await Context.Set<TModel>().ProjectTo<TMapModel>(Mapper.ConfigurationProvider).ToListAsync();
     }
 
     private async Task<bool> SaveChangesAsync()
     {
-        int rowsChanged = await _context.SaveChangesAsync();
+        int rowsChanged = await Context.SaveChangesAsync();
 
         return rowsChanged > 0;
     }

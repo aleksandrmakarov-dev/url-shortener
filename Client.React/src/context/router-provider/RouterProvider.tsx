@@ -1,10 +1,13 @@
+import AccessDeniedPage from "@/pages/(main)/access-denied/page";
 import HomePage from "@/pages/(main)/home/page";
 import MainLayout from "@/pages/(main)/layout";
 import AuthLayout from "@/pages/auth/layout";
 import SignInPage from "@/pages/auth/sign-in/page";
+import SignOutPage from "@/pages/auth/sign-out/page";
 import SignUpPage from "@/pages/auth/sign-up/page";
 import VerifyEmailPage from "@/pages/auth/verify-email/page";
 import FullPageWrapper from "@/shared/components/FullPageWrapper";
+import { RoutePublicGuard } from "@/shared/components/RoutePublicGuard";
 import { Suspense } from "react";
 import {
   createBrowserRouter,
@@ -18,11 +21,15 @@ const router = createBrowserRouter(
     <>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="/access-denied" element={<AccessDeniedPage />} />
       </Route>
       <Route path="/auth" element={<AuthLayout />}>
-        <Route path="sign-in" element={<SignInPage />} />
-        <Route path="sign-up" element={<SignUpPage />} />
+        <Route element={<RoutePublicGuard />}>
+          <Route path="sign-in" element={<SignInPage />} />
+          <Route path="sign-up" element={<SignUpPage />} />
+        </Route>
         <Route path="verify-email" element={<VerifyEmailPage />} />
+        <Route path="sign-out" element={<SignOutPage />} />
       </Route>
     </>
   )

@@ -1,16 +1,22 @@
+import { useSession } from "@/context/session-provider/SessionProvider";
 import { SignInForm } from "@/entities/auth";
 import { useSignInLocal } from "@/features/auth/sign-in";
 import { SignInDto } from "@/lib/dto/auth/sign-in.dto";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { Button } from "@/shared/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export function SignInCard() {
   const { mutate, isError, error, isSuccess, isPending } = useSignInLocal();
+  const { setToken } = useSession();
+
+  const navigate = useNavigate();
 
   const onSubmit = (data: SignInDto) => {
     mutate(data, {
       onSuccess: (response) => {
-        console.log(response);
+        setToken(response);
+        navigate("/", { replace: true });
       },
     });
   };

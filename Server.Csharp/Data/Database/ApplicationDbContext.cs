@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Server.Csharp.Data.Models;
+using Server.Csharp.Data.Entities;
 
 namespace Server.Csharp.Data.Database
 {
     public class ApplicationDbContext:DbContext
     {
-        public DbSet<ShortUrl> ShortUrl { get; set; }
+        public DbSet<ShortUrl> ShortUrls { get; set; }
         public DbSet<User> Users { get; set; }  
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Role> Roles { get; set; } 

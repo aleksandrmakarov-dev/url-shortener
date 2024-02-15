@@ -1,4 +1,4 @@
-﻿using Server.Csharp.Data.Models;
+﻿using Server.Csharp.Data.Entities;
 
 namespace Server.Csharp.Data.Repositories
 {
@@ -6,8 +6,6 @@ namespace Server.Csharp.Data.Repositories
     {
         Task<User?> GetByEmailAndVerificationTokenAsync(string email,string token);
         Task<User?> GetByEmailAsync(string email);
-        Task<User?> GetByRefreshTokenAsync(string token);
         Task<bool> IsExistsByEmailAsync(string email);
-        Task<IEnumerable<TModel>> GetAllAsync<TModel>();
     }
 }

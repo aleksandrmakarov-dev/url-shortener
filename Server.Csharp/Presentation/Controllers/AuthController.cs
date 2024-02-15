@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Server.Csharp.Business.Common;
 using Server.Csharp.Business.Models;
 using Server.Csharp.Business.Models.Common;
 using Server.Csharp.Business.Models.Requests;
 using Server.Csharp.Business.Models.Responses;
 using Server.Csharp.Business.Services;
+using Server.Csharp.Presentation.Attributes;
+using Server.Csharp.Presentation.Common;
+using Server.Csharp.Presentation.Exceptions;
 
 namespace Server.Csharp.Presentation.Controllers
 {
@@ -21,6 +25,7 @@ namespace Server.Csharp.Presentation.Controllers
             _emailService = emailService;
         }
 
+        [RoleAuthorize(Roles.Admin)]
         [HttpGet]
         public async Task<IActionResult> Test()
         {
@@ -49,15 +54,15 @@ namespace Server.Csharp.Presentation.Controllers
             TokenResponse tokens = await _authService.SignInAsync(request);
 
             // Adding cookie to the response
-            HttpContext.Response.Cookies.Append("refresh-token",tokens.RefreshToken,new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
-            });
+            HttpContext.Response.Cookies.Append(
+                Constants.RefreshTokenCookie,
+                tokens.RefreshToken,
+                Constants.CookieOptions(DateTime.UtcNow.AddMinutes(Constants.RefreshTokenExpires)));
 
-            SignInResponse response = new SignInResponse
+            SessionResponse response = new SessionResponse()
             {
-                AccessToken = tokens.AccessToken
+                AccessToken = tokens.AccessToken,
+                UserId = tokens.UserId 
             };
 
             return Ok(response);
@@ -69,6 +74,32 @@ namespace Server.Csharp.Presentation.Controllers
             await _authService.VerifyEmailAsync(request);
 
             return Ok(new MessageResponse("Email verification","Email has been successfully verified."));
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            string? refreshToken = HttpContext.Request.Cookies[Constants.RefreshTokenCookie];
+
+            if (refreshToken == null)
+            {
+                throw new BadRequestException("Refresh token not provided.");
+            }
+
+            SessionResponse response = await _authService.RefreshTokenAsync(new RefreshTokenRequest
+            {
+                Token = refreshToken
+            });
+
+            return Ok(response);
+        }
+
+        [HttpDelete("sign-out")]
+        public async Task<IActionResult> SignOut()
+        {
+            HttpContext.Response.Cookies.Delete(Constants.RefreshTokenCookie,Constants.CookieOptions());
+
+            return NoContent();
         }
     }
 }

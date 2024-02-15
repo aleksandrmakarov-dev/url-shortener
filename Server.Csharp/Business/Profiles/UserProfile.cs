@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Server.Csharp.Business.Models.Responses;
-using Server.Csharp.Data.Models;
+using Server.Csharp.Data.Entities;
 
 namespace Server.Csharp.Business.Profiles
 {

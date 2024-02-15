@@ -28,13 +28,17 @@ namespace Server.Csharp.Presentation.Middlewares
 
                 switch (ex)
                 {
+                    case BadRequestException:
+                        errorResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                        errorResponse.Error = "400 Bad Request";
+                        break;
                     case UnauthorizedException:
                         errorResponse.StatusCode = (int)HttpStatusCode.Unauthorized;
                         errorResponse.Error = "401 Unauthorized";
                         break;
                     case NotFoundException:
                         errorResponse.StatusCode = (int)HttpStatusCode.NotFound;
-                        errorResponse.Error = "404 NotFound";
+                        errorResponse.Error = "404 Not Found";
                         break;
                     case ConflictException:
                         errorResponse.StatusCode = (int)HttpStatusCode.Conflict;

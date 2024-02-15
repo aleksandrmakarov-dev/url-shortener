@@ -1,8 +1,10 @@
-﻿namespace Server.Csharp.Business.Models.Responses
+﻿using Server.Csharp.Data.Entities;
+
+namespace Server.Csharp.Business.Models.Responses
 {
-    public class UserResponse
+    public class UserResponse:ObjectId
     {
-       public string Email { get; set; }
-       public string? Image { get; set; }
+        public string Email { get; set; }
+
     }
 }

@@ -2,21 +2,19 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Server.Csharp.Data.Database;
-using Server.Csharp.Data.Models;
+using Server.Csharp.Data.Entities;
 
 namespace Server.Csharp.Data.Repositories;
 
 public class UsersRepository:GenericRepository<User>,IUsersRepository
 {
-    private readonly IMapper _mapper;
-    public UsersRepository(ApplicationDbContext context, IMapper mapper) : base(context)
+    public UsersRepository(ApplicationDbContext context, IMapper mapper) : base(context,mapper)
     {
-        _mapper = mapper;
     }
 
     public async Task<User?> GetByEmailAndVerificationTokenAsync(string email, string token)
     {
-        return await _context.Users.FirstOrDefaultAsync(
+        return await Context.Users.FirstOrDefaultAsync(
             u =>
                 u.EmailVerificationToken != null &&
                 u.Email == email &&
@@ -26,27 +24,20 @@ public class UsersRepository:GenericRepository<User>,IUsersRepository
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(
+        return await Context.Users.Include(u=>u.Role).FirstOrDefaultAsync(
             u => u.Email == email
         );
     }
 
-    public async Task<User?> GetByRefreshTokenAsync(string token)
+    public override async Task<User?> GetByIdAsync(Guid id)
     {
-        return await _context.Users.FirstOrDefaultAsync(
-            u => u.Sessions.Any(rt => rt.RefreshToken == token)
-        );
+        return await Context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<bool> IsExistsByEmailAsync(string email)
     {
-        return await _context.Users.AnyAsync(
+        return await Context.Users.AnyAsync(
             u => u.Email == email
         );
-    }
-
-    public async Task<IEnumerable<TModel>> GetAllAsync<TModel>()
-    {
-        return await _context.Users.ProjectTo<TModel>(_mapper.ConfigurationProvider).ToListAsync();
     }
 }

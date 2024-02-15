@@ -9,7 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import axios from "@/lib/axios";
+import { setAuthorizationToken } from "@/lib/axios";
 import { useUserById } from "@/entities/user/api";
 import { TokenDto } from "@/lib/dto/auth/token.dto";
 
@@ -47,7 +47,7 @@ export default function SessionProvider({
 
   const {
     data: userData,
-    isPending: isUserLoading,
+    isLoading: isUserLoading,
     isError: isUserError,
     error: userError,
   } = useUserById({
@@ -65,18 +65,9 @@ export default function SessionProvider({
           onSettled: (_) => setIsLoading(false),
         }
       );
-    } else {
-      axios.interceptors.request.use(
-        (config) => {
-          if (!config.headers.Authorization) {
-            config.headers.Authorization = `Bearer ${token.accessToken}`;
-          }
-
-          return config;
-        },
-        (error) => Promise.reject(error)
-      );
     }
+
+    setAuthorizationToken(token?.accessToken);
   }, [token]);
 
   return (
