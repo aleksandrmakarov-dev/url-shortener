@@ -7,6 +7,7 @@ import (
 	"time"
 	resp "url-shortener/internal/lib/api/response"
 	"url-shortener/internal/lib/hashgen"
+	emailverificationsender "url-shortener/internal/lib/messageSender/emailVerificationSender"
 	"url-shortener/internal/models"
 	dberrs "url-shortener/internal/repository/dbErrs"
 
@@ -62,7 +63,25 @@ func (h *Handler) Signup() http.HandlerFunc {
 			return
 		}
 
+		if h.Cfg.EmailVerifRequired {
+
+			EmailVerif, err := h.Services.Auth.CreteEmailVerification(user.Email, h.Cfg.EmailVerifTokenTTL)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal Server Error"))
+				h.Log.Error("Internal error", slog.String("opr", opr), slog.String("err", err.Error()))
+				return
+			}
+
+			err = emailverificationsender.SendMessage(EmailVerif.Email, EmailVerif.Token, h.Cfg.ResendApiKey, h.Cfg.ReactDomain)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal Server Error"))
+				h.Log.Error("Internal error", slog.String("opr", opr), slog.String("err", err.Error()))
+				return
+			}
+		}
+
 		w.WriteHeader(http.StatusOK)
-		return
 	}
 }

@@ -1,37 +1,53 @@
 package handlers
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
+	resp "url-shortener/internal/lib/api/response"
+	dberrs "url-shortener/internal/repository/dbErrs"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+	"github.com/go-playground/validator/v10"
 )
 
-type EmailVerifer interface {
-	VerifEmail(token string) error
+type emailverifReq struct {
+	Email string `json:"email" validate:"required,email"`
+	Token string `json:"token" validate:"required"`
 }
 
-func (h *Handler) EmailVerification(log slog.Logger, emailVerifer EmailVerifer) http.HandlerFunc {
+func (h *Handler) EmailVerification() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		verifToken := chi.URLParam(r, "veriftoken")
+		const opr = "internal.http-server.handlers.EmailVerification"
 
-		if verifToken == "" {
-			//render.JSON(w, r, resp.Error("invalid request"))
+		var req emailverifReq
+		err := render.DecodeJSON(r.Body, &req)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			render.JSON(w, r, resp.ErrorResp(http.StatusBadRequest, resp.ErrBadReq, "Invalid request"))
 			return
 		}
 
-		err := emailVerifer.VerifEmail(verifToken)
-		if err != nil {
-			//if errors.Is(err, repository.ErrorEmailVerifTokenExpired) {
-			//	render.JSON(w, r, resp.Error("verification expired"))
-			//	return
-			//}
-			//render.JSON(w, r, resp.Error("internal error"))
-			//log.Error("some err", slog.String("err", err.Error()))
-			//return
+		if err := validator.New().Struct(req); err != nil {
+			valErr := err.(validator.ValidationErrors)
+			w.WriteHeader(http.StatusBadRequest)
+			render.JSON(w, r, resp.ValidationError(valErr))
+			return
 		}
 
-		//render.JSON(w, r, resp.OK())
+		err = h.Services.Auth.VerifEmail(req.Email, req.Token)
+		if err != nil {
+			if errors.Is(err, dberrs.ErrorEmailVerifTokenExpired) {
+				w.WriteHeader(http.StatusUnauthorized)
+				render.JSON(w, r, resp.ErrorResp(http.StatusUnauthorized, resp.ErrUnauth, "Verification token has expired"))
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal Server Error"))
+			h.Log.Error("Internal error", slog.String("opr", opr), slog.String("err", err.Error()))
+			return
+		}
 
+		w.WriteHeader(http.StatusOK)
 	}
 }

@@ -42,7 +42,7 @@ func (h *Handler) Singin() http.HandlerFunc {
 
 		hs := hashgen.New(h.Cfg.Salt)
 
-		session, accToken, err := h.Services.Auth.Signin(
+		session, accToken, user, err := h.Services.Auth.Signin(
 			req.Email,
 			hs.GenHash(req.Pass),
 			h.Cfg.SigningKey,
@@ -60,6 +60,14 @@ func (h *Handler) Singin() http.HandlerFunc {
 			render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal Server Error"))
 			h.Log.Error("Internal error", slog.String("opr", opr), slog.String("err", err.Error()))
 			return
+		}
+
+		if h.Cfg.EmailVerifRequired {
+			if !user.EmailVerified {
+				w.WriteHeader(http.StatusUnauthorized)
+				render.JSON(w, r, resp.ErrorResp(http.StatusUnauthorized, resp.ErrUnauth, "Email not verified"))
+				return
+			}
 		}
 
 		http.SetCookie(w, &http.Cookie{

@@ -1,9 +1,13 @@
 env: "local"
 storage_path: "./storage/str.db"
+serverDomain: "http://localhost:8080"
+reactDomain : "http://localhost:5173"
 salt: "salt"
 signingKey: "signingKey"
 accsesTokenTokenTTL: 3600s
 refreshTokenTokenTTL: 17280s
+emailVerifTokenTTL: 1h
+emailVerifRequired: true
 http_server:
   address: "localhost:8080"
   timeout: "5s"

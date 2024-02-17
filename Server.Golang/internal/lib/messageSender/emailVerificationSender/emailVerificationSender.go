@@ -2,15 +2,14 @@ package emailverificationsender
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/resend/resend-go/v2"
 )
 
-func SendMessage(email string, token string) error {
+func SendMessage(email string, token string, apiKey string, domain string) error {
 	const opr = "internal.lib.messageSender.emailVerificationSender.SendMessage"
 
-	client := resend.NewClient(os.Getenv("API_KEY_RESEND"))
+	client := resend.NewClient(apiKey)
 	params := &resend.SendEmailRequest{
 		To:      []string{email},
 		From:    "noreply@aleksandrmakarov.com",
@@ -63,7 +62,7 @@ func SendMessage(email string, token string) error {
 			<div class="container">
 				<h1>Email Verification</h1>
 				<p>To complete your registration, please confirm your email address.</p>
-				<a href="http://localhost:8080/email-verification/` + token + `" class="verification-link">Confirm Email</a>
+				<a href="` + domain + `/client/auth/verify-email?email=` + email + `&token=` + token + `" class="verification-link">Confirm Email</a>
 			</div>
 		</body>
 		</html>
