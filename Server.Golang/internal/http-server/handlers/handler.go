@@ -37,6 +37,8 @@ func (h *Handler) InitRoutes() *chi.Mux {
 		r.Post("/sign-up", h.Signup())
 		r.Post("/sign-in", h.Singin())
 		r.Post("/refresh-token", h.RefreshToken())
+		r.Post("/resend-verification", h.ResendVerification())
+		r.Post("/verify-email", h.EmailVerification())
 		r.With(h.AuthMiddleware).Post("/short-url", h.ShortUrl())
 
 	})

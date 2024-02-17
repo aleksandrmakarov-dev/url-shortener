@@ -11,7 +11,7 @@ import (
 
 var (
 	ErrorInvalidSigningMethod = errors.New("invalid signing method")
-	ErrorTokenFormat          = errors.New("Error token format")
+	ErrorTokenFormat          = errors.New("error token format")
 )
 
 type tokenClaims struct {
@@ -37,16 +37,16 @@ func (s *AuthService) CreateUser(u *models.User) error {
 	return s.repo.CreateUser(u)
 }
 
-func (s *AuthService) Signin(email, passHash, signingKey string, RefTokenExp time.Duration, AccessTokenExp time.Duration) (models.Session, string, error) {
+func (s *AuthService) Signin(email, passHash, signingKey string, RefTokenExp time.Duration, AccessTokenExp time.Duration) (models.Session, string, models.User, error) {
 	//Get user
 	user, err := s.repo.GetUser(email, passHash)
 	if err != nil {
-		return models.Session{}, "", err
+		return models.Session{}, "", models.User{}, err
 	}
 
 	session, err := s.repo.GenRefreshToken(&user, RefTokenExp)
 	if err != nil {
-		return models.Session{}, "", err
+		return models.Session{}, "", models.User{}, err
 	}
 
 	//Accesstoken
@@ -60,10 +60,10 @@ func (s *AuthService) Signin(email, passHash, signingKey string, RefTokenExp tim
 
 	ts, err := token.SignedString([]byte(signingKey))
 	if err != nil {
-		return models.Session{}, "", err
+		return models.Session{}, "", models.User{}, err
 	}
 
-	return session, ts, nil
+	return session, ts, user, nil
 }
 
 func (s *AuthService) RefreshToken(token string, signingKey string, AccessTokenExp time.Duration) (int, string, error) {
@@ -108,4 +108,26 @@ func (s *AuthService) ParseToken(token string, signingKey string) (AccessTokenDa
 	}
 
 	return AccessTokenData{UserID: claims.UserId}, nil
+}
+
+func (s *AuthService) VerifEmail(email string, token string) error {
+	EmailVerif, err := s.repo.GetVerifEmail(token, email)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.VerifEmail(EmailVerif)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *AuthService) CreteEmailVerification(email string, EmailVerifTokenTTL time.Duration) (models.EmailVerification, error) {
+	EmailVerif, err := s.repo.CreateEmailVerification(email, EmailVerifTokenTTL)
+	if err != nil {
+		return models.EmailVerification{}, err
+	}
+	return EmailVerif, nil
 }

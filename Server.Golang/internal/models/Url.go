@@ -12,8 +12,5 @@ type Url struct {
 }
 
 func (u *Url) IsExpired() bool {
-	if u.ExpiresAt.Compare(time.Now()) == -1 {
-		return true
-	}
-	return false
+	return u.ExpiresAt.Compare(time.Now()) == -1
 }

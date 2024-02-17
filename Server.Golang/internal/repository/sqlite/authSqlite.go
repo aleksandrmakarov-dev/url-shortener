@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	emailveriftoken "url-shortener/internal/lib/random/emailVerifToken"
 	refreshtoken "url-shortener/internal/lib/random/refreshToken"
 	"url-shortener/internal/models"
 	dberrs "url-shortener/internal/repository/dbErrs"
@@ -114,4 +115,100 @@ func (r *AuthSqlite) CheckRefreshToken(token string) (int, error) {
 	}
 
 	return session.UserID, nil
+}
+
+func (r *AuthSqlite) CreateEmailVerification(email string, EmailVerifTokenTTL time.Duration) (models.EmailVerification, error) {
+	const opr = "repository.sqlite.authSqlite.CreateEmailVerification"
+
+	token, err := emailveriftoken.GenerateToken()
+	if err != nil {
+		return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	EmailVerif := models.EmailVerification{
+		Email:     email,
+		Token:     token,
+		ExpiresAt: time.Now().Add(EmailVerifTokenTTL),
+	}
+
+	stmt, err := r.db.Prepare("INSERT INTO EmailVerification(email,token,expiresAt) VALUES(?,?,?)")
+	if err != nil {
+		return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(EmailVerif.Email, EmailVerif.Token, EmailVerif.ExpiresAt)
+	if err != nil {
+		return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return EmailVerif, nil
+}
+
+func (r *AuthSqlite) GetVerifEmail(token, email string) (models.EmailVerification, error) {
+	const opr = "repository.sqlite.authSqlite.VerifEmail"
+
+	stmt, err := r.db.Prepare("SELECT expiresAt FROM EmailVerification WHERE token = ? AND email = ?")
+	if err != nil {
+		return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	EmailVerif := models.EmailVerification{
+		Email: email,
+		Token: token,
+	}
+
+	err = stmt.QueryRow(token, email).Scan(&EmailVerif.ExpiresAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorEmailVerifTokenExpired)
+		}
+		return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	if EmailVerif.IsExpired() {
+		err = r.DeleteEmailVerification(EmailVerif.Token)
+		if err != nil {
+			return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, err)
+		}
+		return models.EmailVerification{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorEmailVerifTokenExpired)
+	}
+
+	return EmailVerif, nil
+}
+
+func (r *AuthSqlite) VerifEmail(EmailVerif models.EmailVerification) error {
+	const opr = "repository.sqlite.authSqlite.VerifEmail"
+
+	stmt, err := r.db.Prepare("UPDATE Users SET EmailVerified = true WHERE email = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(EmailVerif.Email)
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	err = r.DeleteEmailVerification(EmailVerif.Token)
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (r *AuthSqlite) DeleteEmailVerification(token string) error {
+	const opr = "repository.sqlite.authSqlite.DeleteEmailVerification"
+
+	stmt, err := r.db.Prepare("DELETE FROM EmailVerification WHERE token = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(token)
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
 }

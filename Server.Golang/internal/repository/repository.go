@@ -13,6 +13,10 @@ type Auth interface {
 	GetUser(email, passHash string) (models.User, error)
 	GenRefreshToken(u *models.User, tokenExp time.Duration) (models.Session, error)
 	CheckRefreshToken(token string) (int, error)
+	VerifEmail(EmailVerif models.EmailVerification) error
+	GetVerifEmail(token, email string) (models.EmailVerification, error)
+	DeleteEmailVerification(token string) error
+	CreateEmailVerification(email string, EmailVerifTokenTTL time.Duration) (models.EmailVerification, error)
 }
 
 type Url interface {

@@ -27,7 +27,6 @@ type shortUrlRes struct {
 
 func (h *Handler) ShortUrl() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const opr = "internal.http-server.handlers.ShortUrl"
 
 		var req shortUrlReq
 		err := render.DecodeJSON(r.Body, &req)
@@ -71,9 +70,8 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 
 			w.WriteHeader(http.StatusOK)
 			render.JSON(w, r, shortUrlRes{
-				Url: req.Url,
-				//мб в конфиг придётся добавить
-				ShortUrl: `https://` + h.Cfg.Address + `/` + alias,
+				Url:      req.Url,
+				ShortUrl: h.Cfg.ServerDomain + "/" + alias,
 				Alias:    alias,
 			})
 			return
@@ -109,6 +107,6 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 			ShortUrl: `https://` + h.Cfg.Address + `/` + alias,
 			Alias:    alias,
 		})
-		return
+
 	}
 }

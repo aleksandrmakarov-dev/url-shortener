@@ -10,12 +10,17 @@ import (
 )
 
 type Config struct {
-	Env                  string        `yaml:"env" env-default:"local"`
-	StoragePath          string        `yaml:"storage_path" env-required:"true"`
-	Salt                 string        `yaml:"salt" env-default:"salt"`
-	SigningKey           string        `yaml:"signingKey" env-default:"signingKey"`
+	Env                  string `yaml:"env" env-default:"local"`
+	StoragePath          string `yaml:"storage_path" env-required:"true"`
+	ServerDomain         string `yaml:"serverDomain" env-required:"true"`
+	ReactDomain          string `yaml:"reactDomain" env-required:"true"`
+	Salt                 string `yaml:"salt" env-default:"salt"`
+	SigningKey           string `yaml:"signingKey" env-default:"signingKey"`
+	ResendApiKey         string
 	AccsesTokenTokenTTL  time.Duration `yaml:"accsesTokenTokenTTL" env-default:"3600s"`
 	RefreshTokenTokenTTL time.Duration `yaml:"refreshTokenTokenTTL" env-default:"720h"`
+	EmailVerifTokenTTL   time.Duration `yaml:"emailVerifTokenTTL" env-default:"1h"`
+	EmailVerifRequired   bool          `yaml:"emailVerifRequired" env-default:"true"`
 	HTTPServer           `yaml:"http_server"`
 }
 
@@ -44,6 +49,8 @@ func LoadConfig() *Config {
 	if err != nil {
 		log.Fatalf("%s: %s", opr, err)
 	}
+
+	cfg.ResendApiKey = os.Getenv("API_KEY_RESEND")
 
 	return &cfg
 }
