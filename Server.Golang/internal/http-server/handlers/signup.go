@@ -23,7 +23,6 @@ type signupReq struct {
 func (h *Handler) Signup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const opr = "internal.http-server.handlers.Signup"
-		h.Log.With(slog.String("opr", opr))
 
 		var req signupReq
 		err := render.DecodeJSON(r.Body, &req)

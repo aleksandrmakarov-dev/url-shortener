@@ -22,6 +22,9 @@ type Auth interface {
 type Url interface {
 	CreateShortUrl(u *models.Url) (string, error)
 	GetUrl(alias string) (models.Url, error)
+	UpdateUrlOriginalByID(id int, original string) error
+	UpdateUrlAliasByID(id int, alias string) error
+	DeleteUrlByID(id, userId int) error
 }
 
 type Repository struct {

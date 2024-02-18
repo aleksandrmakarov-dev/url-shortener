@@ -83,15 +83,66 @@ func (r *UrlSqlite) GetUrl(alias string) (models.Url, error) {
 	}
 
 	if url.IsExpired() {
-		r.DeleteUrlByID(url.ID)
+		r.DeleteUrlByID(url.ID, url.UserID)
 		return models.Url{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorURLExpired)
 	}
 
 	return url, nil
 }
 
-func (r *UrlSqlite) DeleteUrlByID(id int) error {
-	//TODO
+func (r *UrlSqlite) DeleteUrlByID(id, userId int) error {
+	const opr = "storage.storages.sqlite.DeleteUrlByID"
+	stmt, err := r.db.Prepare("DELETE FROM Urls WHERE id = ? AND userId = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(id, userId)
+	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
+			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		}
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (r *UrlSqlite) UpdateUrlAliasByID(id int, alias string) error {
+	const opr = "storage.storages.sqlite.DeleteUrlByID"
+
+	stmt, err := r.db.Prepare("UPDATE Urls SET alias = ?  WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(alias, id)
+	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
+			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		}
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (r *UrlSqlite) UpdateUrlOriginalByID(id int, original string) error {
+	const opr = "storage.storages.sqlite.DeleteUrlByID"
+
+	stmt, err := r.db.Prepare("UPDATE Urls SET original = ?  WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(original, id)
+	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
+			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		}
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
 	return nil
 }
 

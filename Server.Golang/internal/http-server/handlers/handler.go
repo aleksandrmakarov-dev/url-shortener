@@ -40,6 +40,7 @@ func (h *Handler) InitRoutes() *chi.Mux {
 		r.Post("/resend-verification", h.ResendVerification())
 		r.Post("/verify-email", h.EmailVerification())
 		r.With(h.AuthMiddleware).Post("/short-url", h.ShortUrl())
+		r.With(h.AuthMiddleware).Delete("/short-url/{id}", h.DeleteShortURL())
 
 	})
 

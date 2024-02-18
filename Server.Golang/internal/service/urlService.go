@@ -22,3 +22,15 @@ func (s *UrlService) CreateShortUrl(u *models.Url) (string, error) {
 func (s *UrlService) GetUrl(alias string) (models.Url, error) {
 	return s.repo.GetUrl(alias)
 }
+
+func (s *UrlService) UpdateURLAliasByID(id int, alias string) error {
+	return s.repo.UpdateUrlAliasByID(id, alias)
+}
+
+func (s *UrlService) UpdateURLOriginalByID(id int, original string) error {
+	return s.repo.UpdateUrlOriginalByID(id, original)
+}
+
+func (s *UrlService) DeleteURLByID(id, userId int) error {
+	return s.repo.DeleteUrlByID(id, userId)
+}
