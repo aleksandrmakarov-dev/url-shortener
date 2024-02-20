@@ -34,7 +34,7 @@ public class AuthService : IAuthService
         _jwtService = jwtService;
     }
 
-    public async Task<SignUpResponse> SignUpAsync(SignUpRequest request)
+    public async Task<EmailVerificationResponse> SignUpAsync(SignUpRequest request)
     {
         // check if email is already registered in database
         User? foundUser = await _usersRepository.GetByEmailAsync(request.Email);
@@ -61,7 +61,7 @@ public class AuthService : IAuthService
         User createdUser =  await _usersRepository.CreateAsync(userToCreate);
 
         //map User to SignUpResponse and return it
-        return _mapper.Map<User, SignUpResponse>(createdUser);
+        return _mapper.Map<User, EmailVerificationResponse>(createdUser);
     }
 
     public async Task<SignInResponse> SignInAsync(SignInRequest request)
@@ -123,5 +123,109 @@ public class AuthService : IAuthService
                 UserId = createdSession.UserId
             }
         };
+    }
+
+    public async Task VerifyEmailAsync(VerifyEmailRequest request)
+    {
+        // check if user with email and token exists
+
+        User? foundUser = await _usersRepository.GetByEmailAsync(request.Email);
+
+        if (foundUser == null || foundUser.EmailVerificationToken != request.Token)
+        {
+            throw new Exception("Invalid email or token");
+        }
+
+        if (foundUser.EmailVerifiedAt != null)
+        {
+            return;
+        }
+
+        // if token is expired throw an error
+        if (foundUser.EmailVerificationTokenExpiresAt != null &&  foundUser.EmailVerificationTokenExpiresAt < DateTime.UtcNow)
+        {
+            throw new Exception("Email verification token is expired");
+        }
+
+        // set email verification token and  datetime when it expires to null and set email verified at to now
+        foundUser.EmailVerificationToken = null;
+        foundUser.EmailVerificationTokenExpiresAt = null;
+        foundUser.EmailVerifiedAt = DateTime.UtcNow;
+
+        // update user
+        await _usersRepository.UpdateAsync(foundUser);
+    }
+
+    public async Task<SessionResponse> RefreshTokenAsync(RefreshTokenRequest request)
+    {
+        // check if session exists
+        Session? foundSession = await _sessionsRepository.GetByRefreshTokenAsync(request.Token);
+
+        // if session not found throw an error
+        if (foundSession == null)
+        {
+            throw new Exception("Invalid refresh token");
+        }
+
+        // if session is expired throw an error
+        if (foundSession.ExpiresAt < DateTime.UtcNow)
+        {
+            throw new Exception("Refresh token is expired");
+        }
+
+        // get user by session userId
+
+        User? foundUser = await _usersRepository.GetByIdAsync(foundSession.UserId);
+
+        // if user not found throw an error
+        if (foundUser == null)
+        {
+            throw new Exception("No user associated with session");
+        }
+
+        // generate new access token
+        string accessToken = _jwtService.GetToken(new JwtPayload
+        {
+            Id = foundUser.Id,
+            Role = Role.User
+        });
+
+        // return access token and user id
+        return new SessionResponse
+        {
+            AccessToken = accessToken,
+            UserId = foundUser.Id
+        };
+    }
+
+    public async Task<EmailVerificationResponse?> NewEmailVerificationAsync(EmailVerificationRequest request)
+    {
+        // check if user with email exists
+        User? foundUser = await _usersRepository.GetByEmailAsync(request.Email);
+
+        // if user not found throw an error
+        if (foundUser == null)
+        {
+            throw new Exception("User is registered");
+        }
+
+        // if user email is already verified return null
+        if (foundUser.EmailVerifiedAt != null)
+        {
+            return null;
+        }
+
+        // generate new email verification token
+        string emailVerificationToken = _tokensService.GetToken(128);
+
+        // set new token and expiration date to user
+        foundUser.EmailVerificationToken = emailVerificationToken;
+        foundUser.EmailVerificationTokenExpiresAt = DateTime.UtcNow.AddHours(12);
+
+        // update user
+        User updatedUser = await _usersRepository.UpdateAsync(foundUser);
+
+        //map User to SignUpResponse and return it
+        return _mapper.Map<User, EmailVerificationResponse>(updatedUser);
     }
 }
