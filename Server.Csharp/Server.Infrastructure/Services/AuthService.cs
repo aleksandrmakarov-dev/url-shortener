@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Server.Data.Entities;
 using Server.Data.Repositories;
+using Server.Infrastructure.Models;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
 
@@ -12,19 +13,25 @@ public class AuthService : IAuthService
     private readonly ISessionsRepository _sessionsRepository;
 
     private readonly IPasswordsService _passwordsService;
+    private readonly ITokensService _tokensService;
+    private readonly IJwtService _jwtService;
+
     private readonly IMapper _mapper;
 
     public AuthService(
         IUsersRepository usersRepository, 
         IPasswordsService passwordsService, 
         IMapper mapper, 
-        ISessionsRepository sessionsRepository
-        )
+        ISessionsRepository sessionsRepository, 
+        ITokensService tokensService, 
+        IJwtService jwtService)
     {
         _usersRepository = usersRepository;
         _passwordsService = passwordsService;
         _mapper = mapper;
         _sessionsRepository = sessionsRepository;
+        _tokensService = tokensService;
+        _jwtService = jwtService;
     }
 
     public async Task<SignUpResponse> SignUpAsync(SignUpRequest request)
@@ -45,6 +52,10 @@ public class AuthService : IAuthService
         userToCreate.PasswordHash = _passwordsService.Hash(request.Password);
 
         // generate email verification token
+        string emailVerificationToken = _tokensService.GetToken(128);
+        
+        userToCreate.EmailVerificationToken = emailVerificationToken;
+        userToCreate.EmailVerificationTokenExpiresAt = DateTime.UtcNow.AddHours(12);
 
         // write user to the database
         User createdUser =  await _usersRepository.CreateAsync(userToCreate);
@@ -74,8 +85,18 @@ public class AuthService : IAuthService
 
         // generate session refresh token
 
-        string refreshToken = "";
+        string refreshToken = _tokensService.GetToken(128);
 
+        // check if token exists in database
+        Session? foundSession = await _sessionsRepository.GetByRefreshTokenAsync(refreshToken);
+
+        // if token found generate new token
+        if (foundSession !=null)
+        {
+            refreshToken = _tokensService.GetToken(128);
+        }
+
+        // create session
         Session sessionToCreate = new Session
         {
             RefreshToken = refreshToken,
@@ -83,9 +104,15 @@ public class AuthService : IAuthService
             UserId = foundUser.Id
         };
 
+        // write session to database
         Session createdSession = await _sessionsRepository.CreateAsync(sessionToCreate);
 
-        string accessToken = "";
+        // generate access token
+        string accessToken = _jwtService.GetToken(new JwtPayload
+        {
+            Id = createdSession.UserId,
+            Role = Role.User
+        });
 
         return new SignInResponse
         {

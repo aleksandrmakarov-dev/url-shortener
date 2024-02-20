@@ -1,4 +1,5 @@
 
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Server.API.Common;
 using Server.Data.Database;
@@ -19,7 +20,12 @@ namespace Server.API
                 options.UseSqlite("Data Source=mydb.db");
             });
 
+            builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly(),Assembly.LoadFile("Server.Data"),
+                Assembly.LoadFile("Server.Infrastructure"));
+
             builder.Services.AddRepositories();
+
+            builder.Services.AddServices();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
