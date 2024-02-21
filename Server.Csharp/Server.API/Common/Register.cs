@@ -17,7 +17,7 @@ namespace Server.API.Common
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ISessionsRepository, SessionsRepository>();
+            services.AddScoped<IUsersService, UsersService>();
 
             services.AddScoped<IPasswordsService, BcryptPasswordsService>();
             services.AddScoped<ITokensService, TokensService>();

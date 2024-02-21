@@ -20,8 +20,10 @@ namespace Server.API
                 options.UseSqlite("Data Source=mydb.db");
             });
 
-            builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly(),Assembly.LoadFile("Server.Data"),
-                Assembly.LoadFile("Server.Infrastructure"));
+            builder.Services.AddAutoMapper(
+                Assembly.GetExecutingAssembly(),
+                Assembly.Load("Server.Infrastructure")
+                );
 
             builder.Services.AddRepositories();
 
