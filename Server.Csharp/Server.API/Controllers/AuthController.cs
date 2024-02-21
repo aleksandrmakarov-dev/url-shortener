@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.API.Common;
+using Server.Infrastructure.Exceptions;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
 using Server.Infrastructure.Services;
 
 namespace Server.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -78,7 +79,7 @@ namespace Server.API.Controllers
             // if refreshToken cookie not found throw an error
             if (refreshToken == null)
             {
-                throw new Exception("No refresh token provided");
+                throw new BadRequestException("No refresh token provided");
             }
             
             // try to get session with refresh token

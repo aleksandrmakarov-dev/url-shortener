@@ -10,4 +10,9 @@ public class ShortUrlsRepository(ApplicationDbContext context) : GenericReposito
     {
         return await context.ShortUrls.FirstOrDefaultAsync(su => su.Alias == alias);
     }
+
+    public async Task<bool> IsExistByAliasAsync(string alias)
+    {
+        return await context.ShortUrls.AnyAsync(su=>su.Alias == alias);
+    }
 }

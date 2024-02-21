@@ -10,9 +10,9 @@ namespace Server.Data.Entities
 {
     public class ShortUrl:Entity
     {
-        public required string Redirect { get; set; }
+        public required string Original { get; set; }
         public required string Alias { get; set;}
-        public Guid UserId { get; set;}
+        public Guid? UserId { get; set;}
         public User? User { get; set;}
         public DateTime? ExpiresAt { get; set; }
     }

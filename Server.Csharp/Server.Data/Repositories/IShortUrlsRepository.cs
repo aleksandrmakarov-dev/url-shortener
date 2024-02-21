@@ -10,5 +10,7 @@ namespace Server.Data.Repositories
     public interface IShortUrlsRepository:IGenericRepository<ShortUrl>
     {
         Task<ShortUrl?> GetByAliasAsync(string alias);
+
+        Task<bool> IsExistByAliasAsync(string alias);
     }
 }

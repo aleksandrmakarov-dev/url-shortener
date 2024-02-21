@@ -5,7 +5,7 @@ using Server.Infrastructure.Services;
 
 namespace Server.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {

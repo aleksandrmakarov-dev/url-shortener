@@ -18,6 +18,7 @@ namespace Server.API.Common
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUsersService, UsersService>();
+            services.AddScoped<IShortUrlsService, ShortUrlsService>();
 
             services.AddScoped<IPasswordsService, BcryptPasswordsService>();
             services.AddScoped<ITokensService, TokensService>();

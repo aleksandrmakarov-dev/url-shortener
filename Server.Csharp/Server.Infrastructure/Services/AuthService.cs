@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Server.Data.Entities;
 using Server.Data.Repositories;
+using Server.Infrastructure.Exceptions;
 using Server.Infrastructure.Models;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
@@ -42,7 +43,7 @@ public class AuthService : IAuthService
         // if user is found throw and exception that user is already registered
         if (foundUser != null)
         {
-            throw new Exception($"Email address {request.Email} is already registered");
+            throw new BadRequestException($"Email address {request.Email} is already registered");
         }
 
         // otherwise map request to User model
@@ -70,7 +71,7 @@ public class AuthService : IAuthService
         
         if (foundUser == null)
         {
-            throw new Exception("Invalid email or password");
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         // implement user is locked out feature
@@ -80,7 +81,7 @@ public class AuthService : IAuthService
         if (foundUser.EmailVerifiedAt == null)
         {
             // if not throw exception
-            throw new Exception("Email is not verified. User can sign in to account only after email verification");
+            throw new BadRequestException("Email is not verified. User can sign in to account only after email verification");
         }
 
         // generate session refresh token
@@ -113,7 +114,7 @@ public class AuthService : IAuthService
             Id = createdSession.UserId,
             Role = Role.User
         });
-
+        
         return new SignInResponse
         {
             RefreshToken = createdSession.RefreshToken,
@@ -133,7 +134,7 @@ public class AuthService : IAuthService
 
         if (foundUser == null || foundUser.EmailVerificationToken != request.Token)
         {
-            throw new Exception("Invalid email or token");
+            throw new UnauthorizedException("Invalid email or token");
         }
 
         if (foundUser.EmailVerifiedAt != null)
@@ -144,7 +145,7 @@ public class AuthService : IAuthService
         // if token is expired throw an error
         if (foundUser.EmailVerificationTokenExpiresAt != null &&  foundUser.EmailVerificationTokenExpiresAt < DateTime.UtcNow)
         {
-            throw new Exception("Email verification token is expired");
+            throw new UnauthorizedException("Email verification token is expired");
         }
 
         // set email verification token and  datetime when it expires to null and set email verified at to now
@@ -164,13 +165,13 @@ public class AuthService : IAuthService
         // if session not found throw an error
         if (foundSession == null)
         {
-            throw new Exception("Invalid refresh token");
+            throw new UnauthorizedException("Invalid refresh token");
         }
 
         // if session is expired throw an error
         if (foundSession.ExpiresAt < DateTime.UtcNow)
         {
-            throw new Exception("Refresh token is expired");
+            throw new UnauthorizedException("Refresh token is expired");
         }
 
         // get user by session userId
@@ -180,7 +181,7 @@ public class AuthService : IAuthService
         // if user not found throw an error
         if (foundUser == null)
         {
-            throw new Exception("No user associated with session");
+            throw new UnauthorizedException("No user associated with session");
         }
 
         // generate new access token
@@ -206,7 +207,7 @@ public class AuthService : IAuthService
         // if user not found throw an error
         if (foundUser == null)
         {
-            throw new Exception("User is registered");
+            throw new NotFoundException("User is not registered");
         }
 
         // if user email is already verified return null

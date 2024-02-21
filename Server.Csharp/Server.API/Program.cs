@@ -2,6 +2,7 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Server.API.Common;
+using Server.API.Middlewares;
 using Server.Data.Database;
 
 namespace Server.API
@@ -12,21 +13,24 @@ namespace Server.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // add services to the container.
 
-            // Add DbContext
+            // add db context
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlite("Data Source=mydb.db");
             });
 
+            // add automapper
             builder.Services.AddAutoMapper(
                 Assembly.GetExecutingAssembly(),
                 Assembly.Load("Server.Infrastructure")
                 );
 
+            // add repositories
             builder.Services.AddRepositories();
 
+            // add services
             builder.Services.AddServices();
 
             builder.Services.AddControllers();
@@ -43,12 +47,15 @@ namespace Server.API
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             // app.UseAuthorization();
 
 
             app.MapControllers();
+
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
+            app.UseMiddleware<UserExtractorMiddleware>();
 
             app.Run();
         }
