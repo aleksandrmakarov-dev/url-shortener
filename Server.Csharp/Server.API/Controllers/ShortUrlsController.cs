@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.API.Common;
+using Server.Data.Entities;
 using Server.Infrastructure.Exceptions;
 using Server.Infrastructure.Models;
 using Server.Infrastructure.Models.Requests;
@@ -52,6 +53,72 @@ namespace Server.API.Controllers
             ShortUrlResponse shortUrlResponse = await _shortUrlsService.GetByAliasAsync(alias);
 
             return Ok(shortUrlResponse);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            IEnumerable<ShortUrlResponse> foundShortUrls = await _shortUrlsService.GetAllAsync();
+            return Ok(foundShortUrls);
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateById([FromRoute] Guid id, [FromBody] UpdateShortUrlRequest request)
+        {
+            //check that user can update only his short urls
+
+            // get extracted from access token user
+            JwtPayload? user = (JwtPayload?)HttpContext.Items[Constants.UserContextName];
+
+            // get short url by id
+            ShortUrlResponse foundShortUrlResponse = await _shortUrlsService.GetByIdAsync(id);
+
+            // check if user tries to update anonymous short url
+
+            if (foundShortUrlResponse.UserId == null && user?.Role != Role.Admin)
+            {
+                throw new UnauthorizedException("Only admin users can update anonymous short urls");
+            }
+
+            // check if current user id equal to user id who create short url or role is admin
+            if (foundShortUrlResponse.UserId != user?.Id && user?.Role != Role.Admin)
+            {
+                throw new UnauthorizedException("User can't update other user's short url");
+            }
+
+            await _shortUrlsService.UpdateByIdAsync(id, request);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteById([FromRoute] Guid id)
+        {
+            //check that user can delete only his short urls
+
+            // get extracted from access token user
+            JwtPayload? user = (JwtPayload?)HttpContext.Items[Constants.UserContextName];
+
+            // get short url by id
+            ShortUrlResponse foundShortUrlResponse = await _shortUrlsService.GetByIdAsync(id);
+
+            // check if user tries to delete anonymous short url
+
+            if (foundShortUrlResponse.UserId == null && user?.Role != Role.Admin)
+            {
+                throw new UnauthorizedException("Only admin users can delete anonymous short urls");
+            }
+
+            // check if current user id equal to user id who create short url or role is admin
+            if (foundShortUrlResponse.UserId != user?.Id && user?.Role != Role.Admin)
+            {
+                // throw an error
+                throw new UnauthorizedException("User can't update other user's short url");
+            }
+
+            await _shortUrlsService.DeleteByIdAsync(id);
+
+            return NoContent();
         }
     }
 }

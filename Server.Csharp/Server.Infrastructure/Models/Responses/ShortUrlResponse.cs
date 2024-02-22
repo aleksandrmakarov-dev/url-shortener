@@ -12,5 +12,6 @@ namespace Server.Infrastructure.Models.Responses
         public required string Original { get; set; }
         public required string Alias { get; set; }
         public required string Domain { get; set; }
+        public Guid? UserId { get; set; }
     }
 }
