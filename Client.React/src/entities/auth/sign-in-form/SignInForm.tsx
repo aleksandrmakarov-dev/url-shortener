@@ -1,4 +1,4 @@
-import { SignInDto, signInDto } from "@/lib/dto/auth/sign-in.dto";
+import { SignInRequest, signInRequest } from "@/lib/dto/auth/sign-in.request";
 import { Button } from "@/shared/ui/button";
 import {
   Form,
@@ -15,14 +15,14 @@ import { useForm } from "react-hook-form";
 
 interface SignInFormProps {
   isLoading?: boolean;
-  onSubmit: (data: SignInDto) => void;
+  onSubmit: (data: SignInRequest) => void;
 }
 
 export function SignInForm({ isLoading, onSubmit }: SignInFormProps) {
   const [show, setShow] = useState<boolean>(false);
 
-  const form = useForm<SignInDto>({
-    resolver: zodResolver(signInDto),
+  const form = useForm<SignInRequest>({
+    resolver: zodResolver(signInRequest),
     defaultValues: {
       email: "",
       password: "",
@@ -66,14 +66,6 @@ export function SignInForm({ isLoading, onSubmit }: SignInFormProps) {
             </FormItem>
           )}
         />
-        <div className="text-end">
-          <a
-            href="/auth/recovery"
-            className="font-semibold underline underline-offset-2"
-          >
-            Forgot Password?
-          </a>
-        </div>
         <Button className="w-full" loading={isLoading}>
           Sign in
         </Button>

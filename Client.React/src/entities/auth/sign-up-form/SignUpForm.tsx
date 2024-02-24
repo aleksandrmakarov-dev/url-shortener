@@ -1,4 +1,4 @@
-import { SignUpDto, signUpDto } from "@/lib/dto/auth/sign-up.dto";
+import { SignUpRequest, signUpRequest } from "@/lib/dto/auth/sign-up.request";
 import { Button } from "@/shared/ui/button";
 import {
   Form,
@@ -15,14 +15,14 @@ import { useForm } from "react-hook-form";
 
 interface SignUpFormProps {
   isLoading?: boolean;
-  onSubmit: (data: SignUpDto) => void;
+  onSubmit: (data: SignUpRequest) => void;
 }
 
 export function SignUpForm({ isLoading, onSubmit }: SignUpFormProps) {
   const [show, setShow] = useState<boolean>(false);
 
-  const form = useForm<SignUpDto>({
-    resolver: zodResolver(signUpDto),
+  const form = useForm<SignUpRequest>({
+    resolver: zodResolver(signUpRequest),
     defaultValues: {
       email: "",
       password: "",

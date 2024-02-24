@@ -5,7 +5,7 @@ import { UserProfileMenu } from "@/widgets/user";
 import { Outlet } from "react-router-dom";
 
 export default function MainLayout() {
-  const { user, isLoading } = useSession();
+  const { session, isLoading } = useSession();
 
   return (
     <FullPageWrapper className="bg-gray-50">
@@ -38,7 +38,7 @@ export default function MainLayout() {
           </div>
           {isLoading ? (
             <p>Loading...</p>
-          ) : user ? (
+          ) : session ? (
             <UserProfileMenu />
           ) : (
             <div className="space-x-2">

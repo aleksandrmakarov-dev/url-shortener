@@ -1,13 +1,13 @@
 import { SignUpForm } from "@/entities/auth";
 import { useSignUpLocal } from "@/features/auth/sign-up";
-import { SignUpDto } from "@/lib/dto/auth/sign-up.dto";
+import { SignUpRequest } from "@/lib/dto/auth/sign-up.request";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { Button } from "@/shared/ui/button";
 
 export function SignUpCard() {
   const { mutate, isError, error, isSuccess, isPending } = useSignUpLocal();
 
-  const onSubmit = (data: SignUpDto) => {
+  const onSubmit = (data: SignUpRequest) => {
     mutate(data);
   };
 
@@ -29,12 +29,26 @@ export function SignUpCard() {
         className="mb-3"
         isSuccess={isSuccess}
         success={{
-          title: "Account created",
-          message:
-            "You have been send verification link to your email. Use it to verify your account.",
+          title: "User created",
+          message: (
+            <>
+              You have been send verification link to your email. You can enter
+              token manually at{" "}
+              <a
+                className="underline font-semibold underline-offset-2"
+                href="/auth/verify-email"
+              >
+                Verify email
+              </a>
+              .
+            </>
+          ),
         }}
         isError={isError}
-        error={error?.response?.data}
+        error={{
+          title: error?.response?.data.error,
+          message: error?.response?.data.message,
+        }}
       />
       <SignUpForm isLoading={isPending} onSubmit={onSubmit} />
       <div className="text-center mt-5">

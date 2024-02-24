@@ -1,16 +1,16 @@
 import { VerifyEmailForm } from "@/entities/auth";
 import { useVerifyEmail } from "@/features/auth/verify-email";
-import { VerifyEmailDto } from "@/lib/dto/auth/verify-email.dto";
+import { VerifyEmailRequest } from "@/lib/dto/auth/verify-email.request";
 import { FormAlert } from "@/shared/components/FormAlert";
 
 interface VerifyEmailCardProps {
-  data?: VerifyEmailDto;
+  data?: VerifyEmailRequest;
 }
 
 export function VerifyEmailCard({ data }: VerifyEmailCardProps) {
   const { mutate, isError, error, isSuccess, isPending } = useVerifyEmail();
 
-  const onSubmit = (data: VerifyEmailDto) => {
+  const onSubmit = (data: VerifyEmailRequest) => {
     mutate(data);
   };
 
@@ -24,8 +24,18 @@ export function VerifyEmailCard({ data }: VerifyEmailCardProps) {
         isSuccess={isSuccess}
         success={{
           title: "Verification sucessful",
-          message:
-            "Your account has been verified. You can sing in to your account.",
+          message: (
+            <>
+              Your account has been verified. You can sing in to your account{" "}
+              <a
+                className="underline font-semibold underline-offset-2"
+                href="/auth/sign-in"
+              >
+                Sign in
+              </a>
+              .
+            </>
+          ),
         }}
         isError={isError}
         error={error?.response?.data}

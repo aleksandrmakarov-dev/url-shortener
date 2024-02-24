@@ -1,21 +1,21 @@
 import { useSession } from "@/context/session-provider/SessionProvider";
 import { SignInForm } from "@/entities/auth";
 import { useSignInLocal } from "@/features/auth/sign-in";
-import { SignInDto } from "@/lib/dto/auth/sign-in.dto";
+import { SignInRequest } from "@/lib/dto/auth/sign-in.request";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { Button } from "@/shared/ui/button";
 import { useNavigate } from "react-router-dom";
 
 export function SignInCard() {
   const { mutate, isError, error, isSuccess, isPending } = useSignInLocal();
-  const { setToken } = useSession();
+  const { setSession } = useSession();
 
   const navigate = useNavigate();
 
-  const onSubmit = (data: SignInDto) => {
+  const onSubmit = (data: SignInRequest) => {
     mutate(data, {
       onSuccess: (response) => {
-        setToken(response);
+        setSession(response);
         navigate("/", { replace: true });
       },
     });
@@ -43,7 +43,10 @@ export function SignInCard() {
           message: "You succesfully signed in to your account.",
         }}
         isError={isError}
-        error={error?.response?.data}
+        error={{
+          title: error?.response?.data.error,
+          message: error?.response?.data.message,
+        }}
       />
       <SignInForm isLoading={isPending} onSubmit={onSubmit} />
       <div className="text-center mt-5">

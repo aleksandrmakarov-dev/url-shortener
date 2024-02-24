@@ -1,4 +1,4 @@
-export type MessageResponseDto = {
+export type MessageResponse = {
   title: string;
   message: string;
 };

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Server.API.Attributes;
 using Server.API.Common;
 using Server.Data.Entities;
 using Server.Infrastructure.Exceptions;
@@ -10,6 +11,7 @@ using Server.Infrastructure.Services;
 
 namespace Server.API.Controllers
 {
+    [Authorize]
     [Route("api/v1/short-urls")]
     [ApiController]
     public class ShortUrlsController : ControllerBase
@@ -21,6 +23,7 @@ namespace Server.API.Controllers
             _shortUrlsService = shortUrlsService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateShortUrlRequest request)
         {
@@ -47,6 +50,7 @@ namespace Server.API.Controllers
             return Ok(shortUrlResponse);
         }
 
+        [AllowAnonymous]
         [HttpGet("{alias}")]
         public async Task<IActionResult> GetByAlias([FromRoute] string alias)
         {
@@ -55,6 +59,7 @@ namespace Server.API.Controllers
             return Ok(shortUrlResponse);
         }
 
+        // [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

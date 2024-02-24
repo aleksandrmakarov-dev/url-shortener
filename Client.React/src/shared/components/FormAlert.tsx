@@ -1,14 +1,17 @@
-import { ErrorResponseDto } from "@/lib/dto/common/error-response.dto";
-import { MessageResponseDto } from "@/lib/dto/common/message-response.dto";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { HTMLAttributes } from "react";
 
+type AlertData = {
+  title?:string;
+  message?:React.ReactNode
+}
+
 interface FormAlertProps extends HTMLAttributes<HTMLDivElement> {
   isSuccess?: boolean;
-  success?: MessageResponseDto;
+  success?:AlertData;
   isError?: boolean;
-  error?: ErrorResponseDto;
+  error?:AlertData;
 }
 
 export function FormAlert({
@@ -28,7 +31,7 @@ export function FormAlert({
         )}
         {...other}
       >
-        <AlertTitle>{error?.error || "Unexpected error"}</AlertTitle>
+        <AlertTitle>{error?.title || "Unexpected error"}</AlertTitle>
         <AlertDescription>
           {error?.message ||
             "Something went wrong while processing your request."}

@@ -16,7 +16,7 @@ namespace Server.Infrastructure.Profiles
         {
             CreateMap<SignUpRequest, User>();
 
-            CreateMap<EmailVerificationRequest, User>();
+            CreateMap<NewEmailVerificationRequest, User>();
 
             CreateMap<User, UserResponse>();
 

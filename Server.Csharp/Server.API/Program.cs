@@ -49,12 +49,18 @@ namespace Server.API
 
             // app.UseHttpsRedirection();
 
-            // app.UseAuthorization();
-
+            app.UseCors(x => x
+                .SetIsOriginAllowed(origin => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
 
             app.MapControllers();
 
+            // global exception handler middleware
             app.UseMiddleware<ExceptionHandlerMiddleware>();
+            
+            // user extractor middleware
             app.UseMiddleware<UserExtractorMiddleware>();
 
             app.Run();

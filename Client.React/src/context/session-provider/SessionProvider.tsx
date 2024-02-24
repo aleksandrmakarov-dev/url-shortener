@@ -1,6 +1,5 @@
 import { useRefreshToken } from "@/features/auth/refresh-token";
-import { ErrorResponseDto } from "@/lib/dto/common/error-response.dto";
-import { UserDto } from "@/lib/dto/user/user.dto";
+import { ErrorResponse } from "@/lib/dto/common/error.response";
 import {
   Dispatch,
   SetStateAction,
@@ -10,20 +9,18 @@ import {
   useState,
 } from "react";
 import { setAuthorizationToken } from "@/lib/axios";
-import { useUserById } from "@/entities/user/api";
-import { TokenDto } from "@/lib/dto/auth/token.dto";
+import { SessionResponse } from "@/lib/dto/auth/session.response";
 
 type SessionContextData = {
-  user?: UserDto;
-  setToken: Dispatch<SetStateAction<TokenDto | undefined>>;
+  session?: SessionResponse;
+  setSession: Dispatch<SetStateAction<SessionResponse | undefined>>;
   isLoading?: boolean;
   isError?: boolean;
-  error?: ErrorResponseDto;
+  error?: ErrorResponse;
 };
 
 const SessionContext = createContext<SessionContextData>({
-  setToken: () => {},
-  isLoading: false,
+  setSession: () => {},
 });
 
 export const useSession = () => {
@@ -35,8 +32,7 @@ export default function SessionProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [isLoading, setIsLoading] = useState<boolean>();
-  const [token, setToken] = useState<TokenDto>();
+  const [session, setSession] = useState<SessionResponse>();
 
   const {
     mutate: refreshTokenMutate,
@@ -45,39 +41,32 @@ export default function SessionProvider({
     error: refreshTokenError,
   } = useRefreshToken();
 
-  const {
-    data: userData,
-    isLoading: isUserLoading,
-    isError: isUserError,
-    error: userError,
-  } = useUserById({
-    id: token?.userId,
-  });
-
   useEffect(() => {
-    if (!token) {
+    if (!session) {
       refreshTokenMutate(
         {},
         {
           onSuccess: (data) => {
-            setToken(data);
+            setSession(data);
           },
-          onSettled: (_) => setIsLoading(false),
+          onError: (e) => {
+            console.log(e);
+          },
         }
       );
+    } else {
+      setAuthorizationToken(session.accessToken);
     }
-
-    setAuthorizationToken(token?.accessToken);
-  }, [token]);
+  }, [session]);
 
   return (
     <SessionContext.Provider
       value={{
-        user: userData,
-        setToken: setToken,
-        isLoading: isRefreshTokenLoading || isUserLoading || isLoading,
-        isError: isRefreshTokenError || isUserError,
-        error: refreshTokenError?.response?.data || userError?.response?.data,
+        session: session,
+        setSession: setSession,
+        isLoading: isRefreshTokenLoading,
+        isError: isRefreshTokenError,
+        error: refreshTokenError?.response?.data,
       }}
     >
       {children}

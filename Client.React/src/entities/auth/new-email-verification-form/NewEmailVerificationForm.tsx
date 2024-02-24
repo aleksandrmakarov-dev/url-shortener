@@ -1,7 +1,5 @@
-import {
-  VerifyEmailRequest,
-  verifyEmailRequest,
-} from "@/lib/dto/auth/verify-email.request";
+
+import { NewEmailVerificationRequest, newEmailVerificationRequest } from "@/lib/dto/auth/new-email-verification.request";
 import { Button } from "@/shared/ui/button";
 import {
   Form,
@@ -15,22 +13,21 @@ import { Input } from "@/shared/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-interface VerifyEmailFormProps {
-  data?: VerifyEmailRequest;
+interface NewEmailVerificationFormProps {
+  data?: NewEmailVerificationRequest;
   isLoading?: boolean;
-  onSubmit: (data: VerifyEmailRequest) => void;
+  onSubmit: (data: NewEmailVerificationRequest) => void;
 }
 
-export function VerifyEmailForm({
+export function NewEmailVerificationForm({
   data,
   isLoading,
   onSubmit,
-}: VerifyEmailFormProps) {
-  const form = useForm<VerifyEmailRequest>({
-    resolver: zodResolver(verifyEmailRequest),
+}: NewEmailVerificationFormProps) {
+  const form = useForm<NewEmailVerificationRequest>({
+    resolver: zodResolver(newEmailVerificationRequest),
     defaultValues: {
       email: "",
-      token: "",
     },
     values: data,
   });
@@ -51,21 +48,8 @@ export function VerifyEmailForm({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="token"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Token</FormLabel>
-              <FormControl>
-                <Input type="text" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <Button loading={isLoading} type="submit" className="w-full">
-          Verify my account
+          Request new verification
         </Button>
       </form>
     </Form>

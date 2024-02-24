@@ -11,9 +11,9 @@ import {
 import { CircleUserRound } from "lucide-react";
 
 export function UserProfileMenu() {
-  const { user } = useSession();
+  const { session } = useSession();
 
-  if (!user) {
+  if (!session) {
     return null;
   }
 
@@ -26,7 +26,7 @@ export function UserProfileMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-42 absolute top-0 -right-4">
         <DropdownMenuLabel className="truncate p-2">
-          {user.email}
+          {session.userId}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

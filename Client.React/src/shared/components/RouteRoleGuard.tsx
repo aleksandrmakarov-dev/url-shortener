@@ -8,13 +8,13 @@ interface RouteRoleGuardProps {
 export function RouteRoleGuard(props: RouteRoleGuardProps) {
   const { roles } = props;
 
-  const { user, isLoading } = useSession();
+  const { session, isLoading } = useSession();
 
   if (isLoading) {
     return null;
   }
 
-  if (user) {
+  if (session) {
     if (roles && roles.includes("")) {
       return <Outlet />;
     } else {

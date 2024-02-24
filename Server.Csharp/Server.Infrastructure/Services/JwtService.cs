@@ -11,7 +11,7 @@ namespace Server.Infrastructure.Services;
 
 public class JwtService : IJwtService
 {
-    private readonly string _jwtKey = "my-secure-jwt-encoding-key";
+    private readonly string _jwtKey = "f96fbd347b356def28510a0d20006509726143a0367fbb5f1f2190ab306ee0786ffac377816d1352a65839aa22987b381f7558dad73ea1b4f0c845f5773f4bdd";
     private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
 
     public JwtService()

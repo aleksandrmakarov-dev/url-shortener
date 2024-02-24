@@ -199,7 +199,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<EmailVerificationResponse?> NewEmailVerificationAsync(EmailVerificationRequest request)
+    public async Task<EmailVerificationResponse?> NewEmailVerificationAsync(NewEmailVerificationRequest request)
     {
         // check if user with email exists
         User? foundUser = await _usersRepository.GetByEmailAsync(request.Email);

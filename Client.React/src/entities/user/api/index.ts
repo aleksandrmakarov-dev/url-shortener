@@ -1,8 +1,8 @@
-import { UserDto } from "@/lib/dto/user/user.dto";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import axios from "@/lib/axios";
-import { ErrorResponseDto } from "@/lib/dto/common/error-response.dto";
+import { UserResponse } from "@/lib/dto/user/user.response";
+import { ErrorResponse } from "@/lib/dto/common/error.response";
 
 export const userKeys = {
   users: {
@@ -12,7 +12,7 @@ export const userKeys = {
 };
 
 async function fetchUserById(params: UserByIdParams) {
-  const response = await axios.get<UserDto>(`/users/${params.id}`);
+  const response = await axios.get<UserResponse>(`/users/${params.id}`);
   return response.data;
 }
 
@@ -21,7 +21,7 @@ type UserByIdParams = {
 };
 
 export const useUserById = (params: UserByIdParams) => {
-  return useQuery<UserDto, AxiosError<ErrorResponseDto>, UserDto, unknown[]>({
+  return useQuery<UserResponse, AxiosError<ErrorResponse>, UserResponse, unknown[]>({
     queryKey: userKeys.users.id(params.id!),
     queryFn: async () => {
       return await fetchUserById(params);

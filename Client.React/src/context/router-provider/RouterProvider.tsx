@@ -2,6 +2,7 @@ import AccessDeniedPage from "@/pages/(main)/access-denied/page";
 import HomePage from "@/pages/(main)/home/page";
 import MainLayout from "@/pages/(main)/layout";
 import AuthLayout from "@/pages/auth/layout";
+import NewEmailVerificationPage from "@/pages/auth/new-email-verification/page";
 import SignInPage from "@/pages/auth/sign-in/page";
 import SignOutPage from "@/pages/auth/sign-out/page";
 import SignUpPage from "@/pages/auth/sign-up/page";
@@ -29,6 +30,10 @@ const router = createBrowserRouter(
           <Route path="sign-up" element={<SignUpPage />} />
         </Route>
         <Route path="verify-email" element={<VerifyEmailPage />} />
+        <Route
+          path="new-email-verification"
+          element={<NewEmailVerificationPage />}
+        />
         <Route path="sign-out" element={<SignOutPage />} />
       </Route>
     </>

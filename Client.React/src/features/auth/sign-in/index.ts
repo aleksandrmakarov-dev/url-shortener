@@ -1,18 +1,18 @@
 import { authKeys } from "@/entities/auth/api";
-import { SignInDto } from "@/lib/dto/auth/sign-in.dto";
-import { TokenDto } from "@/lib/dto/auth/token.dto";
-import { ErrorResponseDto } from "@/lib/dto/common/error-response.dto";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import axios from "@/lib/axios";
+import { SessionResponse } from "@/lib/dto/auth/session.response";
+import { SignInRequest } from "@/lib/dto/auth/sign-in.request";
+import { ErrorResponse } from "@/lib/dto/common/error.response";
 
-async function signInLocal(dto: SignInDto) {
-  const response = await axios.post<TokenDto>("/auth/sign-in", dto);
+async function signInLocal(request: SignInRequest) {
+  const response = await axios.post<SessionResponse>("/auth/sign-in", request);
   return response.data;
 }
 
 export const useSignInLocal = () => {
-  return useMutation<TokenDto, AxiosError<ErrorResponseDto>, SignInDto>({
+  return useMutation<SessionResponse, AxiosError<ErrorResponse>, SignInRequest>({
     mutationKey: authKeys.mutations.signInLocal(),
     mutationFn: async (data) => {
       return await signInLocal(data);

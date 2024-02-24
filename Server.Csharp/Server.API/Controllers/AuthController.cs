@@ -92,7 +92,7 @@ namespace Server.API.Controllers
         }
 
         [HttpPost("new-email-verification")]
-        public async Task<IActionResult> NewEmailVerification(EmailVerificationRequest request)
+        public async Task<IActionResult> NewEmailVerification(NewEmailVerificationRequest request)
         {
             EmailVerificationResponse? emailVerification = await _authService.NewEmailVerificationAsync(request);
 

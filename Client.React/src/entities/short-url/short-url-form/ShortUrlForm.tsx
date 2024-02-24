@@ -1,7 +1,4 @@
-import {
-  EditShortUrlDto,
-  editShortUrlDto,
-} from "@/lib/dto/short-url/edit-short-url.dto";
+import { EditShortUrlRequest, editShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
 import { Button } from "@/shared/ui/button";
 import {
   Form,
@@ -16,15 +13,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 interface ShortUrlFormProps {
-  onSubmit: (data: EditShortUrlDto) => void;
+  onSubmit: (data: EditShortUrlRequest) => void;
 }
 
 export function ShortUrlForm({ onSubmit }: ShortUrlFormProps) {
-  const form = useForm<EditShortUrlDto>({
-    resolver: zodResolver(editShortUrlDto),
+  const form = useForm<EditShortUrlRequest>({
+    resolver: zodResolver(editShortUrlRequest),
     defaultValues: {
       redirect: "",
-      alias: "",
+      customAlias: "",
     },
   });
 
@@ -56,7 +53,7 @@ export function ShortUrlForm({ onSubmit }: ShortUrlFormProps) {
           <div className="col-span-2">
             <FormField
               control={form.control}
-              name="alias"
+              name="customAlias"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Alias (optional)</FormLabel>

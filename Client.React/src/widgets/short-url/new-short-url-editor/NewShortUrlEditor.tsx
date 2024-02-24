@@ -1,8 +1,8 @@
 import { ShortUrlForm } from "@/entities/short-url";
-import { EditShortUrlDto } from "@/lib/dto/short-url/edit-short-url.dto";
+import { EditShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
 
 export function NewShortUrlEditor() {
-  const onSubmit = (data: EditShortUrlDto) => {
+  const onSubmit = (data: EditShortUrlRequest) => {
     console.log(data);
   };
 
