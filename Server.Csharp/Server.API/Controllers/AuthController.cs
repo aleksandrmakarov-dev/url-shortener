@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Server.API.Attributes;
 using Server.API.Common;
 using Server.Infrastructure.Exceptions;
 using Server.Infrastructure.Models.Requests;
@@ -118,6 +118,26 @@ namespace Server.API.Controllers
             };
 
             return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpDelete("sign-out")]
+        public async Task<IActionResult> ExpireSession()
+        {
+            // get refresh token from cookie
+            string? refreshToken = HttpContext.Request.Cookies[CookieNameConstants.RefreshToken];
+
+            // if refreshToken cookie not found throw an error
+            if (refreshToken == null)
+            {
+                throw new BadRequestException("No refresh token provided");
+            }
+
+            await _authService.SignOutAsync(new SignOutRequest { Token = refreshToken });
+
+            HttpContext.Response.Cookies.Delete(CookieNameConstants.RefreshToken);
+
+            return NoContent();
         }
     }
 }

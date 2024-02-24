@@ -10,5 +10,6 @@ namespace Server.Infrastructure.Services
         Task VerifyEmailAsync(VerifyEmailRequest request);
         Task<SessionResponse> RefreshTokenAsync(RefreshTokenRequest request);
         Task<EmailVerificationResponse?> NewEmailVerificationAsync(NewEmailVerificationRequest request);
+        Task SignOutAsync(SignOutRequest request);
     }
 }

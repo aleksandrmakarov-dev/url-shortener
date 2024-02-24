@@ -16,7 +16,10 @@ namespace Server.API.Middlewares
         public async Task InvokeAsync(HttpContext context, IJwtService jwtService)
         {
             // get access token from authorization header
-            string? accessToken = context.Request.Headers.Authorization.FirstOrDefault();
+            string? accessToken = context.Request.Headers.Authorization
+                .FirstOrDefault()?
+                .Split(" ")
+                .Last();
 
             //if access token is null, go to next
             if (accessToken != null)

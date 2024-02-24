@@ -1,1 +1,1 @@
-export { NewShortUrlEditor } from "./new-short-url-editor/NewShortUrlEditor";
+export { CreateShortUrlCard } from "./create-short-url-card/CreateShortUrlCard";

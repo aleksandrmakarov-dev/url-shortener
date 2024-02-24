@@ -13,7 +13,11 @@ namespace Server.Infrastructure.Services
         private readonly ITokensService _tokensService;
         private readonly IMapper _mapper;
 
-        public ShortUrlsService(IShortUrlsRepository shortUrlsRepository, IMapper mapper, ITokensService tokensService)
+        public ShortUrlsService(
+            IShortUrlsRepository shortUrlsRepository, 
+            IMapper mapper, 
+            ITokensService tokensService
+            )
         {
             _shortUrlsRepository = shortUrlsRepository;
             _mapper = mapper;
@@ -26,10 +30,10 @@ namespace Server.Infrastructure.Services
 
             // check if custom alias is set
 
-            if (request.CustomAlias != null)
+            if (!string.IsNullOrEmpty(request.CustomAlias))
             {
-                // check if custom alias is already exists
 
+                // check if custom alias is already exists
                 bool isAliasExist = await _shortUrlsRepository.IsExistByAliasAsync(request.CustomAlias);
 
                 if (isAliasExist)
@@ -60,7 +64,7 @@ namespace Server.Infrastructure.Services
 
             ShortUrlResponse shortUrlResponse = _mapper.Map<ShortUrl, ShortUrlResponse>(createdShortUrl);
             
-            shortUrlResponse.Domain = "http://localhost:7153";
+            shortUrlResponse.Domain = "http://localhost:5173";
 
             return shortUrlResponse;
         }
@@ -76,7 +80,7 @@ namespace Server.Infrastructure.Services
 
             ShortUrlResponse shortUrlResponse = _mapper.Map<ShortUrl,ShortUrlResponse>(foundShortUrl);
 
-            shortUrlResponse.Domain = "http://localhost:7153";
+            shortUrlResponse.Domain = "http://localhost:5173";
 
             return shortUrlResponse;
         }
@@ -98,6 +102,21 @@ namespace Server.Infrastructure.Services
             }
 
             ShortUrl shortUrlToUpdate = _mapper.Map<UpdateShortUrlRequest, ShortUrl>(request);
+
+            // check if custom alias is set
+
+            if (!string.IsNullOrEmpty(request.CustomAlias) && request.CustomAlias != foundShortUrl.Alias)
+            {
+                // check if custom alias is already exists
+                bool isAliasExist = await _shortUrlsRepository.IsExistByAliasAsync(request.CustomAlias);
+
+                if (isAliasExist)
+                {
+                    throw new BadRequestException($"Alias {request.CustomAlias} is already registered. Try another one");
+                }
+
+                shortUrlToUpdate.Alias = request.CustomAlias;
+            }
 
             ShortUrl updatedShortUrl = await _shortUrlsRepository.UpdateAsync(shortUrlToUpdate);
 

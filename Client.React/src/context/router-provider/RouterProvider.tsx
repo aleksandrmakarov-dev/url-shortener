@@ -1,3 +1,4 @@
+import RedirectPage from "@/pages/(main)/[alias]/page";
 import AccessDeniedPage from "@/pages/(main)/access-denied/page";
 import HomePage from "@/pages/(main)/home/page";
 import MainLayout from "@/pages/(main)/layout";
@@ -22,6 +23,7 @@ const router = createBrowserRouter(
     <>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
+        <Route path=":alias" element={<RedirectPage />} />
         <Route path="/access-denied" element={<AccessDeniedPage />} />
       </Route>
       <Route path="/auth" element={<AuthLayout />}>

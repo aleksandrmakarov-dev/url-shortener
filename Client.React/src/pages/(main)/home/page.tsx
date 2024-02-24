@@ -1,5 +1,5 @@
 import { Button } from "@/shared/ui/button";
-import { NewShortUrlEditor } from "@/widgets/short-url";
+import { CreateShortUrlCard } from "@/widgets/short-url";
 
 export default function HomePage() {
   return (
@@ -11,9 +11,7 @@ export default function HomePage() {
           anywhere. Track what’s working, and what’s not.
         </p>
       </div>
-      <div className="bg-white border border-border rounded-md p-8 max-w-screen-sm mx-auto mb-10">
-        <NewShortUrlEditor />
-      </div>
+      <CreateShortUrlCard className="mb-10" />
       <div className="bg-white border border-border rounded-md p-8 max-w-screen-sm mx-auto">
         <div className="text-center">
           <h1 className="text-3xl font-semibold mb-5">

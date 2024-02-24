@@ -229,4 +229,28 @@ public class AuthService : IAuthService
         //map User to SignUpResponse and return it
         return _mapper.Map<User, EmailVerificationResponse>(updatedUser);
     }
+
+    public async Task SignOutAsync(SignOutRequest request)
+    {
+        // check if session exists
+        Session? foundSession = await _sessionsRepository.GetByRefreshTokenAsync(request.Token);
+
+        // if session not found throw an error
+        if (foundSession == null)
+        {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        // if session is expired return
+        if (foundSession.ExpiresAt < DateTime.UtcNow)
+        {
+            return;
+        }
+
+        // set new expiration time datetime now
+        foundSession.ExpiresAt = DateTime.UtcNow;
+        
+        // update date in database
+        await _sessionsRepository.UpdateAsync(foundSession);
+    }
 }

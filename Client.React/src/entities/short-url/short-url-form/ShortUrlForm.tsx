@@ -1,4 +1,7 @@
-import { EditShortUrlRequest, editShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
+import {
+  EditShortUrlRequest,
+  editShortUrlRequest,
+} from "@/lib/dto/short-url/edit-short-url.request";
 import { Button } from "@/shared/ui/button";
 import {
   Form,
@@ -13,24 +16,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 interface ShortUrlFormProps {
+  shortUrl?: EditShortUrlRequest;
   onSubmit: (data: EditShortUrlRequest) => void;
+  isLoading?: boolean;
 }
 
-export function ShortUrlForm({ onSubmit }: ShortUrlFormProps) {
+export function ShortUrlForm({
+  shortUrl,
+  onSubmit,
+  isLoading,
+}: ShortUrlFormProps) {
   const form = useForm<EditShortUrlRequest>({
     resolver: zodResolver(editShortUrlRequest),
     defaultValues: {
-      redirect: "",
+      original: "",
       customAlias: "",
     },
+    values: shortUrl,
   });
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
-          name="redirect"
+          name="original"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Original URL</FormLabel>
@@ -44,7 +54,7 @@ export function ShortUrlForm({ onSubmit }: ShortUrlFormProps) {
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-[1fr_auto_1fr_1fr] gap-x-3 my-5">
+        <div className="grid grid-cols-[1fr_auto_1fr_1fr] gap-x-3">
           <FormItem>
             <FormLabel>Domain</FormLabel>
             <Input value="shrt.com" disabled />
@@ -54,11 +64,15 @@ export function ShortUrlForm({ onSubmit }: ShortUrlFormProps) {
             <FormField
               control={form.control}
               name="customAlias"
-              render={({ field }) => (
+              render={({ field: { disabled, ...other } }) => (
                 <FormItem>
                   <FormLabel>Alias (optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="example: favorite-link" {...field} />
+                    <Input
+                      placeholder="example: favorite-link"
+                      disabled={disabled || !shortUrl?.userId}
+                      {...other}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -67,7 +81,7 @@ export function ShortUrlForm({ onSubmit }: ShortUrlFormProps) {
           </div>
         </div>
         <div>
-          <Button>Get my URL</Button>
+          <Button loading={isLoading}>Get my short URL</Button>
         </div>
       </form>
     </Form>

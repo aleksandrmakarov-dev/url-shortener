@@ -1,5 +1,5 @@
 import { useSignOut } from "@/features/auth/sign-out";
-import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
+import { FormAlert } from "@/shared/components/FormAlert";
 import { useEffect } from "react";
 
 export default function SignOutPage() {
@@ -15,10 +15,14 @@ export default function SignOutPage() {
 
   if (isError) {
     return (
-      <Alert>
-        <AlertTitle>{error?.response?.data.error}</AlertTitle>
-        <AlertDescription>{error?.response?.data.message}</AlertDescription>
-      </Alert>
+      <FormAlert
+        className="max-w-md mx-auto"
+        isError={isError}
+        error={{
+          title: error.response?.data.error,
+          message: error.response?.data.message,
+        }}
+      />
     );
   }
 

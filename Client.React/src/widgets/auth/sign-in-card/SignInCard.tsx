@@ -22,7 +22,7 @@ export function SignInCard() {
   };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md mx-auto">
       <h1 className="text-center mb-10 text-3xl font-semibold">
         Sign in to Account
       </h1>

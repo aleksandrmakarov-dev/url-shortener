@@ -31,7 +31,8 @@ namespace Server.API.Controllers
             JwtPayload? user = (JwtPayload?)HttpContext.Items[Constants.UserContextName];
 
             // check if custom alias is set and if user is anonymous throw an error
-            if (request.CustomAlias != null && user == null)
+
+            if (!string.IsNullOrEmpty(request.CustomAlias) && user == null)
             {
                 throw new UnauthorizedException("Anonymous users can't create short url with custom alias");
             }
@@ -59,7 +60,7 @@ namespace Server.API.Controllers
             return Ok(shortUrlResponse);
         }
 
-        // [AllowAnonymous]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
