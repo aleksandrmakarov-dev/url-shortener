@@ -1,4 +1,5 @@
-﻿using Server.Data.Repositories;
+﻿using Server.Data.Entities;
+using Server.Data.Repositories;
 using Server.Infrastructure.Services;
 
 namespace Server.API.Common
@@ -10,6 +11,9 @@ namespace Server.API.Common
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<ISessionsRepository, SessionsRepository>();
             services.AddScoped<IShortUrlsRepository, ShortUrlsRepository>();
+
+            //cache repositories
+            services.AddScoped<IGenericCacheRepository<ShortUrl>, GenericCacheRepository<ShortUrl>>();
 
             return services;
         }

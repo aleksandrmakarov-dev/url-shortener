@@ -27,6 +27,11 @@ namespace Server.API
                 Assembly.Load("Server.Infrastructure")
                 );
 
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
+
             // add repositories
             builder.Services.AddRepositories();
 
