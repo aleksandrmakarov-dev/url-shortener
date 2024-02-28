@@ -277,8 +277,8 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
         }
     ],
     "pagination": {
-        "currentPage": 1,
-        "pageSize": 10,
+        "page": 1,
+        "size": 10,
         "query": "optional_query_string",
         "userId": "optional_user_id_string",
         "hasNextPage": true
