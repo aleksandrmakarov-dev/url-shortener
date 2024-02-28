@@ -105,11 +105,8 @@ The `AuthController` class handles authentication-related HTTP requests in the A
 - **Success Response (200 OK):** 
     ```json
     {
-        "refreshToken": "refresh_token_string",
-        "session": {
-            "accessToken": "access_token_string",
-            "userId": "user_id_string"
-        }
+         "accessToken": "access_token_string",
+         "userId": "user_id_string"
     }
     ```
 - **Error Response:** 
