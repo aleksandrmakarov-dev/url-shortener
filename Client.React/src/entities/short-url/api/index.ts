@@ -1,5 +1,6 @@
 import axios from "@/lib/axios";
 import { ErrorResponse } from "@/lib/dto/common/error.response";
+import { PagedResponse } from "@/lib/dto/common/paged.response";
 import { ShortUrlResponse } from "@/lib/dto/short-url/short-url.response";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -37,5 +38,25 @@ export const useShortUrlByAlias = (params: ShortUrlByAliasParams) => {
       return await fetchShortUrlByAlias(params);
     },
     enabled: !!params.alias,
+  });
+};
+
+type ShortUrlsParams = {
+  page?: number;
+  size?: number;
+  query?: string;
+  userId?: string;
+};
+
+export const useShortUrls = (params?: ShortUrlsParams) => {
+  return useQuery<
+    PagedResponse<ShortUrlResponse>,
+    AxiosError,
+    PagedResponse<ShortUrlResponse>
+  >({
+    queryKey: shortUrlsKeys.shortUrls.root,
+    queryFn: async () => {
+      return await ();
+    }
   });
 };

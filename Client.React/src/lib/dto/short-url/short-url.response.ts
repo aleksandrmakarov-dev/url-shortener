@@ -4,4 +4,6 @@ export type ShortUrlResponse = {
   alias: string;
   domain: string;
   userId?: string;
+  expiresAt?: Date;
+  createdAt: Date;
 };

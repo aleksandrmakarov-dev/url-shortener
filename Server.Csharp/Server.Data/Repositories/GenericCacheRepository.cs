@@ -13,7 +13,7 @@ public class GenericCacheRepository<TEntity>:IGenericCacheRepository<TEntity> wh
         _distributedCache = distributedCache;
     }
 
-    public async Task<TEntity?> GetByKeyAsync(string key)
+    public async Task<TEntity?> GetAsync(string key)
     {
         string itemKey = GetKey(key);
         // try get json value from cache
@@ -30,21 +30,29 @@ public class GenericCacheRepository<TEntity>:IGenericCacheRepository<TEntity> wh
             });
     }
 
-    public async Task SetAsync(string key, TEntity entity)
+    public async Task SetAsync(string key, TEntity entity,TimeSpan? ttl = null)
     {
         string itemKey = GetKey(key);
         // serialize object to json
         string json = JsonConvert.SerializeObject(entity);
         // set json value to key
-        await _distributedCache.SetStringAsync(itemKey, json);
+        await _distributedCache.SetStringAsync(itemKey, json,new DistributedCacheEntryOptions
+        {
+            SlidingExpiration = ttl
+        });
     }
 
-    public async Task DeleteByKeyAsync(string key)
+    public async Task DeleteAsync(string key)
     {
         string itemKey = GetKey(key);
             
         // try to delete value by key
         await _distributedCache.RemoveAsync(key);
+    }
+
+    public async Task RefreshAsync(string key)
+    {
+        await _distributedCache.RefreshAsync(key);
     }
 
     protected virtual string GetKey(object id) => $"{typeof(TEntity).Name}-{id}";

@@ -54,12 +54,7 @@ export function ShortUrlForm({
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-[1fr_auto_1fr_1fr] gap-x-3">
-          <FormItem>
-            <FormLabel>Domain</FormLabel>
-            <Input value="shrt.com" disabled />
-          </FormItem>
-          <span className="py-2.5 self-end font-semibold">/</span>
+        <div className="grid grid-cols-3 gap-x-3">
           <div className="col-span-2">
             <FormField
               control={form.control}
@@ -79,6 +74,24 @@ export function ShortUrlForm({
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="expiresAt"
+            render={({ field: { disabled, ...other } }) => (
+              <FormItem>
+                <FormLabel>Expires At (Optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="datetime-local"
+                    placeholder="example: favorite-link"
+                    disabled={disabled || !shortUrl?.userId}
+                    {...other}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <div>
           <Button loading={isLoading}>Get my short URL</Button>

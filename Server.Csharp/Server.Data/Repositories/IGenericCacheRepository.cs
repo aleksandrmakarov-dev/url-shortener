@@ -9,8 +9,9 @@ namespace Server.Data.Repositories
 {
     public interface IGenericCacheRepository<TEntity> where TEntity:Entity
     {
-        Task<TEntity?> GetByKeyAsync(string key);
-        Task SetAsync(string key,TEntity entity);
-        Task DeleteByKeyAsync(string key);
+        Task<TEntity?> GetAsync(string key);
+        Task SetAsync(string key,TEntity entity, TimeSpan? ttl = null);
+        Task DeleteAsync(string key);
+        Task RefreshAsync(string key);
     }
 }

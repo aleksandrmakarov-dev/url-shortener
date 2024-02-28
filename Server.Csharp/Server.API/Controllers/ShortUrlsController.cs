@@ -32,7 +32,7 @@ namespace Server.API.Controllers
 
             // check if custom alias is set and if user is anonymous throw an error
 
-            if (!string.IsNullOrEmpty(request.CustomAlias) && user == null)
+            if ((!string.IsNullOrEmpty(request.CustomAlias) || request.ExpiresAt != null) && user == null)
             {
                 throw new UnauthorizedException("Anonymous users can't create short url with custom alias");
             }
@@ -62,7 +62,12 @@ namespace Server.API.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] Guid? userId,
+            [FromQuery] string? query,
+            [FromQuery] int? page = 1,
+            [FromQuery] int? size = 10
+        )
         {
             IEnumerable<ShortUrlResponse> foundShortUrls = await _shortUrlsService.GetAllAsync();
             return Ok(foundShortUrls);

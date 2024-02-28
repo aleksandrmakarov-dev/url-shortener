@@ -7,6 +7,7 @@ export const editShortUrlRequest = z.object({
     .regex(/^[A-Za-z0-9_-]*$/, "contains invalid characters")
     .max(16)
     .optional(),
+  expiresAt: z.string().optional(),
   userId: z.string().optional(),
 });
 

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Server.Data.Common;
 using Server.Data.Entities;
 using Server.Data.Repositories;
 using Server.Infrastructure.Exceptions;
@@ -77,7 +78,7 @@ namespace Server.Infrastructure.Services
         public async Task<ShortUrlResponse> GetByAliasAsync(string alias)
         {
             // check if url exists in cache
-            ShortUrl? foundShortUrl = await _shortUrlsCacheRepository.GetByKeyAsync(alias);
+            ShortUrl? foundShortUrl = await _shortUrlsCacheRepository.GetAsync(alias);
 
             // if cache value is null try get from database
             if (foundShortUrl == null)
@@ -86,13 +87,18 @@ namespace Server.Infrastructure.Services
                 // if value from database is not null, save it to cache
                 if (foundShortUrl != null)
                 {
-                    await _shortUrlsCacheRepository.SetAsync(foundShortUrl.Alias, foundShortUrl);
+                    await _shortUrlsCacheRepository.SetAsync(foundShortUrl.Alias, foundShortUrl,Constants.CacheTimeToLive);
                 }
                 // otherwise throw not found exception
                 else
                 {
                     throw new NotFoundException($"Short url with alias {alias} not found");
                 }
+            }
+            else
+            {
+                // if short url found in cache refresh ttl
+                await _shortUrlsCacheRepository.RefreshAsync(alias);
             }
 
             ShortUrlResponse shortUrlResponse = _mapper.Map<ShortUrl,ShortUrlResponse>(foundShortUrl);
@@ -138,7 +144,7 @@ namespace Server.Infrastructure.Services
             ShortUrl updatedShortUrl = await _shortUrlsRepository.UpdateAsync(shortUrlToUpdate);
 
             // cache short url value
-            await _shortUrlsCacheRepository.SetAsync(updatedShortUrl.Alias, updatedShortUrl);
+            await _shortUrlsCacheRepository.SetAsync(updatedShortUrl.Alias, updatedShortUrl,Constants.CacheTimeToLive);
 
             return _mapper.Map<ShortUrl, ShortUrlResponse>(updatedShortUrl);
         }
@@ -155,7 +161,7 @@ namespace Server.Infrastructure.Services
             await _shortUrlsRepository.DeleteAsync(foundShortUrl);
 
             // try to remove short url cache
-            await _shortUrlsCacheRepository.DeleteByKeyAsync(foundShortUrl.Alias);
+            await _shortUrlsCacheRepository.DeleteAsync(foundShortUrl.Alias);
 
             return _mapper.Map<ShortUrl, ShortUrlResponse>(foundShortUrl);
         }

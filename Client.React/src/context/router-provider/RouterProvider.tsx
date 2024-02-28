@@ -2,6 +2,7 @@ import RedirectPage from "@/pages/(main)/[alias]/page";
 import AccessDeniedPage from "@/pages/(main)/access-denied/page";
 import HomePage from "@/pages/(main)/home/page";
 import MainLayout from "@/pages/(main)/layout";
+import LinksPage from "@/pages/(main)/links/u/[userId]/page";
 import AuthLayout from "@/pages/auth/layout";
 import NewEmailVerificationPage from "@/pages/auth/new-email-verification/page";
 import SignInPage from "@/pages/auth/sign-in/page";
@@ -24,7 +25,12 @@ const router = createBrowserRouter(
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path=":alias" element={<RedirectPage />} />
-        <Route path="/access-denied" element={<AccessDeniedPage />} />
+        <Route path="access-denied" element={<AccessDeniedPage />} />
+        <Route path="links">
+          <Route path="u">
+            <Route path=":userId" element={<LinksPage />} />
+          </Route>
+        </Route>
       </Route>
       <Route path="/auth" element={<AuthLayout />}>
         <Route element={<RoutePublicGuard />}>
