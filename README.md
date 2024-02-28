@@ -105,8 +105,10 @@ The `AuthController` class handles authentication-related HTTP requests in the A
 - **Success Response (200 OK):** 
     ```json
     {
-         "accessToken": "access_token_string",
-         "userId": "user_id_string"
+        "accessToken": "new_access_token_string",
+        "userId": "user_id_string",
+        "email": "user@example.com",
+        "role": "role_string"
     }
     ```
 - **Error Response:** 
@@ -140,7 +142,9 @@ The `AuthController` class handles authentication-related HTTP requests in the A
     ```json
     {
         "accessToken": "new_access_token_string",
-        "userId": "user_id_string"
+        "userId": "user_id_string",
+        "email": "user@example.com",
+        "role": "role_string"
     }
     ```
 - **Error Response:** 
