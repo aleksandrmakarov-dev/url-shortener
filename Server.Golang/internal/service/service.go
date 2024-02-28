@@ -18,9 +18,12 @@ type Auth interface {
 type Url interface {
 	CreateShortUrl(u *models.Url) (string, error)
 	GetUrl(alias string) (models.Url, error)
-	UpdateURLAliasByID(id int, alias string) error
-	UpdateURLOriginalByID(id int, original string) error
+	GetUrlById(id int) (models.Url, error)
+	UpdateURLAliasByID(id int, alias string, userId int) error
+	UpdateURLOriginalByID(id int, original string, userId int) error
 	DeleteURLByID(id, userId int) error
+	SubTimeToUrlByID(id int, t time.Duration, expiresAt time.Time, userId int) error
+	AddTimeToUrlByID(id int, t time.Duration, expiresAt time.Time, userId int) error
 }
 
 type Service struct {

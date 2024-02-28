@@ -61,8 +61,6 @@ func NewSqliteDB(storagePath string) (*sql.DB, error) {
 		return nil, fmt.Errorf("%s: %w", opr, err)
 	}
 
-	fmt.Println(len(queries))
-
 	for _, v := range queries {
 		stmt, err := db.Prepare(v)
 		if err != nil {

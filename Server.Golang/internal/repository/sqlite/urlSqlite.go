@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 	randomalias "url-shortener/internal/lib/random/randomAlias"
 	"url-shortener/internal/models"
 	dberrs "url-shortener/internal/repository/dbErrs"
@@ -66,7 +67,7 @@ func (r *UrlSqlite) CreateShortUrl(u *models.Url) (string, error) {
 }
 
 func (r *UrlSqlite) GetUrl(alias string) (models.Url, error) {
-	const opr = "repository.sqlite.authSqlite.CreateShortUrl"
+	const opr = "repository.sqlite.urlSqlite.GetUrl"
 	stmt, err := r.db.Prepare("SELECT id,alias,redirect,userId,createdAt,expiresAt FROM Urls WHERE alias = ?")
 	if err != nil {
 		return models.Url{}, fmt.Errorf("%s: %w", opr, err)
@@ -75,6 +76,31 @@ func (r *UrlSqlite) GetUrl(alias string) (models.Url, error) {
 	var url models.Url
 
 	err = stmt.QueryRow(alias).Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.CreatedAt, &url.ExpiresAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Url{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		}
+		return models.Url{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	if url.IsExpired() {
+		r.DeleteUrlByID(url.ID, url.UserID)
+		return models.Url{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorURLExpired)
+	}
+
+	return url, nil
+}
+
+func (r *UrlSqlite) GetUrlById(id int) (models.Url, error) {
+	const opr = "repository.sqlite.urlSqlite.GetUrlById"
+	stmt, err := r.db.Prepare("SELECT id,alias,redirect,userId,createdAt,expiresAt FROM Urls WHERE id = ?")
+	if err != nil {
+		return models.Url{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	var url models.Url
+
+	err = stmt.QueryRow(id).Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.CreatedAt, &url.ExpiresAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return models.Url{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
@@ -108,15 +134,15 @@ func (r *UrlSqlite) DeleteUrlByID(id, userId int) error {
 	return nil
 }
 
-func (r *UrlSqlite) UpdateUrlAliasByID(id int, alias string) error {
-	const opr = "storage.storages.sqlite.DeleteUrlByID"
+func (r *UrlSqlite) UpdateUrlAliasByID(id int, alias string, userId int) error {
+	const opr = "storage.storages.sqlite.UpdateUrlAliasByID"
 
-	stmt, err := r.db.Prepare("UPDATE Urls SET alias = ?  WHERE id = ?")
+	stmt, err := r.db.Prepare("UPDATE Urls SET alias = ?  WHERE id = ? AND userId = ?")
 	if err != nil {
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(alias, id)
+	_, err = stmt.Exec(alias, id, userId)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
 			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
@@ -127,15 +153,53 @@ func (r *UrlSqlite) UpdateUrlAliasByID(id int, alias string) error {
 	return nil
 }
 
-func (r *UrlSqlite) UpdateUrlOriginalByID(id int, original string) error {
-	const opr = "storage.storages.sqlite.DeleteUrlByID"
+func (r *UrlSqlite) UpdateUrlOriginalByID(id int, original string, userId int) error {
+	const opr = "storage.storages.sqlite.UpdateUrlOriginalByID"
 
-	stmt, err := r.db.Prepare("UPDATE Urls SET original = ?  WHERE id = ?")
+	stmt, err := r.db.Prepare("UPDATE Urls SET redirect = ?  WHERE id = ? AND userId = ?")
 	if err != nil {
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(original, id)
+	_, err = stmt.Exec(original, id, userId)
+	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
+			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		}
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (r *UrlSqlite) AddTimeToUrlByID(id int, t time.Duration, expiresAt time.Time, userId int) error {
+	const opr = "storage.storages.sqlite.AddTimeToUrlByID"
+
+	stmt, err := r.db.Prepare("UPDATE Urls SET expiresAt = ? WHERE id = ? AND userId = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(expiresAt.Add(t), id, userId)
+	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
+			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		}
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
+}
+
+func (r *UrlSqlite) SubTimeToUrlByID(id int, t time.Duration, expiresAt time.Time, userId int) error {
+	const opr = "storage.storages.sqlite.AddTimeToUrlByID"
+
+	stmt, err := r.db.Prepare("UPDATE Urls SET expiresAt = ? WHERE id = ? AND userId = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	_, err = stmt.Exec(expiresAt.Add(-t), id, userId)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
 			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
