@@ -284,6 +284,7 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
         "hasNextPage": true
     }
 }
+```
 
 ### UpdateById
 - **Route:** `PUT api/v1/short-urls/{id}`
