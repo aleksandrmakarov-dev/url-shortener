@@ -74,225 +74,130 @@ For endpoints requiring authentication, include an access token in the request h
 
 ## Endpoints
 
-### Sign Up with Email and Password
-- **Method:** POST
-- **Route:** `/sign-up`
-- **Description:** Create a new user account with email and password.
-- **Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-```
-- **Response Body:** None
+The `AuthController` class handles authentication-related HTTP requests in the API. Below is the documentation for each endpoint:
 
-#### Error Responses:
-- **Status Code:** 400 Bad Request
-```json
-{
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Invalid email format or password strength"
-}
-```
-- **Status Code:** 409 Conflict
-```json
-{
-  "status": 409,
-  "error": "Conflict",
-  "message": "User with this email already exists"
-}
-```
+### SignUp
+- **Route:** `POST api/v1/auth/sign-up`
+- **Description:** Registers a new user.
+- **Request Body:** 
+    ```json
+    {
+        "email": "user@example.com",
+        "password": "password123"
+    }
+    ```
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "title": "Complete the registration",
+        "message": "You will receive verification code to the email address"
+    }
+    ```
+- **Error Response:** 
+    - **400 Bad Request:** If the email is already registered.
 
+### SignIn
+- **Route:** `POST api/v1/auth/sign-in`
+- **Description:** Authenticates a user.
+- **Request Body:** 
+    ```json
+    {
+        "email": "user@example.com",
+        "password": "password123"
+    }
+    ```
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "refreshToken": "refresh_token_string",
+        "session": {
+            "accessToken": "access_token_string",
+            "userId": "user_id_string"
+        }
+    }
+    ```
+- **Error Response:** 
+    - **400 Bad Request:** If the email is not verified or invalid credentials.
 
-### Sign In with Email and Password
-- **Method:** POST
-- **Route:** `/sign-in`
-- **Description:** Authenticate a user with email and password.
-- **Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-```
-- **Response Body:**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user_id": "ab1cd2ef3"
-}
-```
+### VerifyEmail
+- **Route:** `POST api/v1/auth/verify-email`
+- **Description:** Verifies a user's email address.
+- **Request Body:** 
+    ```json
+    {
+        "email": "user@example.com",
+        "token": "verification_token_string"
+    }
+    ```
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "title": "Registration is completed",
+        "message": "Your email address is verified. You can sign in to your account"
+    }
+    ```
+- **Error Response:** 
+    - **400 Bad Request:** If the verification token is invalid or expired.
 
-- **Response Cookie:**
-  - **Name:** refreshToken
-  - **Value:** [Refresh Token Value]
-  - **HttpOnly:** true
+### RefreshToken
+- **Route:** `POST api/v1/auth/refresh-token`
+- **Description:** Generates a new access token using a refresh token.
+- **Request Body:** None
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "accessToken": "new_access_token_string",
+        "userId": "user_id_string"
+    }
+    ```
+- **Error Response:** 
+    - **400 Bad Request:** If the refresh token is invalid or expired.
 
-#### Error Responses:
-- **Status Code:** 401 Unauthorized
-```json
-{
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "Invalid credentials"
-}
-```
-### Verify Email
-- **Method:** POST
-- **Route:** `/verify-email`
-- **Description:** Verify user's email with a verification token.
-- **Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "token": "verification_token"
-}
-```
-- **Response Body:** None
+### NewEmailVerification
+- **Route:** `POST api/v1/auth/new-email-verification`
+- **Description:** Sends a new email verification token to the user's email address.
+- **Request Body:** 
+    ```json
+    {
+        "email": "user@example.com"
+    }
+    ```
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "title": "New email verification",
+        "message": "New email verification token is sent to your email address"
+    }
+    ```
+- **Error Response:** 
+    - **200 OK:** If the email is already verified.
 
-#### Error Responses:
-- **Status Code:** 404 Not Found
-```json
-{
-  "status": 404,
-  "error": "Not Found",
-  "message": "User or verification token not found"
-}
-```
-- **Status Code:** 401 Unauthorized
-```json
-{
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "Verification token has expired"
-}
-```
+### ExpireSession
+- **Route:** `DELETE api/v1/auth/sign-out`
+- **Description:** Expires the current user session.
+- **Request Body:** 
+    ```json
+    {
+        "token": "refresh_token_string"
+    }
+    ```
+- **Success Response (204 No Content):** No content.
+- **Error Response:** 
+    - **400 Bad Request:** If the refresh token is invalid or expired.
 
-### Refresh Token
-- **Method:** POST
-- **Route:** `/refresh-token`
-- **Description:** Refresh access token using refresh token stored in cookie.
-- **Request Cookie:**
-  - **Name:** refreshToken
-  - **Value:** [Refresh Token Value]
-- **Response Body (Success):**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user_id": "ab1cd2ef3"
-}
-```
-- **Response Body (Error):**
-```json
-{
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "Invalid or expired refresh token"
-}
-```
+#### Request Models
+- **SignInRequest:** Contains user email and password.
+- **SignOutRequest:** Contains a refresh token.
+- **SignUpRequest:** Contains user email and password.
+- **VerifyEmailRequest:** Contains user email and verification token.
+- **NewEmailVerificationRequest:** Contains user email.
 
-### Create Short URL
-- **Method:** POST
-- **Route:** `/short-url`
-- **Description:** Create a shortened URL with an optional alias.
-- **Request Body:**
-```json
-{
-  "original": "https://www.example.com/long/url",
-  "alias": "custom_alias"
-}
-```
-- **Request Headers:** (Optional) Access Token
-- **Response Body:**
-```json
-{
-  "original": "https://www.example.com/long/url",
-  "shortened": "https://example.com/abc123",
-  "alias": "custom_alias"
-}
-``` 
+#### Response Models
+- **MessageResponse:** Contains a title and a message.
+- **SignInResponse:** Contains a refresh token and a session response.
+- **SessionResponse:** Contains an access token and a user ID.
 
-#### Error Responses:
-- **Status Code:** 400 Bad Request
-```json
-{
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Invalid URL format"
-}
-```
-- **Status Code:** 401 Unauthorized
-```json
-{
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "Access token required to set custom alias"
-}
-```
-
-#### Update Short URL
-- **Method:** `PUT`
-- **Route:** `/short-url/:id`
-- **Description:** Update the original URL or alias of a shortened URL.
-- **Request Parameters:**
-  - **id:** The ID of the short URL to be updated.
-- **Request Body:**
-```json
-{
-  "original": "https://www.example.com/new/long/url",
-  "alias": "new_alias"
-}
-```
-- **Request Headers:** `Access Token` (Optional)
-- **Response Body:**
-```json
-{
-  "original": "https://www.example.com/new/long/url",
-  "shortened": "https://example.com/abc123",
-  "alias": "new_alias"
-}
-```
-
-#### Error Responses:
-
-- **Status Code:** `401 Unauthorized`
-```json
-{
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "Access token required to update short URL"
-}
-```
-- **Status Code:** `404 Not Found`
-```json
-{
-  "status": 404,
-  "error": "Not Found",
-  "message": "Short URL not found"
-}
-```
-
-#### Delete Short URL
-- **Method:** `DELETE`
-- **Route:** `/short-url/:id`
-- **Description:** Delete a shortened URL.
-
-#### Error Responses:
-- **Status Code:** `401 Unauthorized`
-```json
-{
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "Access token required to delete short URL"
-}
-```
-- **Status Code:** `404 Not Found`
-```json
-{
-  "status": 404,
-  "error": "Not Found",
-  "message": "Short URL not found"
-}
-```
+#### Errors
+- **BadRequestException:** Indicates a malformed request.
+- **UnauthorizedException:** Indicates authentication or authorization failure.
+- **NotFoundException:** Indicates that a requested resource was not found.
