@@ -75,6 +75,11 @@ func (h *Handler) UpdateShortUrl() http.HandlerFunc {
 					render.JSON(w, r, resp.ErrorResp(http.StatusNotFound, resp.ErrNotFound, "Short URL not found"))
 					return
 				}
+				if errors.Is(err, dberrs.ErrorURLAliasExists) {
+					w.WriteHeader(http.StatusBadRequest)
+					render.JSON(w, r, resp.ErrorResp(http.StatusBadRequest, resp.ErrBadReq, "Alias already exists"))
+					return
+				}
 				w.WriteHeader(http.StatusInternalServerError)
 				render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal server error"))
 				h.Log.Error("Internal error", slog.String("opr", opr), slog.String("err", err.Error()))
@@ -97,7 +102,7 @@ func (h *Handler) UpdateShortUrl() http.HandlerFunc {
 			}
 		}
 
-		url, err := h.Services.Url.GetUrlById(id)
+		url, err := h.Services.Url.GetUrlById(id, AuthData.UserID)
 		if err != nil {
 			if errors.Is(err, dberrs.ErrorURLNotFound) {
 				w.WriteHeader(http.StatusNotFound)

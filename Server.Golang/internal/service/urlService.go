@@ -24,8 +24,8 @@ func (s *UrlService) GetUrl(alias string) (models.Url, error) {
 	return s.repo.GetUrl(alias)
 }
 
-func (s *UrlService) GetUrlById(id int) (models.Url, error) {
-	return s.repo.GetUrlById(id)
+func (s *UrlService) GetUrlById(id, userId int) (models.Url, error) {
+	return s.repo.GetUrlById(id, userId)
 }
 
 func (s *UrlService) UpdateURLAliasByID(id int, alias string, userId int) error {

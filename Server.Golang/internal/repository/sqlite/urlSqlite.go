@@ -91,16 +91,16 @@ func (r *UrlSqlite) GetUrl(alias string) (models.Url, error) {
 	return url, nil
 }
 
-func (r *UrlSqlite) GetUrlById(id int) (models.Url, error) {
+func (r *UrlSqlite) GetUrlById(id, userId int) (models.Url, error) {
 	const opr = "repository.sqlite.urlSqlite.GetUrlById"
-	stmt, err := r.db.Prepare("SELECT id,alias,redirect,userId,createdAt,expiresAt FROM Urls WHERE id = ?")
+	stmt, err := r.db.Prepare("SELECT id,alias,redirect,userId,createdAt,expiresAt FROM Urls WHERE id = ? AND userId = ?")
 	if err != nil {
 		return models.Url{}, fmt.Errorf("%s: %w", opr, err)
 	}
 
 	var url models.Url
 
-	err = stmt.QueryRow(id).Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.CreatedAt, &url.ExpiresAt)
+	err = stmt.QueryRow(id, userId).Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.CreatedAt, &url.ExpiresAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return models.Url{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
@@ -123,11 +123,11 @@ func (r *UrlSqlite) DeleteUrlByID(id, userId int) error {
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(id, userId)
+	sl, err := stmt.Exec(id, userId)
+	if count, _ := sl.RowsAffected(); count == 0 {
+		return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+	}
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
-			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
-		}
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
@@ -142,12 +142,15 @@ func (r *UrlSqlite) UpdateUrlAliasByID(id int, alias string, userId int) error {
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(alias, id, userId)
+	sl, err := stmt.Exec(alias, id, userId)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
-			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLAliasExists)
 		}
 		return fmt.Errorf("%s: %w", opr, err)
+	}
+	if count, _ := sl.RowsAffected(); count == 0 {
+		return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
 	}
 
 	return nil
@@ -161,12 +164,12 @@ func (r *UrlSqlite) UpdateUrlOriginalByID(id int, original string, userId int) e
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(original, id, userId)
+	sl, err := stmt.Exec(original, id, userId)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
-			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
-		}
 		return fmt.Errorf("%s: %w", opr, err)
+	}
+	if count, _ := sl.RowsAffected(); count == 0 {
+		return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
 	}
 
 	return nil
@@ -180,12 +183,12 @@ func (r *UrlSqlite) AddTimeToUrlByID(id int, t time.Duration, expiresAt time.Tim
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(expiresAt.Add(t), id, userId)
+	sl, err := stmt.Exec(expiresAt.Add(t), id, userId)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
-			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
-		}
 		return fmt.Errorf("%s: %w", opr, err)
+	}
+	if count, _ := sl.RowsAffected(); count == 0 {
+		return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
 	}
 
 	return nil
@@ -199,12 +202,12 @@ func (r *UrlSqlite) SubTimeToUrlByID(id int, t time.Duration, expiresAt time.Tim
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(expiresAt.Add(-t), id, userId)
+	sl, err := stmt.Exec(expiresAt.Add(-t), id, userId)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
-			return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
-		}
 		return fmt.Errorf("%s: %w", opr, err)
+	}
+	if count, _ := sl.RowsAffected(); count == 0 {
+		return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
 	}
 
 	return nil
