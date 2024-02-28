@@ -24,9 +24,6 @@ func main() {
 	}
 	log.Info("Storage is initialized")
 
-	//hasher := hashgen.SHA1Hasher{
-	//	Salt: cfg.Salt,
-	//
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handler := handlers.NewHandler(*log, services, *cfg)

@@ -15,8 +15,9 @@ import (
 )
 
 type shortUrlReq struct {
-	Url   string `json:"original" validate:"required,url"`
-	Alias string `json:"alias"`
+	Url      string `json:"original" validate:"required,url"`
+	Alias    string `json:"alias"`
+	Lifetime string `json:"lifetime"`
 }
 
 type shortUrlRes struct {
@@ -43,6 +44,16 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 			return
 		}
 
+		lt := h.Cfg.DefaultUrlLifatimeA
+		if req.Lifetime != "" {
+			lt, err = time.ParseDuration(req.Lifetime)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				render.JSON(w, r, resp.ErrorResp(http.StatusBadRequest, resp.ErrBadReq, "Invalid request"))
+				return
+			}
+		}
+
 		AuthDataContext := r.Context().Value("Auth")
 		if AuthDataContext != nil {
 
@@ -51,9 +62,8 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 				Alias:       req.Alias,
 				RedirectUrl: req.Url,
 				UserID:      AuthData.UserID,
-				//время Должно быть в запросе, дефолт время перенести в конфиг
-				ExpiresAt:   time.Now().Add(time.Hour * 2000),
-				Navigations: 0,
+				CreatedAt:   time.Now(),
+				ExpiresAt:   time.Now().Add(lt),
 			}
 			alias, err := h.Services.Url.CreateShortUrl(&url)
 			if err != nil {
@@ -87,9 +97,8 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 			Alias:       "",
 			RedirectUrl: req.Url,
 			UserID:      0,
-			//дефолт время для не авторизованных юзеров перенести в конфиг
-			ExpiresAt:   time.Now().Add(time.Hour * 3),
-			Navigations: 0,
+			CreatedAt:   time.Now(),
+			ExpiresAt:   time.Now().Add(h.Cfg.DefaultUrlLifatimeUA),
 		}
 
 		alias, err := h.Services.Url.CreateShortUrl(&url)

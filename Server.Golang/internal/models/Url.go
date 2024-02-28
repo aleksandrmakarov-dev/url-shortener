@@ -7,8 +7,8 @@ type Url struct {
 	Alias       string
 	RedirectUrl string
 	UserID      int
+	CreatedAt   time.Time
 	ExpiresAt   time.Time
-	Navigations int
 }
 
 func (u *Url) IsExpired() bool {

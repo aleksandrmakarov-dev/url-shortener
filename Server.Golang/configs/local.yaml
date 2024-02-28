@@ -7,6 +7,8 @@ signingKey: "signingKey"
 accsesTokenTokenTTL: 3600s
 refreshTokenTokenTTL: 17280s
 emailVerifTokenTTL: 1h
+defaultUrlLifatimeUA: 24h
+defaultUrlLifatimeA: 72h
 emailVerifRequired: true
 http_server:
   address: "localhost:8080"

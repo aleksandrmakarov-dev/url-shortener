@@ -20,6 +20,8 @@ type Config struct {
 	AccsesTokenTokenTTL  time.Duration `yaml:"accsesTokenTokenTTL" env-default:"3600s"`
 	RefreshTokenTokenTTL time.Duration `yaml:"refreshTokenTokenTTL" env-default:"720h"`
 	EmailVerifTokenTTL   time.Duration `yaml:"emailVerifTokenTTL" env-default:"1h"`
+	DefaultUrlLifatimeUA time.Duration `yaml:"defaultUrlLifatimeUA" env-default:"24h"`
+	DefaultUrlLifatimeA  time.Duration `yaml:"defaultUrlLifatimeA" env-default:"72h"`
 	EmailVerifRequired   bool          `yaml:"emailVerifRequired" env-default:"true"`
 	HTTPServer           `yaml:"http_server"`
 }

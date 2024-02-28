@@ -15,35 +15,42 @@ var queries = []string{
 		createdAt DATETIME NOT NULL,
 		emailVerified BOOLEAN NOT NULL
 	);
-	CREATE INDEX IF NOT EXISTS idx_user_id ON User(id);`,
+	CREATE INDEX IF NOT EXISTS idx_user_id ON Users(id);`,
 
 	`CREATE TABLE IF NOT EXISTS Sessions (
 		id INTEGER PRIMARY KEY,
-		userId INTEGER REFERENCES User(id),
+		userId INTEGER REFERENCES Users(id),
 		refreshToken VARCHAR(255) NOT NULL UNIQUE,
 		expiresAt DATETIME NOT NULL
 	);
-	CREATE INDEX IF NOT EXISTS idx_account_userId ON Account(userId);
-	CREATE INDEX IF NOT EXISTS idx_account_refreshToken ON Account(refreshToken);`,
+	CREATE INDEX IF NOT EXISTS idx_session_userId ON Sessions(userId);
+	CREATE INDEX IF NOT EXISTS idx_session_refreshToken ON Sessions(refreshToken);`,
 
 	`CREATE TABLE IF NOT EXISTS Urls (
 		id INTEGER PRIMARY KEY,
 		alias TEXT NOT NULL UNIQUE,
 		redirect VARCHAR(255) NOT NULL,
-		userId INTEGER REFERENCES User(id),
-		expiresAt DATETIME NULL,
-		navigations INT NOT NULL
+		userId INTEGER REFERENCES Users(id),
+		createdAt DATETIME NULL,
+		expiresAt DATETIME NULL
 	);
-	CREATE INDEX IF NOT EXISTS idx_url_userId ON Url(userId);
-	CREATE INDEX IF NOT EXISTS idx_url_alias ON Url(alias);`,
+	CREATE INDEX IF NOT EXISTS idx_url_userId ON Urls(userId);
+	CREATE INDEX IF NOT EXISTS idx_url_alias ON Urls(alias);`,
 
 	`CREATE TABLE IF NOT EXISTS EmailVerification (
 		email TEXT NOT NULL,
 		token TEXT NOT NULL,
 		expiresAt DATETIME NULL
 	);
-	CREATE INDEX IF NOT EXISTS idx_EmailVerification_token ON EmailVerification(token);
-	`,
+	CREATE INDEX IF NOT EXISTS idx_emailVerification_token ON EmailVerification(token);`,
+
+	`CREATE TABLE IF NOT EXISTS Navigations(
+		id INTEGER PRIMARY KEY,
+		urlId INTEGER REFERENCES Urls(id),
+		country VARCHAR(255) NOT NULL,
+		ip VARCHAR(255) NOT NULL,
+		Date DATETIME NULL
+	);`,
 }
 
 func NewSqliteDB(storagePath string) (*sql.DB, error) {
@@ -54,6 +61,8 @@ func NewSqliteDB(storagePath string) (*sql.DB, error) {
 		return nil, fmt.Errorf("%s: %w", opr, err)
 	}
 
+	fmt.Println(len(queries))
+
 	for _, v := range queries {
 		stmt, err := db.Prepare(v)
 		if err != nil {
@@ -61,7 +70,6 @@ func NewSqliteDB(storagePath string) (*sql.DB, error) {
 		}
 
 		_, err = stmt.Exec()
-
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", opr, err)
 		}
