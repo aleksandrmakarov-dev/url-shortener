@@ -69,11 +69,7 @@
 ## Base URL
 `https://api.example.com/api/v1`
 
-## Authentication
-For endpoints requiring authentication, include an access token in the request headers.
-
-## Endpoints
-
+## Authentication 
 The `AuthController` class handles authentication-related HTTP requests in the API. Below is the documentation for each endpoint:
 
 ### SignUp
@@ -200,4 +196,113 @@ The `AuthController` class handles authentication-related HTTP requests in the A
 #### Errors
 - **BadRequestException:** Indicates a malformed request.
 - **UnauthorizedException:** Indicates authentication or authorization failure.
+- **NotFoundException:** Indicates that a requested resource was not found.
+
+## Short URL
+The `ShortUrlsController` class manages short URL operations in the API. Below is the documentation for each endpoint:
+
+### Create
+- **Route:** `POST api/v1/short-urls`
+- **Description:** Creates a new short URL.
+- **Request Body:** 
+    ```json
+    {
+        "original": "https://example.com",
+        "customAlias": "custom_alias_string",
+        "userId": "user_id_string",
+        "expiresAt": "optional_expiration_date"
+    }
+    ```
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "id": "short_url_id",
+        "original": "https://example.com",
+        "alias": "short_url_alias",
+        "domain": "http://localhost:5173",
+        "expiresAt": "optional_expiration_date",
+        "userId": "user_id_string"
+    }
+    ```
+- **Error Response:** 
+    - **400 Bad Request:** If the custom alias is already taken or if the user is not authorized to use a custom alias.
+
+### GetByAlias
+- **Route:** `GET api/v1/short-urls/{alias}`
+- **Description:** Retrieves a short URL by its alias.
+- **URL Parameter:** `alias` - The alias of the short URL.
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "id": "short_url_id",
+        "original": "https://example.com",
+        "alias": "short_url_alias",
+        "domain": "http://localhost:5173",
+        "expiresAt": "optional_expiration_date",
+        "userId": "user_id_string"
+    }
+    ```
+- **Error Response:** 
+    - **404 Not Found:** If the short URL with the provided alias does not exist.
+
+### GetAll
+- **Route:** `GET api/v1/short-urls`
+- **Description:** Retrieves all short URLs.
+- **Success Response (200 OK):** 
+    ```json
+    [
+        {
+            "id": "short_url_id",
+            "original": "https://example.com",
+            "alias": "short_url_alias",
+            "domain": "http://localhost:5173",
+            "expiresAt": "optional_expiration_date",
+            "userId": "user_id_string"
+        },
+        {
+            "id": "another_short_url_id",
+            "original": "https://anotherexample.com",
+            "alias": "another_short_url_alias",
+            "domain": "http://localhost:5173",
+            "expiresAt": "optional_expiration_date",
+            "userId": "user_id_string"
+        }
+    ]
+    ```
+
+### UpdateById
+- **Route:** `PUT api/v1/short-urls/{id}`
+- **Description:** Updates an existing short URL by its ID.
+- **URL Parameter:** `id` - The ID of the short URL.
+- **Request Body:** 
+    ```json
+    {
+        "original": "https://updatedexample.com",
+        "customAlias": "updated_custom_alias_string",
+        "expiresAt": "optional_updated_expiration_date"
+    }
+    ```
+- **Success Response (204 No Content):** No content.
+- **Error Response:** 
+    - **400 Bad Request:** If the custom alias is already taken.
+    - **404 Not Found:** If the short URL with the provided ID does not exist.
+
+### DeleteById
+- **Route:** `DELETE api/v1/short-urls/{id}`
+- **Description:** Deletes a short URL by its ID.
+- **URL Parameter:** `id` - The ID of the short URL.
+- **Success Response (204 No Content):** No content.
+- **Error Response:** 
+    - **404 Not Found:** If the short URL with the provided ID does not exist.
+
+#### Request Models
+- **CreateShortUrlRequest:** Contains details for creating a short URL.
+- **UpdateShortUrlRequest:** Contains details for updating a short URL.
+
+#### Response Models
+- **ShortUrlResponse:** Contains details of a short URL.
+
+#### Errors
+- **UnauthorizedException:** Indicates that the user is not authorized to perform the operation.
+- **BadRequestException:** Indicates a malformed request.
 - **NotFoundException:** Indicates that a requested resource was not found.
