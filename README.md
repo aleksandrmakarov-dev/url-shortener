@@ -252,7 +252,7 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
 - **Query Parameters:**
   - `userId` (optional): Filters short URLs by user ID.
   - `page` (optional, default: 1): Specifies the page number for pagination.
-  - `pageSize` (optional, default: 10): Specifies the number of items per page.
+  - `size` (optional, default: 10): Specifies the number of items per page.
   - `query` (optional): Searches for short URLs by alias.
 - **Success Response (200 OK):** 
 
