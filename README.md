@@ -245,12 +245,20 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
 - **Error Response:** 
     - **404 Not Found:** If the short URL with the provided alias does not exist.
 
-### GetAll
+### GetAll Short URLs
+
 - **Route:** `GET api/v1/short-urls`
 - **Description:** Retrieves all short URLs.
+- **Query Parameters:**
+  - `userId` (optional): Filters short URLs by user ID.
+  - `page` (optional, default: 1): Specifies the page number for pagination.
+  - `pageSize` (optional, default: 10): Specifies the number of items per page.
+  - `query` (optional): Searches for short URLs by alias.
 - **Success Response (200 OK):** 
-    ```json
-    [
+
+```json
+{
+    "items": [
         {
             "id": "short_url_id",
             "original": "https://example.com",
@@ -267,8 +275,15 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
             "expiresAt": "optional_expiration_date",
             "userId": "user_id_string"
         }
-    ]
-    ```
+    ],
+    "pagination": {
+        "currentPage": 1,
+        "pageSize": 10,
+        "query": "optional_query_string",
+        "userId": "optional_user_id_string",
+        "hasNextPage": true
+    }
+}
 
 ### UpdateById
 - **Route:** `PUT api/v1/short-urls/{id}`
