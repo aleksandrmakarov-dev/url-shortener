@@ -51,6 +51,6 @@ func (h *Handler) ResendVerification() http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusOK)
-
+		render.JSON(w, r, resp.Resp("New email verification", "New email verification token is sent to your email address"))
 	}
 }

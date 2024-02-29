@@ -84,5 +84,6 @@ func (h *Handler) Signup() http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusOK)
+		render.JSON(w, r, resp.Resp("Complete the registration", "You will receive verification code to the email address"))
 	}
 }

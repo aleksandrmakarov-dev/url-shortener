@@ -18,8 +18,10 @@ type signinReq struct {
 }
 
 type signinRes struct {
-	AccsesToken string
-	UserID      int
+	AccsesToken string `json:"accessToken"`
+	UserID      int    `json:"userId"`
+	Email       string `json:"email"`
+	Role        string `json:"role"`
 }
 
 func (h *Handler) Singin() http.HandlerFunc {
@@ -80,6 +82,8 @@ func (h *Handler) Singin() http.HandlerFunc {
 		render.JSON(w, r, signinRes{
 			AccsesToken: accToken,
 			UserID:      session.UserID,
+			Email:       req.Email,
+			Role:        "unknown",
 		})
 
 	}
