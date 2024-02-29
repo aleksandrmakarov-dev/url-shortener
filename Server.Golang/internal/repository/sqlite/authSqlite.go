@@ -26,12 +26,12 @@ func NewAuthSqlite(db *sql.DB) *AuthSqlite {
 func (r *AuthSqlite) CreateUser(u *models.User) error {
 	const opr = "repository.sqlite.authSqlite.CreateUser"
 
-	stmt, err := r.db.Prepare("INSERT INTO Users(email,passwordHash,createdAt,emailVerified) VALUES(?,?,?,?)")
+	stmt, err := r.db.Prepare("INSERT INTO Users(email,role,passwordHash,createdAt,emailVerified) VALUES(?,?,?,?,?)")
 	if err != nil {
 		return fmt.Errorf("%s: %w", opr, err)
 	}
 
-	_, err = stmt.Exec(u.Email, u.PassHash, u.CreatedAt, u.EmailVerified)
+	_, err = stmt.Exec(u.Email, u.Role, u.PassHash, u.CreatedAt, u.EmailVerified)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return fmt.Errorf("%s: %w", opr, dberrs.ErrorEmailExists)
@@ -46,14 +46,14 @@ func (r *AuthSqlite) CreateUser(u *models.User) error {
 func (r *AuthSqlite) GetUser(email, passHash string) (models.User, error) {
 	const opr = "repository.sqlite.authSqlite.GetUser"
 
-	stmt, err := r.db.Prepare("SELECT ID, Email, passwordHash, CreatedAt, EmailVerified FROM Users WHERE Email = ? AND passwordHash = ?")
+	stmt, err := r.db.Prepare("SELECT ID, Email,role, passwordHash, CreatedAt, EmailVerified FROM Users WHERE Email = ? AND passwordHash = ?")
 	if err != nil {
 		return models.User{}, fmt.Errorf("%s: %w", opr, err)
 	}
 
 	user := models.User{}
 
-	err = stmt.QueryRow(email, passHash).Scan(&user.ID, &user.Email, &user.PassHash, &user.CreatedAt, &user.EmailVerified)
+	err = stmt.QueryRow(email, passHash).Scan(&user.ID, &user.Email, &user.Role, &user.PassHash, &user.CreatedAt, &user.EmailVerified)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return models.User{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidCredentials)
@@ -90,12 +90,12 @@ func (r *AuthSqlite) GenRefreshToken(u *models.User, tokenExp time.Duration) (mo
 	return session, nil
 }
 
-func (r *AuthSqlite) CheckRefreshToken(token string) (int, error) {
+func (r *AuthSqlite) CheckRefreshToken(token string) (models.User, error) {
 	const opr = "repository.sqlite.authSqlite.RefreshToken"
 
-	stmt, err := r.db.Prepare("SELECT userId, expiresAt FROM Sessions WHERE refreshToken = ?")
+	stmt, err := r.db.Prepare("SELECT userId,expiresAt FROM Sessions WHERE refreshToken = ?")
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", opr, err)
+		return models.User{}, fmt.Errorf("%s: %w", opr, err)
 	}
 
 	session := models.Session{
@@ -105,16 +105,33 @@ func (r *AuthSqlite) CheckRefreshToken(token string) (int, error) {
 	err = stmt.QueryRow(token).Scan(&session.UserID, &session.ExpiresAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
+			return models.User{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
 		}
-		return 0, fmt.Errorf("%s: %w", opr, err)
+		return models.User{}, fmt.Errorf("%s: %w", opr, err)
 	}
 
 	if session.ExpiresAt.Compare(time.Now()) == -1 {
-		return 0, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
+		return models.User{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
 	}
 
-	return session.UserID, nil
+	stmt, err = r.db.Prepare("SELECT email,role FROM Users WHERE id = ?")
+	if err != nil {
+		return models.User{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	user := models.User{
+		ID: session.UserID,
+	}
+
+	err = stmt.QueryRow(session.UserID).Scan(&user.Email, &user.Role)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.User{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
+		}
+		return models.User{}, fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return user, nil
 }
 
 func (r *AuthSqlite) CreateEmailVerification(email string, EmailVerifTokenTTL time.Duration) (models.EmailVerification, error) {

@@ -11,6 +11,7 @@ var queries = []string{
 	`CREATE TABLE IF NOT EXISTS Users (
 		id INTEGER PRIMARY KEY,
 		email VARCHAR(255) NOT NULL UNIQUE,
+		role VARCHAR(255) NOT NULL,
 		passwordHash VARCHAR(255) NOT NULL,
 		createdAt DATETIME NOT NULL,
 		emailVerified BOOLEAN NOT NULL

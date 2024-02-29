@@ -27,7 +27,7 @@ func (h *Handler) RefreshToken() http.HandlerFunc {
 			return
 		}
 
-		userId, accessToken, err := h.Services.Auth.RefreshToken(refTokenCookie.Value, h.Cfg.SigningKey, h.Cfg.AccsesTokenTokenTTL)
+		user, accessToken, err := h.Services.Auth.RefreshToken(refTokenCookie.Value, h.Cfg.SigningKey, h.Cfg.AccsesTokenTokenTTL)
 		if err != nil {
 			if errors.Is(err, dberrs.ErrorInvalidOrExpToken) {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -44,9 +44,9 @@ func (h *Handler) RefreshToken() http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		render.JSON(w, r, refreshtokenRes{
 			AccessToken: accessToken,
-			UserID:      userId,
-			Email:       "unknown",
-			Role:        "unknown",
+			UserID:      user.ID,
+			Email:       user.Email,
+			Role:        user.Role,
 		})
 	}
 }

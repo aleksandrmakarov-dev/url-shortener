@@ -12,7 +12,7 @@ type Auth interface {
 	CreateUser(u *models.User) error
 	GetUser(email, passHash string) (models.User, error)
 	GenRefreshToken(u *models.User, tokenExp time.Duration) (models.Session, error)
-	CheckRefreshToken(token string) (int, error)
+	CheckRefreshToken(token string) (models.User, error)
 	VerifEmail(EmailVerif models.EmailVerification) error
 	GetVerifEmail(token, email string) (models.EmailVerification, error)
 	DeleteEmailVerification(token string) error

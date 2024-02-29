@@ -16,7 +16,8 @@ var (
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
+	UserId int    `json:"user_id"`
+	Role   string `json:"role"`
 }
 
 type AuthService struct {
@@ -56,6 +57,7 @@ func (s *AuthService) Signin(email, passHash, signingKey string, RefTokenExp tim
 			IssuedAt:  time.Now().Unix(),
 		},
 		user.ID,
+		user.Role,
 	})
 
 	ts, err := token.SignedString([]byte(signingKey))
@@ -66,10 +68,10 @@ func (s *AuthService) Signin(email, passHash, signingKey string, RefTokenExp tim
 	return session, ts, user, nil
 }
 
-func (s *AuthService) RefreshToken(token string, signingKey string, AccessTokenExp time.Duration) (int, string, error) {
-	userId, err := s.repo.CheckRefreshToken(token)
+func (s *AuthService) RefreshToken(token string, signingKey string, AccessTokenExp time.Duration) (models.User, string, error) {
+	user, err := s.repo.CheckRefreshToken(token)
 	if err != nil {
-		return 0, "", err
+		return models.User{}, "", err
 	}
 
 	AccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
@@ -77,15 +79,16 @@ func (s *AuthService) RefreshToken(token string, signingKey string, AccessTokenE
 			ExpiresAt: time.Now().Add(AccessTokenExp).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		userId,
+		user.ID,
+		user.Role,
 	})
 
 	AccessTokenString, err := AccessToken.SignedString([]byte(signingKey))
 	if err != nil {
-		return 0, "", err
+		return models.User{}, "", err
 	}
 
-	return userId, AccessTokenString, nil
+	return user, AccessTokenString, nil
 
 }
 
