@@ -45,6 +45,7 @@ func (h *Handler) Signup() http.HandlerFunc {
 
 		user := models.User{
 			Email:         req.Email,
+			Role:          "U",
 			PassHash:      hs.GenHash(req.Pass),
 			CreatedAt:     time.Now(),
 			EmailVerified: false,

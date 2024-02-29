@@ -34,14 +34,14 @@ func (h *Handler) InitRoutes() *chi.Mux {
 
 	router.Route("/api/v1", func(r chi.Router) {
 
-		r.Post("/sign-up", h.Signup())
-		r.Post("/sign-in", h.Singin())
-		r.Post("/refresh-token", h.RefreshToken())
-		r.Post("/resend-verification", h.ResendVerification())
-		r.Post("/verify-email", h.EmailVerification())
-		r.With(h.AuthMiddleware).Post("/short-url", h.ShortUrl())
-		r.With(h.AuthMiddleware).Delete("/short-url/{id}", h.DeleteShortURL())
-		r.With(h.AuthMiddleware).Put("/short-url/{id}", h.UpdateShortUrl())
+		r.Post("/auth/sign-up", h.Signup())
+		r.Post("/auth/sign-in", h.Singin())
+		r.Post("/auth/refresh-token", h.RefreshToken())
+		r.Post("/auth/resend-verification", h.ResendVerification())
+		r.Post("/auth/verify-email", h.EmailVerification())
+		r.With(h.AuthMiddleware).Post("/short-urls", h.ShortUrl())
+		r.With(h.AuthMiddleware).Delete("/short-urls/{id}", h.DeleteShortURL())
+		r.With(h.AuthMiddleware).Put("/short-urls/{id}", h.UpdateShortUrl())
 
 	})
 

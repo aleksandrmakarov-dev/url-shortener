@@ -82,8 +82,8 @@ func (h *Handler) Singin() http.HandlerFunc {
 		render.JSON(w, r, signinRes{
 			AccsesToken: accToken,
 			UserID:      session.UserID,
-			Email:       req.Email,
-			Role:        "unknown",
+			Email:       user.Email,
+			Role:        user.Role,
 		})
 
 	}
