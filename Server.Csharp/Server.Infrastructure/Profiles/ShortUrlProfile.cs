@@ -16,7 +16,11 @@ namespace Server.Infrastructure.Profiles
         {
             CreateMap<CreateShortUrlRequest, ShortUrl>();
 
-            CreateMap<ShortUrl, ShortUrlResponse>();
+            CreateMap<ShortUrl, ShortUrlResponse>()
+                .ForMember(
+                    d=>d.Domain,
+                    cd=>cd.MapFrom(v=> "http://localhost:5173")
+                    );
         }
     }
 }

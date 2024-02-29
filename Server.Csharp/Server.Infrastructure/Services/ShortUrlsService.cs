@@ -1,8 +1,14 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using System.Reflection.Metadata.Ecma335;
+using System.Transactions;
+using AutoMapper;
+using LinqKit;
 using Server.Data.Common;
 using Server.Data.Entities;
 using Server.Data.Repositories;
 using Server.Infrastructure.Exceptions;
+using Server.Infrastructure.Models;
+using Server.Infrastructure.Models.Filters;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
 
@@ -176,6 +182,58 @@ namespace Server.Infrastructure.Services
             }
 
             return _mapper.Map<ShortUrl, ShortUrlResponse>(foundShortUrl);
+        }
+
+        public async Task<Paged<ShortUrlResponse>> GetPageAsync(int page = 1, int size = 10, ShortUrlsPageFilter? filter = null)
+        {
+            // by default where expression is set to null
+            Expression<Func<ShortUrl, bool>>? whereExpression = null;
+
+            // if filter not equal to null check filter values
+            if (filter != null)
+            {
+                
+                if (filter.UserId != null)
+                {
+                    // if user id is not null create expression that checks if user id is equal to provided userId
+                    Expression<Func<ShortUrl, bool>> filterByUserId = su => su.UserId == filter.UserId;
+                    whereExpression = filterByUserId;
+                }
+
+                if (!string.IsNullOrEmpty(filter.Query))
+                {
+                    // if query is not null or empty string create expression that checks if alias contains query value
+                    Expression<Func<ShortUrl, bool>> filterByAlias = su =>
+                        su.Alias.ToLower().Contains(filter.Query.ToLower());
+
+                    // if whereExpression is null set it equal to filterByAlias expression otherwise use and with previous one
+                    whereExpression = whereExpression != null ? whereExpression.And(filterByAlias) : filterByAlias;
+                }
+            }
+
+            // get page result
+            IEnumerable<ShortUrl> foundShortUrls = await _shortUrlsRepository.GetPageAsync(page, size,whereExpression);
+
+            // count total number of items
+            int count = await _shortUrlsRepository.CountAsync(whereExpression);
+
+            IEnumerable<ShortUrlResponse> mappedShortUrls = _mapper.Map<IEnumerable<ShortUrlResponse>>(foundShortUrls);
+
+            // return page result
+            Paged<ShortUrlResponse> pagedResponse = new Paged<ShortUrlResponse>
+            {
+                Items = mappedShortUrls,
+                Pagination = new Pagination
+                {
+                    Page = page,
+                    Size = size,
+                    // check if there are items left for the next page
+                    HasNextPage = count > ((page - 1)*size)+size,
+                    HasPreviousPage = page > 1
+                }
+            };
+
+            return pagedResponse;
         }
     }
 }

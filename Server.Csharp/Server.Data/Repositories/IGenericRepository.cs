@@ -1,4 +1,5 @@
-﻿using Server.Data.Entities;
+﻿using System.Linq.Expressions;
+using Server.Data.Entities;
 
 namespace Server.Data.Repositories
 {
@@ -9,5 +10,9 @@ namespace Server.Data.Repositories
         Task DeleteAsync(TEntity entity);
         Task<TEntity?> GetByIdAsync(Guid id);
         Task<IEnumerable<TEntity>> GetAllAsync();
+
+        Task<IEnumerable<TEntity>> GetPageAsync(int page, int size,
+            Expression<Func<TEntity, bool>>? whereExpression = null);
+        Task<int> CountAsync(Expression<Func<TEntity, bool>>? whereExpression = null);
     }
 }

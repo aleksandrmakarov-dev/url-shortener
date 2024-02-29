@@ -6,5 +6,6 @@ export type PagedResponse<T> = {
 export type Pagination = {
   page: number;
   size: number;
-  query?: string;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 };

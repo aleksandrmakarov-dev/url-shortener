@@ -5,6 +5,7 @@ using Server.API.Common;
 using Server.Data.Entities;
 using Server.Infrastructure.Exceptions;
 using Server.Infrastructure.Models;
+using Server.Infrastructure.Models.Filters;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
 using Server.Infrastructure.Services;
@@ -65,12 +66,16 @@ namespace Server.API.Controllers
         public async Task<IActionResult> GetAll(
             [FromQuery] Guid? userId,
             [FromQuery] string? query,
-            [FromQuery] int? page = 1,
-            [FromQuery] int? size = 10
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 10
         )
         {
-            IEnumerable<ShortUrlResponse> foundShortUrls = await _shortUrlsService.GetAllAsync();
-            return Ok(foundShortUrls);
+            Paged<ShortUrlResponse> pageResponse = await _shortUrlsService.GetPageAsync(page, size, new ShortUrlsPageFilter
+            {
+                UserId = userId,
+                Query = query,
+            });
+            return Ok(pageResponse);
         }
 
         [HttpPut("{id:guid}")]

@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Drawing;
+using System.Linq.Expressions;
+using LinqKit;
+using Microsoft.EntityFrameworkCore;
 using Server.Data.Database;
 using Server.Data.Entities;
 
@@ -40,6 +43,33 @@ public class GenericRepository<TEntity>(ApplicationDbContext context) : IGeneric
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         return await context.Set<TEntity>().ToListAsync();
+    }
+
+    public virtual async Task<IEnumerable<TEntity>> GetPageAsync(int page, int size,Expression<Func<TEntity,bool>>? whereExpression = null)
+    {
+        IQueryable<TEntity> query = context.Set<TEntity>();
+
+        if (whereExpression != null)
+        {
+            query = query.Where(whereExpression);
+        }
+
+        return await query
+            .Skip((page - 1) * size)
+            .Take(size)
+            .ToListAsync();
+    }
+
+    public async Task<int> CountAsync(Expression<Func<TEntity, bool>>? whereExpression = null)
+    {
+        IQueryable<TEntity> query = context.Set<TEntity>();
+
+        if (whereExpression != null)
+        {
+            return await query.CountAsync(whereExpression);
+        }
+
+        return await query.CountAsync();
     }
 
     protected virtual async Task SaveChangesAsync(string? onErrorMessage)
