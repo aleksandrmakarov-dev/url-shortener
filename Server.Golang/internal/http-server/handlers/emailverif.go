@@ -49,5 +49,6 @@ func (h *Handler) EmailVerification() http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusOK)
+		render.JSON(w, r, resp.Resp("Registration is completed", "Your email address is verified. You can sign in to your account"))
 	}
 }

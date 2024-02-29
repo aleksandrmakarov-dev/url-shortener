@@ -11,8 +11,10 @@ import (
 )
 
 type refreshtokenRes struct {
-	AccessToken string
-	UserID      int
+	AccessToken string `json:"accessToken"`
+	UserID      int    `json:"userId"`
+	Email       string `json:"email"`
+	Role        string `json:"role"`
 }
 
 func (h *Handler) RefreshToken() http.HandlerFunc {
@@ -43,6 +45,8 @@ func (h *Handler) RefreshToken() http.HandlerFunc {
 		render.JSON(w, r, refreshtokenRes{
 			AccessToken: accessToken,
 			UserID:      userId,
+			Email:       "unknown",
+			Role:        "unknown",
 		})
 	}
 }
