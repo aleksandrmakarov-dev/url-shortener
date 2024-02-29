@@ -17,6 +17,7 @@ type SessionContextData = {
   isLoading?: boolean;
   isError?: boolean;
   error?: ErrorResponse;
+  isSuccess?: boolean;
 };
 
 const SessionContext = createContext<SessionContextData>({

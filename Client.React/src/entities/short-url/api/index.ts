@@ -2,17 +2,22 @@ import axios from "@/lib/axios";
 import { ErrorResponse } from "@/lib/dto/common/error.response";
 import { PagedResponse } from "@/lib/dto/common/paged.response";
 import { ShortUrlResponse } from "@/lib/dto/short-url/short-url.response";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
 export const shortUrlsKeys = {
   shortUrls: {
     root: ["short-urls"],
     alias: (alias: string) => [...shortUrlsKeys.shortUrls.root, "alias", alias],
-    infinite: () => [...shortUrlsKeys.shortUrls.root, "infinity"],
+    query: (params?: ShortUrlsParams) => [
+      ...shortUrlsKeys.shortUrls.root,
+      { ...params },
+    ],
   },
   mutations: {
     create: () => [...shortUrlsKeys.shortUrls.root, "create"],
+    update: () => [...shortUrlsKeys.shortUrls.root, "update"],
+    delete: () => [...shortUrlsKeys.shortUrls.root, "delete"],
   },
 };
 
@@ -63,30 +68,12 @@ async function fetchShortUrls(params?: ShortUrlsParams) {
 export const useShortUrls = (params?: ShortUrlsParams) => {
   return useQuery<
     PagedResponse<ShortUrlResponse>,
-    AxiosError,
+    AxiosError<ErrorResponse>,
     PagedResponse<ShortUrlResponse>
   >({
-    queryKey: shortUrlsKeys.shortUrls.root,
+    queryKey: shortUrlsKeys.shortUrls.query(params),
     queryFn: async () => {
       return await fetchShortUrls(params);
     },
-  });
-};
-
-export const useInfiniteShortUrls = (params?: ShortUrlsParams) => {
-  return useInfiniteQuery<
-    PagedResponse<ShortUrlResponse>,
-    AxiosError,
-    PagedResponse<ShortUrlResponse>
-  >({
-    queryKey: shortUrlsKeys.shortUrls.infinite(),
-    queryFn: async () => {
-      return await fetchShortUrls(params);
-    },
-    initialPageParam: { page: 1, size: 10 },
-    getNextPageParam: (lastPage) =>
-      lastPage.pagination.hasNextPage
-        ? { page: lastPage.pagination.page + 1, size: lastPage.pagination.size }
-        : undefined,
   });
 };

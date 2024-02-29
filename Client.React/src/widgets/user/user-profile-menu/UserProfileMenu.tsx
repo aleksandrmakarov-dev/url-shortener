@@ -28,6 +28,11 @@ export function UserProfileMenu() {
         <DropdownMenuLabel className="truncate p-2">
           {session.userId}
         </DropdownMenuLabel>
+        <DropdownMenuItem asChild>
+          <a className="cursor-pointer" href={`/links/u/${session.userId}`}>
+            My links
+          </a>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <a className="cursor-pointer" href="/auth/sign-out">

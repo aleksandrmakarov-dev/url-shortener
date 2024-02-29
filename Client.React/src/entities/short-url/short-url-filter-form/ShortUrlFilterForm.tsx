@@ -37,7 +37,7 @@ export function ShortUrlFilterForm({
           render={({ field }) => (
             <FormItem className="w-full">
               <FormControl>
-                <Input placeholder="Search" {...field} />
+                <Input type="search" placeholder="Search" {...field} />
               </FormControl>
             </FormItem>
           )}

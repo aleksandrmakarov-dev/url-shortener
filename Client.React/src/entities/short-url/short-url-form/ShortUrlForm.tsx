@@ -1,3 +1,4 @@
+import { useSession } from "@/context/session-provider/SessionProvider";
 import {
   EditShortUrlRequest,
   editShortUrlRequest,
@@ -26,6 +27,8 @@ export function ShortUrlForm({
   onSubmit,
   isLoading,
 }: ShortUrlFormProps) {
+  const { session } = useSession();
+
   const form = useForm<EditShortUrlRequest>({
     resolver: zodResolver(editShortUrlRequest),
     defaultValues: {
@@ -65,7 +68,7 @@ export function ShortUrlForm({
                   <FormControl>
                     <Input
                       placeholder="example: favorite-link"
-                      disabled={disabled || !shortUrl?.userId}
+                      disabled={disabled || !session}
                       {...other}
                     />
                   </FormControl>
@@ -84,7 +87,7 @@ export function ShortUrlForm({
                   <Input
                     type="datetime-local"
                     placeholder="example: favorite-link"
-                    disabled={disabled || !shortUrl?.userId}
+                    disabled={disabled || !session}
                     {...other}
                   />
                 </FormControl>
@@ -93,8 +96,8 @@ export function ShortUrlForm({
             )}
           />
         </div>
-        <div>
-          <Button loading={isLoading}>Get my short URL</Button>
+        <div className="flex justify-end">
+          <Button loading={isLoading}>Shorten URL</Button>
         </div>
       </form>
     </Form>

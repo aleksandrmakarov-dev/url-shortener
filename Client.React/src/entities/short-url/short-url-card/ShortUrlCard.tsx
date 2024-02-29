@@ -19,10 +19,14 @@ import moment from "moment";
 
 interface ShortUrlCardProps {
   shortUrl: ShortUrlResponse;
+  onEditClick?: (id: string) => void;
+  onDeleteClick?: (id: string) => void;
 }
 
 export function ShortUrlCard({
-  shortUrl: { alias, domain, original, createdAt },
+  shortUrl: { id, alias, domain, original, createdAt },
+  onDeleteClick,
+  onEditClick,
 }: ShortUrlCardProps) {
   return (
     <div className="border border-border rounded-md bg-white p-5">
@@ -59,26 +63,26 @@ export function ShortUrlCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-42 absolute top-0 -right-4">
               <DropdownMenuItem asChild>
-                <span>
+                <span className="cursor-pointer">
                   <Copy className="w-4 h-4 mr-1.5" />
                   <span>Copy link</span>
                 </span>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <span>
+              <DropdownMenuItem onClick={() => onEditClick?.(alias)} asChild>
+                <span className="cursor-pointer">
                   <Edit className="w-4 h-4 mr-1.5" />
                   <span>Edit link</span>
                 </span>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <span>
+                <span className="cursor-pointer">
                   <LineChart className="w-4 h-4 mr-1.5" />
                   <span>Statistics</span>
                 </span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <span>
+              <DropdownMenuItem onClick={() => onDeleteClick?.(id)} asChild>
+                <span className="cursor-pointer">
                   <Trash className="w-4 h-4 mr-1.5" />
                   <span>Delete link</span>
                 </span>

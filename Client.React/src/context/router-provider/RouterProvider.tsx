@@ -11,6 +11,7 @@ import SignUpPage from "@/pages/auth/sign-up/page";
 import VerifyEmailPage from "@/pages/auth/verify-email/page";
 import FullPageWrapper from "@/shared/components/FullPageWrapper";
 import { RoutePublicGuard } from "@/shared/components/RoutePublicGuard";
+import { RouteRoleGuard } from "@/shared/components/RouteRoleGuard";
 import { Suspense } from "react";
 import {
   createBrowserRouter,
@@ -27,8 +28,10 @@ const router = createBrowserRouter(
         <Route path=":alias" element={<RedirectPage />} />
         <Route path="access-denied" element={<AccessDeniedPage />} />
         <Route path="links">
-          <Route path="u">
-            <Route path=":userId" element={<LinksPage />} />
+          <Route element={<RouteRoleGuard />}>
+            <Route path="u">
+              <Route path=":userId" element={<LinksPage />} />
+            </Route>
           </Route>
         </Route>
       </Route>
