@@ -229,6 +229,7 @@ namespace Server.Infrastructure.Services
                     Size = size,
                     // check if there are items left for the next page
                     HasNextPage = count > ((page - 1)*size)+size,
+                    // check if page is bigger than 1
                     HasPreviousPage = page > 1
                 }
             };
