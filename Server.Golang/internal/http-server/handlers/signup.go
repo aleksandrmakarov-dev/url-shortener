@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -23,7 +22,6 @@ type signupReq struct {
 
 func (h *Handler) Signup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(*r)
 		const opr = "internal.http-server.handlers.Signup"
 
 		var req signupReq

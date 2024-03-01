@@ -16,8 +16,8 @@ var (
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int    `json:"user_id"`
-	Role   string `json:"role"`
+	UserId   int    `json:"user_id"`
+	UserRole string `json:"role"`
 }
 
 type AuthService struct {
@@ -25,7 +25,8 @@ type AuthService struct {
 }
 
 type AccessTokenData struct {
-	UserID int
+	UserID   int
+	UserRole string
 }
 
 func NewAuthService(repo repository.Auth) *AuthService {
@@ -92,6 +93,20 @@ func (s *AuthService) RefreshToken(token string, signingKey string, AccessTokenE
 
 }
 
+func (s *AuthService) DeleteRefreshToken(token string) error {
+	user, err := s.repo.CheckRefreshToken(token)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.DeleteRefreshToken(token, user.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *AuthService) ParseToken(token string, signingKey string) (AccessTokenData, error) {
 	t, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -110,7 +125,7 @@ func (s *AuthService) ParseToken(token string, signingKey string) (AccessTokenDa
 		return AccessTokenData{}, ErrorTokenFormat
 	}
 
-	return AccessTokenData{UserID: claims.UserId}, nil
+	return AccessTokenData{UserID: claims.UserId, UserRole: claims.UserRole}, nil
 }
 
 func (s *AuthService) VerifEmail(email string, token string) error {

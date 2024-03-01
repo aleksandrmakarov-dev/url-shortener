@@ -9,7 +9,7 @@ refreshTokenTokenTTL: 17280s
 emailVerifTokenTTL: 1h
 defaultUrlLifatimeUA: 24h
 defaultUrlLifatimeA: 72h
-emailVerifRequired: false
+emailVerifRequired: true
 http_server:
   address: "localhost:8080"
   timeout: "5s"

@@ -111,6 +111,7 @@ func (r *AuthSqlite) CheckRefreshToken(token string) (models.User, error) {
 	}
 
 	if session.ExpiresAt.Compare(time.Now()) == -1 {
+		r.DeleteRefreshToken(session.RefreshToken, session.UserID)
 		return models.User{}, fmt.Errorf("%s: %w", opr, dberrs.ErrorInvalidOrExpToken)
 	}
 
@@ -132,6 +133,25 @@ func (r *AuthSqlite) CheckRefreshToken(token string) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *AuthSqlite) DeleteRefreshToken(token string, userID int) error {
+	const opr = "repository.sqlite.authSqlite.DeleteRefreshToken"
+
+	stmt, err := r.db.Prepare("DELETE FROM Sessions WHERE refreshToken = ? AND userId = ?")
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	sl, err := stmt.Exec(token, userID)
+	if count, _ := sl.RowsAffected(); count == 0 {
+		return fmt.Errorf("%s: %w", opr, dberrs.ErrorURLNotFound)
+	}
+	if err != nil {
+		return fmt.Errorf("%s: %w", opr, err)
+	}
+
+	return nil
 }
 
 func (r *AuthSqlite) CreateEmailVerification(email string, EmailVerifTokenTTL time.Duration) (models.EmailVerification, error) {

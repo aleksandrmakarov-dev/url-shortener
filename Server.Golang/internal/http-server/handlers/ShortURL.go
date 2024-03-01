@@ -21,9 +21,12 @@ type shortUrlReq struct {
 }
 
 type shortUrlRes struct {
-	Url      string `json:"original"`
-	ShortUrl string `json:"shortened"`
-	Alias    string `json:"alias"`
+	ID        int       `json:"id"`
+	Url       string    `json:"original"`
+	Alias     string    `json:"alias"`
+	Domain    string    `json:"domain"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	UserID    int       `json:"userId"`
 }
 
 func (h *Handler) ShortUrl() http.HandlerFunc {
@@ -65,7 +68,7 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 				CreatedAt:   time.Now(),
 				ExpiresAt:   time.Now().Add(lt),
 			}
-			alias, err := h.Services.Url.CreateShortUrl(&url)
+			_, err := h.Services.Url.CreateShortUrl(&url)
 			if err != nil {
 				if errors.Is(err, dberrs.ErrorURLAliasExists) {
 					w.WriteHeader(http.StatusBadRequest)
@@ -80,9 +83,12 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 
 			w.WriteHeader(http.StatusOK)
 			render.JSON(w, r, shortUrlRes{
-				Url:      req.Url,
-				ShortUrl: h.Cfg.ServerDomain + "/" + alias,
-				Alias:    alias,
+				ID:        url.ID,
+				Url:       url.RedirectUrl,
+				Alias:     url.Alias,
+				Domain:    h.Cfg.ReactDomain,
+				ExpiresAt: url.ExpiresAt,
+				UserID:    url.UserID,
 			})
 			return
 		}
@@ -101,7 +107,7 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 			ExpiresAt:   time.Now().Add(h.Cfg.DefaultUrlLifatimeUA),
 		}
 
-		alias, err := h.Services.Url.CreateShortUrl(&url)
+		_, err = h.Services.Url.CreateShortUrl(&url)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			render.JSON(w, r, resp.ErrorResp(http.StatusInternalServerError, resp.ErrInternal, "Internal server error"))
@@ -111,10 +117,12 @@ func (h *Handler) ShortUrl() http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		render.JSON(w, r, shortUrlRes{
-			Url: req.Url,
-			//мб в конфиг придётся добавить
-			ShortUrl: `https://` + h.Cfg.Address + `/` + alias,
-			Alias:    alias,
+			ID:        url.ID,
+			Url:       url.RedirectUrl,
+			Alias:     url.Alias,
+			Domain:    h.Cfg.ReactDomain,
+			ExpiresAt: url.ExpiresAt,
+			UserID:    url.UserID,
 		})
 
 	}

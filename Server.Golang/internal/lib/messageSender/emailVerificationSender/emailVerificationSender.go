@@ -62,7 +62,7 @@ func SendMessage(email string, token string, apiKey string, domain string) error
 			<div class="container">
 				<h1>Email Verification</h1>
 				<p>To complete your registration, please confirm your email address.</p>
-				<a href="` + domain + `/client/auth/verify-email?email=` + email + `&token=` + token + `" class="verification-link">Confirm Email</a>
+				<a href="` + domain + `/auth/verify-email?email=` + email + `&token=` + token + `" class="verification-link">Confirm Email</a>
 			</div>
 		</body>
 		</html>
