@@ -229,7 +229,7 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
     - **400 Bad Request:** If the custom alias is already taken or if the user is not authorized to use a custom alias.
 
 ### GetByAlias
-- **Route:** `GET api/v1/short-urls/{alias}`
+- **Route:** `GET api/v1/short-urls/a/{alias}`
 - **Description:** Retrieves a short URL by its alias.
 - **URL Parameter:** `alias` - The alias of the short URL.
 - **Success Response (200 OK):** 
@@ -245,6 +245,24 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
     ```
 - **Error Response:** 
     - **404 Not Found:** If the short URL with the provided alias does not exist.
+
+### GetByAlias
+- **Route:** `GET api/v1/short-urls/id/{id}`
+- **Description:** Retrieves a short URL by its id.
+- **URL Parameter:** `id` - The id of the short URL.
+- **Success Response (200 OK):** 
+    ```json
+    {
+        "id": "short_url_id",
+        "original": "https://example.com",
+        "alias": "short_url_alias",
+        "domain": "http://localhost:5173",
+        "expiresAt": "optional_expiration_date",
+        "userId": "user_id_string"
+    }
+    ```
+- **Error Response:** 
+    - **404 Not Found:** If the short URL with the provided id does not exist.
 
 ### GetAll Short URLs
 
