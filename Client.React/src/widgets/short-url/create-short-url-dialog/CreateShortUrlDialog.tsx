@@ -26,29 +26,28 @@ export function CreateShortUrlDialog({
   const { mutate, isPending, isError, error } = useCreateShortUrl();
 
   const onSubmit = (data: EditShortUrlRequest) => {
-    console.log(data);
-    // mutate(
-    //   {
-    //     ...data,
-    //     expiresAt: isNullOrEmpty(data.expiresAt) ? undefined : data.expiresAt,
-    //   },
-    //   {
-    //     onSuccess: (data) => {
-    //       setOpen(false);
-    //       queryClient.invalidateQueries({
-    //         queryKey: shortUrlsKeys.shortUrls.query(),
-    //       });
-    //       toast("Short URL created", {
-    //         description: "A new Short URL has been created successfully",
-    //         icon: <CheckCircle className="pr-1.5 text-green-500" />,
-    //         action: {
-    //           label: "Copy",
-    //           onClick: () => copyShortUrlToClipboard(data.domain, data.alias),
-    //         },
-    //       });
-    //     },
-    //   }
-    // );
+    mutate(
+      {
+        ...data,
+        expiresAt: isNullOrEmpty(data.expiresAt) ? undefined : data.expiresAt,
+      },
+      {
+        onSuccess: (data) => {
+          setOpen(false);
+          queryClient.invalidateQueries({
+            queryKey: shortUrlsKeys.shortUrls.query(),
+          });
+          toast("Short URL created", {
+            description: "A new Short URL has been created successfully",
+            icon: <CheckCircle className="pr-1.5 text-green-500" />,
+            action: {
+              label: "Copy",
+              onClick: () => copyShortUrlToClipboard(data.domain, data.alias),
+            },
+          });
+        },
+      }
+    );
   };
 
   return (
