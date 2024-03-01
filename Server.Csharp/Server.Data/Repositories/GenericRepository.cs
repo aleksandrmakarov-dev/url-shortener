@@ -42,7 +42,7 @@ public class GenericRepository<TEntity>(ApplicationDbContext context) : IGeneric
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
-        return await context.Set<TEntity>().ToListAsync();
+        return await context.Set<TEntity>().OrderByDescending(e=>e.CreatedAt).ToListAsync();
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetPageAsync(int page, int size,Expression<Func<TEntity,bool>>? whereExpression = null)
@@ -55,6 +55,7 @@ public class GenericRepository<TEntity>(ApplicationDbContext context) : IGeneric
         }
 
         return await query
+            .OrderByDescending(e=>e.CreatedAt)
             .Skip((page - 1) * size)
             .Take(size)
             .ToListAsync();

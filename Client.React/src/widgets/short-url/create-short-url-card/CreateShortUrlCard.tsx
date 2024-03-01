@@ -2,7 +2,7 @@ import { useSession } from "@/context/session-provider/SessionProvider";
 import { ShortUrlForm, ShortenedUrl } from "@/entities/short-url";
 import { useCreateShortUrl } from "@/features/short-url/create";
 import { EditShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
-import { cn } from "@/lib/utils";
+import { cn, isNullOrEmpty } from "@/lib/utils";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { HTMLAttributes } from "react";
 
@@ -18,7 +18,12 @@ export function CreateShortUrlCard({
     useCreateShortUrl();
 
   const onSubmit = (request: EditShortUrlRequest) => {
-    mutate(request);
+    mutate({
+      ...request,
+      expiresAt: isNullOrEmpty(request.expiresAt)
+        ? undefined
+        : request.expiresAt,
+    });
   };
 
   return (

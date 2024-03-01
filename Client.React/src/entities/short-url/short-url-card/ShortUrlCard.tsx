@@ -1,3 +1,4 @@
+import { copyShortUrlToClipboard } from "@/features/short-url";
 import { ShortUrlResponse } from "@/lib/dto/short-url/short-url.response";
 import { Button } from "@/shared/ui/button";
 import {
@@ -24,7 +25,7 @@ interface ShortUrlCardProps {
 }
 
 export function ShortUrlCard({
-  shortUrl: { id, alias, domain, original, createdAt },
+  shortUrl: { id, alias, domain, original, createdAt, expiresAt },
   onDeleteClick,
   onEditClick,
 }: ShortUrlCardProps) {
@@ -53,7 +54,14 @@ export function ShortUrlCard({
         <a className="text-sm underline-offset-2 hover:underline" href="/">
           0 clicks
         </a>
-        <p className="text-sm">{moment(createdAt).format("L")}</p>
+        <div>
+          <p className="text-sm">{moment(createdAt).format("L")}</p>
+          {expiresAt && (
+            <p className="text-sm text-red-500">
+              {moment(expiresAt).format("L")}
+            </p>
+          )}
+        </div>
         <div className="text-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -62,13 +70,16 @@ export function ShortUrlCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-42 absolute top-0 -right-4">
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem
+                onClick={() => copyShortUrlToClipboard(domain, alias)}
+                asChild
+              >
                 <span className="cursor-pointer">
                   <Copy className="w-4 h-4 mr-1.5" />
                   <span>Copy link</span>
                 </span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEditClick?.(alias)} asChild>
+              <DropdownMenuItem onClick={() => onEditClick?.(id)} asChild>
                 <span className="cursor-pointer">
                   <Edit className="w-4 h-4 mr-1.5" />
                   <span>Edit link</span>

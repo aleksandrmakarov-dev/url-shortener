@@ -53,10 +53,23 @@ namespace Server.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{alias}")]
-        public async Task<IActionResult> GetByAlias([FromRoute] string alias)
+        [HttpGet("a/{alias}")]
+        public async Task<IActionResult> GetByAlias([FromRoute] string alias, [FromQuery] bool? throwOnExpire)
         {
-            ShortUrlResponse shortUrlResponse = await _shortUrlsService.GetByAliasAsync(alias);
+            ShortUrlResponse shortUrlResponse = await _shortUrlsService.GetByAliasAsync(new GetShortUrlByAliasRequest
+            {
+                Alias = alias,
+                ThrowOnExpire = throwOnExpire
+            });
+
+            return Ok(shortUrlResponse);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("id/{id:guid}")]
+        public async Task<IActionResult> GetByAlias([FromRoute] Guid id)
+        {
+            ShortUrlResponse shortUrlResponse = await _shortUrlsService.GetByIdAsync(id);
 
             return Ok(shortUrlResponse);
         }

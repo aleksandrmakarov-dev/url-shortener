@@ -21,6 +21,7 @@ namespace Server.Infrastructure.Profiles
                     d=>d.Domain,
                     cd=>cd.MapFrom(v=> "http://localhost:5173")
                     );
+            CreateMap<UpdateShortUrlRequest, ShortUrl>();
         }
     }
 }

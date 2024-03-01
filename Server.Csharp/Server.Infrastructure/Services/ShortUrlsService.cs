@@ -81,15 +81,15 @@ namespace Server.Infrastructure.Services
             return shortUrlResponse;
         }
 
-        public async Task<ShortUrlResponse> GetByAliasAsync(string alias)
+        public async Task<ShortUrlResponse> GetByAliasAsync(GetShortUrlByAliasRequest request)
         {
             // check if url exists in cache
-            ShortUrl? foundShortUrl = await _shortUrlsCacheRepository.GetAsync(alias);
+            ShortUrl? foundShortUrl = await _shortUrlsCacheRepository.GetAsync(request.Alias);
 
             // if cache value is null try get from database
             if (foundShortUrl == null)
             {
-                foundShortUrl = await _shortUrlsRepository.GetByAliasAsync(alias);
+                foundShortUrl = await _shortUrlsRepository.GetByAliasAsync(request.Alias);
                 // if value from database is not null, save it to cache
                 if (foundShortUrl != null)
                 {
@@ -98,14 +98,23 @@ namespace Server.Infrastructure.Services
                 // otherwise throw not found exception
                 else
                 {
-                    throw new NotFoundException($"Short url with alias {alias} not found");
+                    throw new NotFoundException($"Short url with alias {request.Alias} not found");
                 }
             }
             else
             {
                 // if short url found in cache refresh ttl
-                await _shortUrlsCacheRepository.RefreshAsync(alias);
+                await _shortUrlsCacheRepository.RefreshAsync(request.Alias);
             }
+
+            // if flag throwOnExpire is true and url is expired throw an exception
+
+            if (request.ThrowOnExpire is true && foundShortUrl.ExpiresAt < DateTime.UtcNow)
+            {
+                throw new BadRequestException("Short URL is expired");
+            }
+
+            // add new navigation item
 
             ShortUrlResponse shortUrlResponse = _mapper.Map<ShortUrl,ShortUrlResponse>(foundShortUrl);
 
@@ -130,22 +139,41 @@ namespace Server.Infrastructure.Services
                 throw new NotFoundException($"Short url with id {id} not found");
             }
 
-            ShortUrl shortUrlToUpdate = _mapper.Map<UpdateShortUrlRequest, ShortUrl>(request);
+            ShortUrl shortUrlToUpdate = _mapper.Map<UpdateShortUrlRequest, ShortUrl>(request,foundShortUrl);
 
             // check if custom alias is set
 
-            if (!string.IsNullOrEmpty(request.CustomAlias) && request.CustomAlias != foundShortUrl.Alias)
+            if (!string.IsNullOrEmpty(request.CustomAlias))
             {
-                // check if custom alias is already exists
-                bool isAliasExist = await _shortUrlsRepository.IsExistByAliasAsync(request.CustomAlias);
-
-                if (isAliasExist)
+                if (request.CustomAlias != foundShortUrl.Alias)
                 {
-                    throw new BadRequestException($"Alias {request.CustomAlias} is already registered. Try another one");
+                    // check if custom alias is already exists
+                    bool isAliasExist = await _shortUrlsRepository.IsExistByAliasAsync(request.CustomAlias);
+
+                    if (isAliasExist)
+                    {
+                        throw new BadRequestException($"Alias {request.CustomAlias} is already registered. Try another one");
+                    }
+
+                    shortUrlToUpdate.Alias = request.CustomAlias;
+                }
+            }
+            else
+            {
+                // generate random alias
+
+                string randomAlias = _tokensService.GetToken(8);
+
+                //check if new alias is exist in database
+
+                if (await _shortUrlsRepository.IsExistByAliasAsync(randomAlias))
+                {
+                    randomAlias = _tokensService.GetToken(8);
                 }
 
-                shortUrlToUpdate.Alias = request.CustomAlias;
+                shortUrlToUpdate.Alias = randomAlias;
             }
+            
 
             ShortUrl updatedShortUrl = await _shortUrlsRepository.UpdateAsync(shortUrlToUpdate);
 
@@ -204,7 +232,12 @@ namespace Server.Infrastructure.Services
                 {
                     // if query is not null or empty string create expression that checks if alias contains query value
                     Expression<Func<ShortUrl, bool>> filterByAlias = su =>
-                        su.Alias.ToLower().Contains(filter.Query.ToLower());
+                        su.Alias
+                            .ToLower()
+                            .Contains(filter.Query.ToLower()) || 
+                        su.Original
+                            .ToLower()
+                            .Contains(filter.Query.ToLower());
 
                     // if whereExpression is null set it equal to filterByAlias expression otherwise use and with previous one
                     whereExpression = whereExpression != null ? whereExpression.And(filterByAlias) : filterByAlias;

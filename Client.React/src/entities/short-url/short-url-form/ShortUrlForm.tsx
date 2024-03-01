@@ -20,12 +20,14 @@ interface ShortUrlFormProps {
   shortUrl?: EditShortUrlRequest;
   onSubmit: (data: EditShortUrlRequest) => void;
   isLoading?: boolean;
+  btnLabel?: string;
 }
 
 export function ShortUrlForm({
   shortUrl,
   onSubmit,
   isLoading,
+  btnLabel,
 }: ShortUrlFormProps) {
   const { session } = useSession();
 
@@ -97,7 +99,7 @@ export function ShortUrlForm({
           />
         </div>
         <div className="flex justify-end">
-          <Button loading={isLoading}>Shorten URL</Button>
+          <Button loading={isLoading}>{btnLabel ?? "Shorten URL"}</Button>
         </div>
       </form>
     </Form>

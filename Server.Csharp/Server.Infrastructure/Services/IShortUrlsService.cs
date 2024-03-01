@@ -8,7 +8,7 @@ namespace Server.Infrastructure.Services;
 public interface IShortUrlsService
 {
     Task<ShortUrlResponse> CreateAsync(CreateShortUrlRequest request);
-    Task<ShortUrlResponse> GetByAliasAsync(string alias);
+    Task<ShortUrlResponse> GetByAliasAsync(GetShortUrlByAliasRequest request);
     Task<IEnumerable<ShortUrlResponse>> GetAllAsync();
     Task<ShortUrlResponse> UpdateByIdAsync(Guid id, UpdateShortUrlRequest request);
     Task<ShortUrlResponse> DeleteByIdAsync(Guid id);

@@ -10,9 +10,12 @@ export const editShortUrlRequest = z.object({
     .optional(),
   expiresAt: z
     .string()
-    .refine((v) => moment(v).isAfter(), {
-      message: "date must be in the future",
-    })
+    .refine(
+      (v) => (v == undefined || v?.length == 0 ? true : moment(v).isAfter()),
+      {
+        message: "date must be in the future",
+      }
+    )
     .optional(),
   userId: z.string().optional(),
 });

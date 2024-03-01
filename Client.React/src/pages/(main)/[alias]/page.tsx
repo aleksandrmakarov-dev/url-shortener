@@ -8,6 +8,7 @@ export default function RedirectPage() {
 
   const { data, isSuccess, isLoading, isError, error } = useShortUrlByAlias({
     alias: alias,
+    throwOnExpire: true,
   });
 
   useEffect(() => {

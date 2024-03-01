@@ -23,11 +23,15 @@ export const shortUrlsKeys = {
 
 type ShortUrlByAliasParams = {
   alias?: string;
+  throwOnExpire?: boolean;
 };
 
 async function fetchShortUrlByAlias(params: ShortUrlByAliasParams) {
   const response = await axios.get<ShortUrlResponse>(
-    `/short-urls/${params.alias}`
+    `/short-urls/a/${params.alias}`,
+    {
+      params: { throwOnExpire: params.throwOnExpire },
+    }
   );
   return response.data;
 }
@@ -75,5 +79,31 @@ export const useShortUrls = (params?: ShortUrlsParams) => {
     queryFn: async () => {
       return await fetchShortUrls(params);
     },
+  });
+};
+
+type ShortUrlByIdParams = {
+  id?: string;
+};
+
+async function fetchShortUrlById(params: ShortUrlByIdParams) {
+  const response = await axios.get<ShortUrlResponse>(
+    `/short-urls/id/${params.id}`
+  );
+  return response.data;
+}
+
+export const useShortUrlById = (params: ShortUrlByIdParams) => {
+  return useQuery<
+    ShortUrlResponse,
+    AxiosError<ErrorResponse>,
+    ShortUrlResponse,
+    unknown[]
+  >({
+    queryKey: shortUrlsKeys.shortUrls.alias(params.id!),
+    queryFn: async () => {
+      return await fetchShortUrlById(params);
+    },
+    enabled: !!params.id,
   });
 };
