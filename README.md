@@ -249,7 +249,7 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
 ### GetAll Short URLs
 
 - **Route:** `GET api/v1/short-urls`
-- **Description:** Retrieves all short URLs.
+- **Description:** Retrieves all short URLs. By default returns newly created items.
 - **Query Parameters:**
   - `userId` (optional): Filters short URLs by user ID.
   - `page` (optional, default: 1): Specifies the page number for pagination.
