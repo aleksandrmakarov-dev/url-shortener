@@ -169,7 +169,7 @@ The `AuthController` class handles authentication-related HTTP requests in the A
 - **Error Response:** 
     - **200 OK:** If the email is already verified.
 
-### ExpireSession
+### SignOut
 - **Route:** `DELETE api/v1/auth/sign-out`
 - **Description:** Expires the current user session.
 - **Request Body:** 
@@ -246,7 +246,7 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
 - **Error Response:** 
     - **404 Not Found:** If the short URL with the provided alias does not exist.
 
-### GetByAlias
+### GetById
 - **Route:** `GET api/v1/short-urls/id/{id}`
 - **Description:** Retrieves a short URL by its id.
 - **URL Parameter:** `id` - The id of the short URL.
