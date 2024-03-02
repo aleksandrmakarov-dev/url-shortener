@@ -18,10 +18,12 @@ namespace Server.API.Controllers
     public class ShortUrlsController : ControllerBase
     {
         private readonly IShortUrlsService _shortUrlsService;
+        private readonly INavigationsService _navigationService;
 
-        public ShortUrlsController(IShortUrlsService shortUrlsService)
+        public ShortUrlsController(IShortUrlsService shortUrlsService, INavigationsService navigationService)
         {
             _shortUrlsService = shortUrlsService;
+            _navigationService = navigationService;
         }
 
         [AllowAnonymous]
@@ -60,6 +62,17 @@ namespace Server.API.Controllers
             {
                 Alias = alias,
                 ThrowOnExpire = throwOnExpire
+            });
+
+            await _navigationService.CreateAsync(new CreateNavigationRequest
+            {
+                IpAddress = "192.168.0.1",
+                CountryName = "Finland",
+                CountryCode = "FI",
+                Browser = "Google Chrome",
+                Platform = "Windows",
+                ShortUrlId = shortUrlResponse.Id
+
             });
 
             return Ok(shortUrlResponse);

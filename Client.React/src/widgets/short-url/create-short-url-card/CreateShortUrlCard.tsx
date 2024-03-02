@@ -2,16 +2,14 @@ import { useSession } from "@/context/session-provider/SessionProvider";
 import { ShortUrlForm, ShortenedUrl } from "@/entities/short-url";
 import { useCreateShortUrl } from "@/features/short-url/create";
 import { EditShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
-import { cn, isNullOrEmpty } from "@/lib/utils";
+import { isNullOrEmpty } from "@/lib/utils";
+import { CardContainer } from "@/shared/components/CardContainer";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { HTMLAttributes } from "react";
 
 interface CreateShortUrlCardProps extends HTMLAttributes<HTMLDivElement> {}
 
-export function CreateShortUrlCard({
-  className,
-  ...other
-}: CreateShortUrlCardProps) {
+export function CreateShortUrlCard(props: CreateShortUrlCardProps) {
   const { session } = useSession();
 
   const { mutate, isPending, isSuccess, data, isError, error, reset } =
@@ -27,13 +25,7 @@ export function CreateShortUrlCard({
   };
 
   return (
-    <div
-      className={cn(
-        "bg-white border border-border rounded-md p-8 max-w-screen-sm mx-auto",
-        className
-      )}
-      {...other}
-    >
+    <CardContainer {...props}>
       {isSuccess ? (
         <>
           <h1 className="mb-5 text-3xl font-semibold">
@@ -63,6 +55,6 @@ export function CreateShortUrlCard({
           />
         </>
       )}
-    </div>
+    </CardContainer>
   );
 }

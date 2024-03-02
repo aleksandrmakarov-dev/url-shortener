@@ -1,6 +1,7 @@
 import { SignUpForm } from "@/entities/auth";
 import { useSignUpLocal } from "@/features/auth/sign-up";
 import { SignUpRequest } from "@/lib/dto/auth/sign-up.request";
+import { CardContainer } from "@/shared/components/CardContainer";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { Button } from "@/shared/ui/button";
 
@@ -12,7 +13,7 @@ export function SignUpCard() {
   };
 
   return (
-    <div className="w-full max-w-md">
+    <CardContainer className="w-full max-w-md mx-auto p-8">
       <h1 className="text-center mb-10 text-3xl font-semibold">
         Create your account
       </h1>
@@ -62,6 +63,6 @@ export function SignUpCard() {
           </a>
         </p>
       </div>
-    </div>
+    </CardContainer>
   );
 }

@@ -15,5 +15,6 @@ namespace Server.Data.Entities
         public Guid? UserId { get; set;}
         public User? User { get; set;}
         public DateTime? ExpiresAt { get; set; }
+        public ICollection<Navigation> Navigation { get; set; } = new List<Navigation>();
     }
 }

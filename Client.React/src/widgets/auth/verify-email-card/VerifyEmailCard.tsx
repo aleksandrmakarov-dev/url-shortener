@@ -1,6 +1,7 @@
 import { VerifyEmailForm } from "@/entities/auth";
 import { useVerifyEmail } from "@/features/auth/verify-email";
 import { VerifyEmailRequest } from "@/lib/dto/auth/verify-email.request";
+import { CardContainer } from "@/shared/components/CardContainer";
 import { FormAlert } from "@/shared/components/FormAlert";
 
 interface VerifyEmailCardProps {
@@ -15,9 +16,9 @@ export function VerifyEmailCard({ data }: VerifyEmailCardProps) {
   };
 
   return (
-    <div className="w-full max-w-md">
+    <CardContainer className="w-full max-w-md p-8">
       <h1 className="text-center mb-10 text-3xl font-semibold">
-        Verify you account
+        Verify your account
       </h1>
       <FormAlert
         className="mb-3"
@@ -41,6 +42,6 @@ export function VerifyEmailCard({ data }: VerifyEmailCardProps) {
         error={error?.response?.data}
       />
       <VerifyEmailForm data={data} isLoading={isPending} onSubmit={onSubmit} />
-    </div>
+    </CardContainer>
   );
 }

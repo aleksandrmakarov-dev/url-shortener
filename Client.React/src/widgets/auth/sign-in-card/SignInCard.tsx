@@ -2,6 +2,7 @@ import { useSession } from "@/context/session-provider/SessionProvider";
 import { SignInForm } from "@/entities/auth";
 import { useSignInLocal } from "@/features/auth/sign-in";
 import { SignInRequest } from "@/lib/dto/auth/sign-in.request";
+import { CardContainer } from "@/shared/components/CardContainer";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { Button } from "@/shared/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +23,7 @@ export function SignInCard() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <CardContainer className="w-full max-w-md mx-auto p-8">
       <h1 className="text-center mb-10 text-3xl font-semibold">
         Sign in to Account
       </h1>
@@ -60,6 +61,6 @@ export function SignInCard() {
           </a>
         </p>
       </div>
-    </div>
+    </CardContainer>
   );
 }

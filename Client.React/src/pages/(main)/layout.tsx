@@ -9,7 +9,7 @@ export default function MainLayout() {
 
   return (
     <FullPageWrapper className="bg-gray-50">
-      <nav className="sticky h-14 flex items-center bg-gray-50 top-0 px-5">
+      <nav className="sticky h-14 flex items-center bg-gray-50 top-0 px-5 z-10">
         <div className="max-w-screen-lg w-full mx-auto flex items-center justify-between">
           <div>
             <a className="text-lg font-bold" href="/">

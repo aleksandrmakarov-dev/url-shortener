@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Data.Database;
 
@@ -10,51 +11,14 @@ using Server.Data.Database;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240301143145_add role to the user")]
+    partial class addroletotheuser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
-
-            modelBuilder.Entity("Server.Data.Entities.Navigation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Browser")
-                        .HasMaxLength(64)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CountryCode")
-                        .HasMaxLength(5)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CountryName")
-                        .HasMaxLength(64)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("IpAddress")
-                        .HasMaxLength(16)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Platform")
-                        .HasMaxLength(64)
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ShortUrlId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShortUrlId");
-
-                    b.ToTable("Navigation");
-                });
 
             modelBuilder.Entity("Server.Data.Entities.Session", b =>
                 {
@@ -70,7 +34,6 @@ namespace Server.Data.Migrations
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")
@@ -161,17 +124,6 @@ namespace Server.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Server.Data.Entities.Navigation", b =>
-                {
-                    b.HasOne("Server.Data.Entities.ShortUrl", "ShortUrl")
-                        .WithMany("Navigation")
-                        .HasForeignKey("ShortUrlId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ShortUrl");
-                });
-
             modelBuilder.Entity("Server.Data.Entities.Session", b =>
                 {
                     b.HasOne("Server.Data.Entities.User", "User")
@@ -190,11 +142,6 @@ namespace Server.Data.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Server.Data.Entities.ShortUrl", b =>
-                {
-                    b.Navigation("Navigation");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.User", b =>

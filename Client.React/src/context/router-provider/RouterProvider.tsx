@@ -3,6 +3,7 @@ import AccessDeniedPage from "@/pages/(main)/access-denied/page";
 import HomePage from "@/pages/(main)/home/page";
 import MainLayout from "@/pages/(main)/layout";
 import LinksPage from "@/pages/(main)/links/u/[userId]/page";
+import StatsPage from "@/pages/(main)/stats/[alias]/page";
 import AuthLayout from "@/pages/auth/layout";
 import NewEmailVerificationPage from "@/pages/auth/new-email-verification/page";
 import SignInPage from "@/pages/auth/sign-in/page";
@@ -33,6 +34,9 @@ const router = createBrowserRouter(
               <Route path=":userId" element={<LinksPage />} />
             </Route>
           </Route>
+        </Route>
+        <Route path="stats">
+          <Route path=":id" element={<StatsPage />} />
         </Route>
       </Route>
       <Route path="/auth" element={<AuthLayout />}>

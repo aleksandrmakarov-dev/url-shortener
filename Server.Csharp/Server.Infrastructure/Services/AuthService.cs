@@ -112,7 +112,7 @@ public class AuthService : IAuthService
         string accessToken = _jwtService.GetToken(new JwtPayload
         {
             Id = createdSession.UserId,
-            Role = Role.User
+            Role = Enum.Parse<Role>(foundUser.Role)
         });
         
         return new SignInResponse
@@ -121,7 +121,9 @@ public class AuthService : IAuthService
             Session = new SessionResponse
             {
                 AccessToken = accessToken,
-                UserId = createdSession.UserId
+                UserId = createdSession.UserId,
+                Email = foundUser.Email,
+                Role = Enum.Parse<Role>(foundUser.Role)
             }
         };
     }
@@ -188,14 +190,16 @@ public class AuthService : IAuthService
         string accessToken = _jwtService.GetToken(new JwtPayload
         {
             Id = foundUser.Id,
-            Role = Role.User
+            Role = Enum.Parse<Role>(foundUser.Role)
         });
 
         // return access token and user id
         return new SessionResponse
         {
             AccessToken = accessToken,
-            UserId = foundUser.Id
+            UserId = foundUser.Id,
+            Email = foundUser.Email,
+            Role = Enum.Parse<Role>(foundUser.Role)
         };
     }
 

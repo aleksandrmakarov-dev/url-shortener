@@ -11,14 +11,56 @@ using Server.Data.Database;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240221222733_user in short url is optional")]
-    partial class userinshorturlisoptional
+    [Migration("20240302130731_add county code, browser and platform, rename county to countryName")]
+    partial class addcountycodebrowserandplatformrenamecountytocountryName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
+
+            modelBuilder.Entity("Server.Data.Entities.Navigation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Browser")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CountryCode")
+                        .HasMaxLength(5)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CountryName")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("NavigatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Platform")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ShortUrlId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShortUrlId");
+
+                    b.ToTable("Navigation");
+                });
 
             modelBuilder.Entity("Server.Data.Entities.Session", b =>
                 {
@@ -34,6 +76,7 @@ namespace Server.Data.Migrations
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")
@@ -97,6 +140,7 @@ namespace Server.Data.Migrations
                         .HasColumnType("VARCHAR");
 
                     b.Property<string>("EmailVerificationToken")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("EmailVerificationTokenExpiresAt")
@@ -107,6 +151,12 @@ namespace Server.Data.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -115,6 +165,17 @@ namespace Server.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Server.Data.Entities.Navigation", b =>
+                {
+                    b.HasOne("Server.Data.Entities.ShortUrl", "ShortUrl")
+                        .WithMany("Navigation")
+                        .HasForeignKey("ShortUrlId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ShortUrl");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Session", b =>
@@ -135,6 +196,11 @@ namespace Server.Data.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Server.Data.Entities.ShortUrl", b =>
+                {
+                    b.Navigation("Navigation");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.User", b =>

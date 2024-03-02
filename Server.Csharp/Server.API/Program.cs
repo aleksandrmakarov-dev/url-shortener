@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Server.API.Common;
 using Server.API.Middlewares;
 using Server.Data.Database;
+using Server.Data.Repositories;
+using Server.Infrastructure.Common;
+using Server.Infrastructure.Services;
 
 namespace Server.API
 {
@@ -67,6 +70,14 @@ namespace Server.API
             
             // user extractor middleware
             app.UseMiddleware<UserExtractorMiddleware>();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                SeedData.Seed(
+                    scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(),
+                    scope.ServiceProvider.GetRequiredService<IPasswordsService>()
+                );
+            }
 
             app.Run();
         }

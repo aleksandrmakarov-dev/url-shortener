@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Server.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class addroletotheuser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,10 +17,11 @@ namespace Server.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "VARCHAR", maxLength: 200, nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
-                    EmailVerificationToken = table.Column<string>(type: "TEXT", nullable: true),
+                    PasswordHash = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    EmailVerificationToken = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     EmailVerificationTokenExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     EmailVerifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Role = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -54,9 +55,9 @@ namespace Server.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Redirect = table.Column<string>(type: "TEXT", nullable: false),
+                    Original = table.Column<string>(type: "TEXT", nullable: false),
                     Alias = table.Column<string>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: true),
                     ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -67,8 +68,7 @@ namespace Server.Data.Migrations
                         name: "FK_ShortUrls_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(

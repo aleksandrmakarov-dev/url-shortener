@@ -26,7 +26,7 @@ export function UserProfileMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-42 absolute top-0 -right-4">
         <DropdownMenuLabel className="truncate p-2">
-          {session.userId}
+          {session.email}
         </DropdownMenuLabel>
         <DropdownMenuItem asChild>
           <a className="cursor-pointer" href={`/links/u/${session.userId}`}>

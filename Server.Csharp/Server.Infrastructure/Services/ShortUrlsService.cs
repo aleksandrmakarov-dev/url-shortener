@@ -75,8 +75,6 @@ namespace Server.Infrastructure.Services
             await _shortUrlsCacheRepository.SetAsync(createdShortUrl.Alias, createdShortUrl);
 
             ShortUrlResponse shortUrlResponse = _mapper.Map<ShortUrl, ShortUrlResponse>(createdShortUrl);
-            
-            shortUrlResponse.Domain = "http://localhost:5173";
 
             return shortUrlResponse;
         }

@@ -11,6 +11,7 @@ namespace Server.API.Common
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<ISessionsRepository, SessionsRepository>();
             services.AddScoped<IShortUrlsRepository, ShortUrlsRepository>();
+            services.AddScoped<INavigationsRepository, NavigationsRepository>();
 
             //cache repositories
             services.AddScoped<IGenericCacheRepository<ShortUrl>, GenericCacheRepository<ShortUrl>>();
@@ -23,6 +24,8 @@ namespace Server.API.Common
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IShortUrlsService, ShortUrlsService>();
+            services.AddScoped<INavigationsService,NavigationsService>();
+            services.AddScoped<IStatisticsService, StatisticsService>();
 
             services.AddScoped<IPasswordsService, BcryptPasswordsService>();
             services.AddScoped<ITokensService, TokensService>();
