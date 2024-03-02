@@ -1,9 +1,8 @@
 package models
 
 type Pagination struct {
-	Page        int    `json:"page"`
-	Size        int    `json:"size"`
-	Query       string `json:"query"`
-	UserID      int    `json:"userId"`
-	HasNextPage bool   `json:"hasNextPage"`
+	Page            int  `json:"page"`
+	Size            int  `json:"size"`
+	HasNextPage     bool `json:"hasNextPage"`
+	HasPreviousPage bool `json:"hasPreviousPage"`
 }

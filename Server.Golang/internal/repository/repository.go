@@ -23,8 +23,9 @@ type Auth interface {
 type Url interface {
 	CreateShortUrl(u *models.Url) (string, error)
 	GetUrl(alias string) (models.Url, error)
+	GetUrlsCount(userId int, aliasQuery string) int
 	GetUrlById(id, userId int) (models.Url, error)
-	GetAllUrls(userId, page, size int, query string) ([]models.Url, models.Pagination, error)
+	GetAllUrls(userId, page, size int, query, domain string) ([]models.Url, models.Pagination)
 	UpdateUrlOriginalByID(id int, original string, userId int) error
 	UpdateUrlAliasByID(id int, alias string, userId int) error
 	DeleteUrlByID(id, userId int) error

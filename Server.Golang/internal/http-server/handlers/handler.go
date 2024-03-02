@@ -43,6 +43,7 @@ func (h *Handler) InitRoutes() *chi.Mux {
 			r.Post("/verify-email", h.EmailVerification())
 		})
 
+		r.With(h.AuthMiddleware).Get("/short-urls", h.GetAllUrlsByUserId())
 		r.Get("/short-urls/{alias}", h.GetUrlByAlias())
 		r.With(h.AuthMiddleware).Post("/short-urls", h.ShortUrl())
 		r.With(h.AuthMiddleware).Delete("/short-urls/{id}", h.DeleteShortURL())

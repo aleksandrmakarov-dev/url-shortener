@@ -134,7 +134,8 @@ func (r *UrlSqlite) DeleteUrlByID(id, userId int) error {
 	return nil
 }
 
-func (r *UrlSqlite) GetAllUrls(userId, page, size int, query string) ([]models.Url, models.Pagination, error) {
+func (r *UrlSqlite) GetAllUrls(userId, page, size int, query, domain string) ([]models.Url, models.Pagination) {
+
 	if page <= 0 {
 		page = 1
 	}
@@ -142,23 +143,48 @@ func (r *UrlSqlite) GetAllUrls(userId, page, size int, query string) ([]models.U
 		size = 10
 	}
 
+	count := r.GetUrlsCount(userId, query)
+	var pagination = models.Pagination{
+		Page:            page,
+		Size:            size,
+		HasNextPage:     false,
+		HasPreviousPage: false,
+	}
+
+	if count == 0 {
+		return []models.Url{}, pagination
+	}
+	if count > (((page - 1) * size) + size) {
+		pagination.HasNextPage = true
+	}
+	if page > 1 {
+		pagination.HasPreviousPage = true
+	}
+
 	var urls []models.Url
 
-	if query == "" {
-		rows, err := r.db.Query("SELECT * FROM Urls WHERE userId = ?", userId)
+	rows, _ := r.db.Query("SELECT * FROM Urls WHERE userId = ? AND alias LIKE CONCAT('%', ?, '%') LIMIT ? OFFSET ?;", userId, query, size, size*page-size)
+	for rows.Next() {
+		var url models.Url
 
-		for rows.Next() {
-			var url models.Url
-			rows.Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.CreatedAt, &url.ExpiresAt)
-			urls = append(urls, url)
-		}
-
-		fmt.Println(urls)
-
-		return []models.Url{}, models.Pagination{}, err
+		url.Domain = domain
+		rows.Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.CreatedAt, &url.ExpiresAt)
+		urls = append(urls, url)
 	}
-	return []models.Url{}, models.Pagination{}, nil
+
+	return urls, pagination
+
 }
+
+func (r *UrlSqlite) GetUrlsCount(userId int, aliasQuery string) int {
+	stmt, _ := r.db.Prepare("SELECT COUNT(*) FROM Urls WHERE userId = ? AND alias LIKE CONCAT('%', ?, '%')")
+
+	var count int
+	stmt.QueryRow(userId, aliasQuery).Scan(&count)
+
+	return count
+}
+
 func (r *UrlSqlite) UpdateUrlAliasByID(id int, alias string, userId int) error {
 	const opr = "storage.storages.sqlite.UpdateUrlAliasByID"
 
