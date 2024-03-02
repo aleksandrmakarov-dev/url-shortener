@@ -19,15 +19,11 @@ func (h *Handler) GetAllUrlsByUserId() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		page, err := strconv.Atoi(r.URL.Query().Get("page"))
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			render.JSON(w, r, resp.ErrorResp(http.StatusBadRequest, resp.ErrBadReq, "page must be an integer"))
-			return
+			page = 1
 		}
 		size, err := strconv.Atoi(r.URL.Query().Get("size"))
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			render.JSON(w, r, resp.ErrorResp(http.StatusBadRequest, resp.ErrBadReq, "size must be an integer"))
-			return
+			size = 10
 		}
 		query := r.URL.Query().Get("query")
 

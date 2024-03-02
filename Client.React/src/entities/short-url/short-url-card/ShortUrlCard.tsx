@@ -46,7 +46,7 @@ export function ShortUrlCard({
           <p className="text-sm">{moment(createdAt).format("DD/MM/YYYY")}</p>
           {expiresAt && (
             <p className="text-sm text-red-500">
-              {moment(expiresAt).format("DD/MM/YYYY")}
+              {moment(expiresAt).format("DD/MM/YYYY HH:SS")}
             </p>
           )}
         </div>
