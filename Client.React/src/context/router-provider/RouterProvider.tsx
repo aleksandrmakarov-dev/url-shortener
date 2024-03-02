@@ -35,8 +35,10 @@ const router = createBrowserRouter(
             </Route>
           </Route>
         </Route>
-        <Route path="stats">
-          <Route path=":id" element={<StatsPage />} />
+        <Route element={<RouteRoleGuard />}>
+          <Route path="stats">
+            <Route path=":id" element={<StatsPage />} />
+          </Route>
         </Route>
       </Route>
       <Route path="/auth" element={<AuthLayout />}>

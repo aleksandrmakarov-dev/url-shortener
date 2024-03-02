@@ -24,14 +24,17 @@ namespace Server.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Browser")
+                        .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CountryCode")
+                        .IsRequired()
                         .HasMaxLength(5)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CountryName")
+                        .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
@@ -39,10 +42,12 @@ namespace Server.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IpAddress")
+                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Platform")
+                        .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
@@ -53,7 +58,7 @@ namespace Server.Data.Migrations
 
                     b.HasIndex("ShortUrlId");
 
-                    b.ToTable("Navigation");
+                    b.ToTable("Navigations");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Session", b =>

@@ -145,9 +145,9 @@ namespace Server.Infrastructure.Common
 
                     for (int i = 0; i < 100; i++)
                     {
-                        Country country = countries[r.Next(0, countriesLength - 1)];
-                        string browser = browsers[r.Next(0, browsersLength - 1)];
-                        string platform = platforms[r.Next(0, platformsLength - 1)];
+                        Country country = countries[r.Next(0, countriesLength)];
+                        string browser = browsers[r.Next(0, browsersLength)];
+                        string platform = platforms[r.Next(0, platformsLength)];
 
                         navigations.Add(new Navigation
                         {

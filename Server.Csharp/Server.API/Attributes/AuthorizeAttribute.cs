@@ -35,7 +35,7 @@ public class AuthorizeAttribute : Attribute,IAuthorizationFilter
             {
                 StatusCode = (int)HttpStatusCode.Unauthorized,
                 Error = "401 Unauthorized",
-                Message = "You don't have enough privileges to access perform action"
+                Message = "You don't have enough privileges to perform action"
             };
 
             context.Result = new JsonResult(errorResponse)

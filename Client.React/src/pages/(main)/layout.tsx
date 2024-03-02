@@ -16,26 +16,6 @@ export default function MainLayout() {
               SHRT.COM
             </a>
           </div>
-          <div className="space-x-10">
-            <a
-              className="font-semibold underline-offset-2 hover:underline "
-              href="/"
-            >
-              Home
-            </a>
-            <a
-              className="font-semibold underline-offset-2 hover:underline "
-              href="/"
-            >
-              QR Codes
-            </a>
-            <a
-              className="font-semibold underline-offset-2 hover:underline "
-              href="/"
-            >
-              Stats
-            </a>
-          </div>
           {isLoading ? (
             <p>Loading...</p>
           ) : session ? (

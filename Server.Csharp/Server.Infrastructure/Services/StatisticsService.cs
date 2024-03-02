@@ -1,48 +1,38 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Server.Data.Database;
+using Server.Data.Entities;
+using Server.Data.Repositories;
 using Server.Infrastructure.Models.Responses;
 
 namespace Server.Infrastructure.Services;
 
 public class StatisticsService:IStatisticsService
 {
-    ApplicationDbContext _context;
+    private readonly INavigationsRepository _navigationRepository;
 
-    public StatisticsService(ApplicationDbContext context)
+    public StatisticsService(INavigationsRepository navigationRepository)
     {
-        _context = context;
+        _navigationRepository = navigationRepository;
     }
 
     public async Task<StatisticsResponse> GetByShortUrlId(Guid id)
     {
-        int navigationCount = await _context.Navigations.CountAsync(n=>n.ShortUrlId == id);
 
-        List<StatisticsItem> countryAndClicksList = await _context.Navigations
-            .Where(n=> n.ShortUrlId == id)
-            .GroupBy(n => n.CountryName)
-            .Select(n=>new StatisticsItem
-            {
-                Name = n.Key,
-                Count = n.Count()
-            }).ToListAsync();
 
-        List<StatisticsItem> platformAndClicksList = await _context.Navigations
-            .Where(n=>n.ShortUrlId == id)
-            .GroupBy(n=>n.Platform)
-            .Select(n => new StatisticsItem
-            {
-                Name = n.Key,
-                Count = n.Count()
-            }).ToListAsync();
+        // calculate total number of navigation
+        int navigationCount = await _navigationRepository.CountAsync(n => n.ShortUrlId == id);
 
-        List<StatisticsItem> browserAndClicksList = await _context.Navigations
-            .Where(n => n.ShortUrlId == id)
-            .GroupBy(n => n.Browser)
-            .Select(n => new StatisticsItem
-            {
-                Name = n.Key,
-                Count = n.Count()
-            }).ToListAsync();
+        // calculate number of navigation from different countries
+        IEnumerable<KeyValuePair<string, int>> countryAndClicksList =
+            await _navigationRepository.CountByShortUrlIdAndGroupAsync(id, n => n.CountryName);
+
+        // calculate number of navigation from different platforms
+        IEnumerable<KeyValuePair<string, int>> platformAndClicksList =
+            await _navigationRepository.CountByShortUrlIdAndGroupAsync(id, n => n.Platform);
+
+        // calculate number of navigation from different browsers
+        IEnumerable<KeyValuePair<string, int>> browserAndClicksList =
+            await _navigationRepository.CountByShortUrlIdAndGroupAsync(id, n => n.Browser);
 
         StatisticsResponse response = new StatisticsResponse
         {

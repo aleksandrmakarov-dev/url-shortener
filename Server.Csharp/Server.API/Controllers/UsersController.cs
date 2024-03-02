@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Server.API.Attributes;
+using Server.Infrastructure.Models;
 using Server.Infrastructure.Models.Responses;
 using Server.Infrastructure.Services;
 
 namespace Server.API.Controllers
 {
+    [Authorize(Role.Admin)]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase

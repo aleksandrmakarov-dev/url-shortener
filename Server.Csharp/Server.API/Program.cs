@@ -65,6 +65,8 @@ namespace Server.API
 
             app.MapControllers();
 
+            app.UseAuthorization();
+
             // global exception handler middleware
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             

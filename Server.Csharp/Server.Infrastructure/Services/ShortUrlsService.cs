@@ -204,7 +204,7 @@ namespace Server.Infrastructure.Services
 
             if (foundShortUrl == null)
             {
-                throw new NotFoundException($"User with id {id} not found");
+                throw new NotFoundException($"Short Url with id {id} not found");
             }
 
             return _mapper.Map<ShortUrl, ShortUrlResponse>(foundShortUrl);

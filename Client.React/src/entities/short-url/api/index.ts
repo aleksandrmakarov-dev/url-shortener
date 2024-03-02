@@ -9,6 +9,7 @@ export const shortUrlsKeys = {
   shortUrls: {
     root: ["short-urls"],
     alias: (alias: string) => [...shortUrlsKeys.shortUrls.root, "alias", alias],
+    id: (id: string) => [...shortUrlsKeys.shortUrls.root, "id", id],
     query: (params?: ShortUrlsParams) => [
       ...shortUrlsKeys.shortUrls.root,
       { ...params },
@@ -100,7 +101,7 @@ export const useShortUrlById = (params: ShortUrlByIdParams) => {
     ShortUrlResponse,
     unknown[]
   >({
-    queryKey: shortUrlsKeys.shortUrls.alias(params.id!),
+    queryKey: shortUrlsKeys.shortUrls.id(params.id!),
     queryFn: async () => {
       return await fetchShortUrlById(params);
     },

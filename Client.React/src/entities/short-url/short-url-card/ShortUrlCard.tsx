@@ -1,6 +1,6 @@
 import { ShortUrlResponse } from "@/lib/dto/short-url/short-url.response";
 import { CardContainer } from "@/shared/components/CardContainer";
-import { ExternalLink } from "lucide-react";
+import { BarChart, BarChart3, ExternalLink, LineChart } from "lucide-react";
 import moment from "moment";
 import { HTMLAttributes } from "react";
 
@@ -10,7 +10,7 @@ interface ShortUrlCardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function ShortUrlCard({
-  shortUrl: { alias, domain, original, createdAt, expiresAt },
+  shortUrl: { id, alias, domain, original, createdAt, expiresAt },
   actions,
   ...other
 }: ShortUrlCardProps) {
@@ -37,10 +37,10 @@ export function ShortUrlCard({
           </div>
         </div>
         <a
-          className="text-sm underline-offset-2 hover:underline"
-          href={`/stats/${alias}`}
+          className="text-sm flex items-center underline-offset-2 hover:underline"
+          href={`/stats/${id}`}
         >
-          0 clicks
+          <LineChart className="w-5 h-5 mr-1.5" /> <span>Stats</span>
         </a>
         <div>
           <p className="text-sm">{moment(createdAt).format("DD/MM/YYYY")}</p>

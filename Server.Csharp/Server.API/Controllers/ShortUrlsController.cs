@@ -78,7 +78,6 @@ namespace Server.API.Controllers
             return Ok(shortUrlResponse);
         }
 
-        [AllowAnonymous]
         [HttpGet("id/{id:guid}")]
         public async Task<IActionResult> GetByAlias([FromRoute] Guid id)
         {
@@ -87,7 +86,6 @@ namespace Server.API.Controllers
             return Ok(shortUrlResponse);
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] Guid? userId,
@@ -96,6 +94,13 @@ namespace Server.API.Controllers
             [FromQuery] int size = 10
         )
         {
+            JwtPayload? user = (JwtPayload?)HttpContext.Items[Constants.UserContextName];
+
+            if (user == null || (user.Id != userId && user.Role != Role.Admin))
+            {
+                throw new 
+            }
+
             Paged<ShortUrlResponse> pageResponse = await _shortUrlsService.GetPageAsync(page, size, new ShortUrlsPageFilter
             {
                 UserId = userId,
