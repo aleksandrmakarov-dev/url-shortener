@@ -25,6 +25,7 @@ func main() {
 	log.Info("Storage is initialized")
 
 	repos := repository.NewRepository(db)
+	repos.Url.GetAllUrls(0, 1, 10, "")
 	services := service.NewService(repos)
 	handler := handlers.NewHandler(*log, services, *cfg)
 	router := handler.InitRoutes()
