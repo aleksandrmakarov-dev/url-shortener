@@ -134,6 +134,31 @@ func (r *UrlSqlite) DeleteUrlByID(id, userId int) error {
 	return nil
 }
 
+func (r *UrlSqlite) GetAllUrls(userId, page, size int, query string) ([]models.Url, models.Pagination, error) {
+	if page <= 0 {
+		page = 1
+	}
+	if size <= 0 {
+		size = 10
+	}
+
+	var urls []models.Url
+
+	if query == "" {
+		rows, err := r.db.Query("SELECT * FROM Urls WHERE userId = ?", userId)
+
+		for rows.Next() {
+			var url models.Url
+			rows.Scan(&url.ID, &url.Alias, &url.RedirectUrl, &url.UserID, &url.CreatedAt, &url.ExpiresAt)
+			urls = append(urls, url)
+		}
+
+		fmt.Println(urls)
+
+		return []models.Url{}, models.Pagination{}, err
+	}
+	return []models.Url{}, models.Pagination{}, nil
+}
 func (r *UrlSqlite) UpdateUrlAliasByID(id int, alias string, userId int) error {
 	const opr = "storage.storages.sqlite.UpdateUrlAliasByID"
 
