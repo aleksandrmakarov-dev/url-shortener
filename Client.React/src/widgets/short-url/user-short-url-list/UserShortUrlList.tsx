@@ -5,16 +5,10 @@ import { HTMLAttributes, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { DeleteShortUrlDialog } from "../delete-short-url-dialog/DeleteShortUrlDialog";
 import { UpdateShortUrlDialog } from "../update-short-url-dialog/UpdateShortUrlDialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
 import { Button } from "@/shared/ui/button";
 import { copyShortUrlToClipboard } from "@/features/short-url";
 import { MoreVertical, Copy, Edit, LineChart, Trash } from "lucide-react";
+import { MenuBase } from "@/shared/components/MenuBase";
 
 interface UserShortUrlListProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -58,61 +52,51 @@ export function UserShortUrlList(props: UserShortUrlListProps) {
     <div {...props}>
       <ShortUrlList
         className="mb-3"
-        shortUrls={data?.items ?? []}
+        shortUrls={data?.items}
         render={(item) => (
           <ShortUrlCard
             key={item.id}
             shortUrl={item}
             actions={
               <div className="text-end">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <MenuBase
+                  trigger={
                     <Button size="icon" variant="ghost">
                       <MoreVertical />
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-42 absolute top-0 -right-4">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        copyShortUrlToClipboard(item.domain, item.alias)
-                      }
-                      asChild
-                    >
-                      <span className="cursor-pointer">
-                        <Copy className="w-4 h-4 mr-1.5" />
-                        <span>Copy link</span>
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditClick(item.id)}
-                      asChild
-                    >
-                      <span className="cursor-pointer">
-                        <Edit className="w-4 h-4 mr-1.5" />
-                        <span>Edit link</span>
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onStatisticsClick(item.id)}
-                      asChild
-                    >
-                      <span className="cursor-pointer">
-                        <LineChart className="w-4 h-4 mr-1.5" />
-                        <span>Statistics</span>
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => onDeleteClick(item.id)}
-                      asChild
-                    >
-                      <span className="cursor-pointer">
-                        <Trash className="w-4 h-4 mr-1.5" />
-                        <span>Delete link</span>
-                      </span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  }
+                >
+                  <span
+                    className="flex items-center"
+                    onClick={() =>
+                      copyShortUrlToClipboard(item.domain, item.alias)
+                    }
+                  >
+                    <Copy className="w-4 h-4 mr-1.5" />
+                    <span>Copy link</span>
+                  </span>
+                  <span
+                    className="flex items-center"
+                    onClick={() => onEditClick(item.id)}
+                  >
+                    <Edit className="w-4 h-4 mr-1.5" />
+                    <span>Edit link</span>
+                  </span>
+                  <span
+                    className="flex items-center"
+                    onClick={() => onStatisticsClick(item.id)}
+                  >
+                    <LineChart className="w-4 h-4 mr-1.5" />
+                    <span>Statistics</span>
+                  </span>
+                  <span
+                    className="flex items-center"
+                    onClick={() => onDeleteClick(item.id)}
+                  >
+                    <Trash className="w-4 h-4 mr-1.5" />
+                    <span>Delete link</span>
+                  </span>
+                </MenuBase>
               </div>
             }
           />

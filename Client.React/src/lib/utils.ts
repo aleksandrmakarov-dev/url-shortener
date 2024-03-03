@@ -12,3 +12,8 @@ export function isNullOrEmpty(value?: string | null): boolean {
 export function writeToClipboard(value: string) {
   navigator.clipboard.writeText(value);
 }
+
+export const Role = {
+  Admin: "Admin",
+  User: "User",
+};

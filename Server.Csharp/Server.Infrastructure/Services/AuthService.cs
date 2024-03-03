@@ -48,9 +48,10 @@ public class AuthService : IAuthService
 
         // otherwise map request to User model
         User userToCreate = _mapper.Map<SignUpRequest, User>(request);
-
+        
         // generate password hash from request password
         userToCreate.PasswordHash = _passwordsService.Hash(request.Password);
+        userToCreate.Role = Role.User.ToString();
 
         // generate email verification token
         string emailVerificationToken = _tokensService.GetToken(128);

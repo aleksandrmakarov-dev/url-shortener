@@ -1,6 +1,6 @@
 import { ShortUrlResponse } from "@/lib/dto/short-url/short-url.response";
 import { CardContainer } from "@/shared/components/CardContainer";
-import { BarChart, BarChart3, ExternalLink, LineChart } from "lucide-react";
+import { ExternalLink, LineChart } from "lucide-react";
 import moment from "moment";
 import { HTMLAttributes } from "react";
 
@@ -16,13 +16,13 @@ export function ShortUrlCard({
 }: ShortUrlCardProps) {
   return (
     <CardContainer {...other}>
-      <div className="grid grid-cols-8 gap-x-3 items-center">
+      <div className="flex flex-col md:grid grid-cols-8 gap-3 md:items-center">
         <div className="col-span-5">
           <div className="flex items-center mb-1">
-            <ExternalLink className="w-5 h-5 mr-2" />
+            <ExternalLink className="w-5 h-5 mr-1.5 shrink-0" />
             <a
               target="_blank"
-              className="font-semibold underline-offset-2 hover:underline"
+              className="font-semibold underline-offset-2 hover:underline truncate"
               href={`${domain}/${alias}`}
             >{`${domain}/${alias}`}</a>
           </div>
@@ -46,7 +46,7 @@ export function ShortUrlCard({
           <p className="text-sm">{moment(createdAt).format("DD/MM/YYYY")}</p>
           {expiresAt && (
             <p className="text-sm text-red-500">
-              {moment(expiresAt).format("DD/MM/YYYY")}
+              {moment(expiresAt).format("DD/MM/YYYY HH:mm")}
             </p>
           )}
         </div>

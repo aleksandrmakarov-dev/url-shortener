@@ -44,7 +44,7 @@ export function StatisticsAgent({
 
   return (
     <CardContainer {...other}>
-      <div className="grid grid-cols-2">
+      <div className="flex flex-col items-center md:grid grid-cols-2 overflow-auto">
         {data?.map(({ name, values }) => (
           <div key={`item-${name}`}>
             <h5 className="text-xl font-medium mb-3 text-center">{name}</h5>

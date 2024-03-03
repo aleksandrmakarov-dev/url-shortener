@@ -33,7 +33,7 @@ export function StatisticsLocation({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical">
             <XAxis type="number" />
-            <YAxis dataKey="key" type="category" width={100} />
+            <YAxis dataKey="key" type="category" width={75} />
             <Bar dataKey="value" fill="#4b7bec" background={{ fill: "#eee" }} />
             <Tooltip />
           </BarChart>

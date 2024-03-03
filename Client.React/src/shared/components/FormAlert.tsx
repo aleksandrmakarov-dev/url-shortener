@@ -3,15 +3,15 @@ import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { HTMLAttributes } from "react";
 
 type AlertData = {
-  title?:string;
-  message?:React.ReactNode
-}
+  title?: string;
+  message?: React.ReactNode;
+};
 
 interface FormAlertProps extends HTMLAttributes<HTMLDivElement> {
   isSuccess?: boolean;
-  success?:AlertData;
+  success?: AlertData;
   isError?: boolean;
-  error?:AlertData;
+  error?: AlertData;
 }
 
 export function FormAlert({
@@ -26,7 +26,7 @@ export function FormAlert({
     return (
       <Alert
         className={cn(
-          "bg-red-50 border border-red-300 text-red-600",
+          "bg-red-50 border border-red-300 text-red-600 overflow-auto max-h-24",
           className
         )}
         {...other}

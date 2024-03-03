@@ -98,7 +98,7 @@ namespace Server.API.Controllers
 
             if (user == null || (user.Id != userId && user.Role != Role.Admin))
             {
-                throw new 
+                throw new UnauthorizedException("Only admin user can view other user's short URLs.");       
             }
 
             Paged<ShortUrlResponse> pageResponse = await _shortUrlsService.GetPageAsync(page, size, new ShortUrlsPageFilter

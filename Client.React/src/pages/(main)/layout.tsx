@@ -32,7 +32,7 @@ export default function MainLayout() {
           )}
         </div>
       </nav>
-      <div className="max-w-screen-lg mx-auto py-10">
+      <div className="max-w-screen-lg mx-auto py-10 px-5 xl:px-0">
         <Outlet />
       </div>
     </FullPageWrapper>

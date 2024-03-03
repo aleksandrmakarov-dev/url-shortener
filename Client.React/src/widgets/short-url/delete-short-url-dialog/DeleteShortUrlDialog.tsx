@@ -52,13 +52,18 @@ export function DeleteShortUrlDialog({
 
   return (
     <DialogBase open={open} setOpen={setOpen} title="Delete Short URL">
-      <FormAlert isError={isError} error={error?.response?.data} />
-      <p>
+      <FormAlert
+        className="mb-3"
+        isError={isError}
+        error={error?.response?.data}
+      />
+      <p className="mb-3">
         Are you sure you want to delete this Short URL? This action cannot be
         undone.
       </p>
       <div className="flex gap-x-3 justify-end">
         <Button
+          className="hidden md:block"
           disabled={isPending}
           type="button"
           variant="outline"
@@ -67,6 +72,7 @@ export function DeleteShortUrlDialog({
           No, keep it
         </Button>
         <Button
+          className="w-full"
           loading={isPending}
           type="button"
           variant="destructive"

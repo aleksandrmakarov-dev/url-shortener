@@ -59,8 +59,8 @@ export function ShortUrlForm({
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-3 gap-x-3">
-          <div className="col-span-2">
+        <div className="flex flex-col sm:grid grid-cols-5 gap-x-3">
+          <div className="col-span-3">
             <FormField
               control={form.control}
               name="customAlias"
@@ -79,27 +79,31 @@ export function ShortUrlForm({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="expiresAt"
-            render={({ field: { disabled, ...other } }) => (
-              <FormItem>
-                <FormLabel>Expires At (Optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="datetime-local"
-                    placeholder="example: favorite-link"
-                    disabled={disabled || !session}
-                    {...other}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="col-span-2">
+            <FormField
+              control={form.control}
+              name="expiresAt"
+              render={({ field: { disabled, ...other } }) => (
+                <FormItem>
+                  <FormLabel>Expires At (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="datetime-local"
+                      placeholder="example: favorite-link"
+                      disabled={disabled || !session}
+                      {...other}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
         <div className="flex justify-end">
-          <Button loading={isLoading}>{btnLabel ?? "Shorten URL"}</Button>
+          <Button className="w-full sm:w-auto" loading={isLoading}>
+            {btnLabel ?? "Shorten URL"}
+          </Button>
         </div>
       </form>
     </Form>

@@ -1,13 +1,6 @@
 import { useSession } from "@/context/session-provider/SessionProvider";
+import { MenuBase } from "@/shared/components/MenuBase";
 import { Button } from "@/shared/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
 import { CircleUserRound } from "lucide-react";
 
 export function UserProfileMenu() {
@@ -18,28 +11,20 @@ export function UserProfileMenu() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <MenuBase
+      trigger={
         <Button className="rounded-full" size="icon" variant="ghost">
           <CircleUserRound />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-42 absolute top-0 -right-4">
-        <DropdownMenuLabel className="truncate p-2">
-          {session.email}
-        </DropdownMenuLabel>
-        <DropdownMenuItem asChild>
-          <a className="cursor-pointer" href={`/links/u/${session.userId}`}>
-            My links
-          </a>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <a className="cursor-pointer" href="/auth/sign-out">
-            Sign out
-          </a>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      }
+      label={session.email}
+    >
+      <a className="cursor-pointer" href={`/links/u/${session.userId}`}>
+        My links
+      </a>
+      <a className="cursor-pointer" href="/auth/sign-out">
+        Sign out
+      </a>
+    </MenuBase>
   );
 }

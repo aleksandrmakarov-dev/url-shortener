@@ -33,7 +33,11 @@ export default function SessionProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [session, setSession] = useState<SessionResponse>();
+  const [session, setSession] = useState<SessionResponse | undefined>(
+    undefined
+  );
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const {
     mutate: refreshTokenMutate,
@@ -44,19 +48,22 @@ export default function SessionProvider({
 
   useEffect(() => {
     if (!session) {
+      setIsLoading(true);
       refreshTokenMutate(
         {},
         {
           onSuccess: (data) => {
+            setAuthorizationToken(data.accessToken);
             setSession(data);
           },
           onError: (e) => {
             console.log(e);
           },
+          onSettled: () => setIsLoading(false),
         }
       );
     } else {
-      setAuthorizationToken(session.accessToken);
+      if (isLoading) setIsLoading(false);
     }
   }, [session]);
 
@@ -65,7 +72,7 @@ export default function SessionProvider({
       value={{
         session: session,
         setSession: setSession,
-        isLoading: isRefreshTokenLoading,
+        isLoading: isLoading || isRefreshTokenLoading,
         isError: isRefreshTokenError,
         error: refreshTokenError?.response?.data,
       }}

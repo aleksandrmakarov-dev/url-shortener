@@ -18,7 +18,7 @@ export default function LinksPage() {
         title="My Short URLs"
         description="Access, manage and view statistics of all your custom short URLs conveniently in one place."
       />
-      <div className="grid grid-cols-3 gap-x-3">
+      <div className="flex flex-col-reverse md:grid grid-cols-3 gap-3">
         <UserShortUrlList className="col-span-2" />
         <div className="space-y-3">
           <FilterShortUrlCard />

@@ -58,7 +58,11 @@ export function CreateShortUrlDialog({
       description="Change the fields to update your Short URL"
       trigger={trigger}
     >
-      <FormAlert isError={isError} error={error?.response?.data} />
+      <FormAlert
+        className="mb-3"
+        isError={isError}
+        error={error?.response?.data}
+      />
       <ShortUrlForm
         onSubmit={onSubmit}
         isLoading={isPending}

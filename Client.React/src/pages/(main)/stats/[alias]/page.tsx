@@ -4,6 +4,7 @@ import { StatisticsAgent, StatisticsLocation } from "@/entities/statistics";
 import { useStatisticsById } from "@/entities/statistics/api";
 import { copyShortUrlToClipboard } from "@/features/short-url";
 import { FormAlert } from "@/shared/components/FormAlert";
+import { Header } from "@/shared/components/Header";
 import { Button } from "@/shared/ui/button";
 import { Copy } from "lucide-react";
 import { useParams } from "react-router-dom";
@@ -31,6 +32,11 @@ export default function StatsPage() {
 
   return (
     <div className="max-w-screen-md mx-auto">
+      <Header
+        className="mb-5"
+        title="Your Short URL's Statistics"
+        description="View location, platform and device of users who visited your short URL."
+      />
       <FormAlert
         className="mb-5"
         isError={isGetError}
