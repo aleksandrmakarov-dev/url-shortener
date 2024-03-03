@@ -11,8 +11,8 @@ using Server.Data.Database;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240301190419_add navigation to short url")]
-    partial class addnavigationtoshorturl
+    [Migration("20240303230614_rename countryName to country")]
+    partial class renamecountryNametocountry
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,17 +26,27 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Browser")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Country")
                         .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(16)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("NavigatedAt")
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ShortUrlId")
@@ -46,7 +56,7 @@ namespace Server.Data.Migrations
 
                     b.HasIndex("ShortUrlId");
 
-                    b.ToTable("Navigation");
+                    b.ToTable("Navigations");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Session", b =>
@@ -63,6 +73,7 @@ namespace Server.Data.Migrations
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")

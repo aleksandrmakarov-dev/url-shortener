@@ -1,4 +1,6 @@
-﻿namespace Server.Infrastructure.Services;
+﻿using Server.Infrastructure.Interfaces;
+
+namespace Server.Infrastructure.Services;
 
 public class BcryptPasswordsService : IPasswordsService
 {

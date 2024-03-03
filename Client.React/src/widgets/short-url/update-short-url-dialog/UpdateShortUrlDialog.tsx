@@ -2,7 +2,7 @@ import { ShortUrlForm } from "@/entities/short-url";
 import { shortUrlsKeys, useShortUrlById } from "@/entities/short-url/api";
 import { useUpdateShortUrlById } from "@/features/short-url/update";
 import { EditShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
-import { isNullOrEmpty } from "@/lib/utils";
+import { LocalToUTC, UTCToLocal } from "@/lib/utils";
 import { DialogBase } from "@/shared/components/DialogBase";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,14 +40,11 @@ export function UpdateShortUrlDialog({
     id: id,
   });
 
-  const onSubmit = (data: EditShortUrlRequest) => {
+  const onSubmit = (request: EditShortUrlRequest) => {
     mutate(
       {
         id: id,
-        value: {
-          ...data,
-          expiresAt: isNullOrEmpty(data.expiresAt) ? undefined : data.expiresAt,
-        },
+        value: { ...request, expiresAt: LocalToUTC(request.expiresAt) },
       },
       {
         onSuccess: () => {
@@ -85,9 +82,9 @@ export function UpdateShortUrlDialog({
         isLoading={isGetLoading || isUpdateLoading}
         shortUrl={{
           original: shortUrl?.original ?? "",
-          userId: shortUrl?.userId,
           customAlias: shortUrl?.alias,
-          expiresAt: shortUrl?.expiresAt?.toString(),
+          expiresAt: UTCToLocal(shortUrl?.expiresAt),
+          userId: shortUrl?.userId,
         }}
         btnLabel="Update my URL"
       />

@@ -1,5 +1,6 @@
 ﻿using Server.Data.Entities;
 using Server.Data.Repositories;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Services;
 
 namespace Server.API.Common
@@ -30,6 +31,7 @@ namespace Server.API.Common
             services.AddScoped<IPasswordsService, BcryptPasswordsService>();
             services.AddScoped<ITokensService, TokensService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<ILocationService, HttpLocationService>();
 
             return services;
         }

@@ -1,8 +1,6 @@
 ﻿using System.Net;
-using System.Text.Json;
 using Server.Infrastructure.Exceptions;
 using Server.Infrastructure.Models.Responses;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Server.API.Middlewares
 {

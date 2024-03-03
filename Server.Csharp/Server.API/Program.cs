@@ -1,13 +1,12 @@
-
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Server.API.Common;
 using Server.API.Middlewares;
 using Server.Data.Database;
-using Server.Data.Repositories;
 using Server.Infrastructure.Common;
-using Server.Infrastructure.Services;
+using Server.Infrastructure.Interfaces;
 
 namespace Server.API
 {
@@ -36,6 +35,8 @@ namespace Server.API
                 options.Configuration = "localhost:6379";
             });
 
+            builder.Services.AddHttpClient<ILocationService>();
+
             // add repositories
             builder.Services.AddRepositories();
 
@@ -50,6 +51,13 @@ namespace Server.API
                 // ignore omitted parameters on models to enable optional params (e.g. User update)
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
+
+            builder.Services.Configure<ForwardedHeadersOptions>(options => {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

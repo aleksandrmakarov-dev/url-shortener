@@ -1,7 +1,7 @@
 import { ShortUrlResponse } from "@/lib/dto/short-url/short-url.response";
+import { UTCToLocal } from "@/lib/utils";
 import { CardContainer } from "@/shared/components/CardContainer";
 import { ExternalLink, LineChart } from "lucide-react";
-import moment from "moment";
 import { HTMLAttributes } from "react";
 
 interface ShortUrlCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -43,14 +43,10 @@ export function ShortUrlCard({
           <LineChart className="w-5 h-5 mr-1.5" /> <span>Stats</span>
         </a>
         <div>
-          <p className="text-sm">{moment(createdAt).format("DD/MM/YYYY")}</p>
+          <p className="text-sm">{UTCToLocal(createdAt, "DD/MM/YYYY")}</p>
           {expiresAt && (
             <p className="text-sm text-red-500">
-<<<<<<< HEAD
-              {moment(expiresAt).format("DD/MM/YYYY HH:mm")}
-=======
-              {moment(expiresAt).format("DD/MM/YYYY HH:SS")}
->>>>>>> eef943d8c995c92c891b9ff1b4a4059697ff1ed9
+              {UTCToLocal(expiresAt, "DD/MM/YYYY HH:mm")}
             </p>
           )}
         </div>

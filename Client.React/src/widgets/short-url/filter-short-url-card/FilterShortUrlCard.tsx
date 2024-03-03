@@ -15,6 +15,8 @@ export function FilterShortUrlCard() {
       params.delete(key);
     }
 
+    params.set("page", "1");
+
     setSearchParams(params);
   };
 

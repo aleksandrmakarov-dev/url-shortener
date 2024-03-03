@@ -11,8 +11,8 @@ using Server.Data.Database;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240301190943_add max length")]
-    partial class addmaxlength
+    [Migration("20240303225737_remove contrycode from Navigation table")]
+    partial class removecontrycodefromNavigationtable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,12 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Country")
+                    b.Property<string>("Browser")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CountryName")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
@@ -35,10 +40,13 @@ namespace Server.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IpAddress")
+                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("NavigatedAt")
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ShortUrlId")
@@ -48,7 +56,7 @@ namespace Server.Data.Migrations
 
                     b.HasIndex("ShortUrlId");
 
-                    b.ToTable("Navigation");
+                    b.ToTable("Navigations");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Session", b =>

@@ -5,18 +5,24 @@
 namespace Server.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class addmaxlength : Migration
+    public partial class renamecountryNametocountry : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.RenameColumn(
+                name: "CountryName",
+                table: "Navigations",
+                newName: "Country");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.RenameColumn(
+                name: "Country",
+                table: "Navigations",
+                newName: "CountryName");
         }
     }
 }

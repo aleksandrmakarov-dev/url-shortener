@@ -28,12 +28,7 @@ namespace Server.Data.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CountryCode")
-                        .IsRequired()
-                        .HasMaxLength(5)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CountryName")
+                    b.Property<string>("Country")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");

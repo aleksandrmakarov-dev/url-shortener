@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Server.Infrastructure.Models.Responses;
 
-namespace Server.Infrastructure.Services
+namespace Server.Infrastructure.Interfaces
 {
-    public interface IStatisticsService
+    public interface IUsersService
     {
-        Task<StatisticsResponse> GetByShortUrlId(Guid id);
+        Task<IEnumerable<UserResponse>> GetAllAsync();
     }
 }

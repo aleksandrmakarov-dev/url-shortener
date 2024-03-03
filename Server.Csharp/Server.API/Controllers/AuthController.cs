@@ -2,9 +2,9 @@
 using Server.API.Attributes;
 using Server.API.Common;
 using Server.Infrastructure.Exceptions;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
-using Server.Infrastructure.Services;
 
 namespace Server.API.Controllers
 {

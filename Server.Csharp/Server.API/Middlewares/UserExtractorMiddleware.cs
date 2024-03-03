@@ -1,6 +1,6 @@
 ﻿using Server.API.Common;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models;
-using Server.Infrastructure.Services;
 
 namespace Server.API.Middlewares
 {

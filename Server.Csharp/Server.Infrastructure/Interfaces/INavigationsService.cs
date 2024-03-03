@@ -9,7 +9,7 @@ using Server.Data.Repositories;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
 
-namespace Server.Infrastructure.Services
+namespace Server.Infrastructure.Interfaces
 {
     public interface INavigationsService
     {
@@ -32,7 +32,7 @@ namespace Server.Infrastructure.Services
             Navigation navigationToCreate = _mapper.Map<Navigation>(request);
 
             Navigation createdNavigation = await _navigationRepository.CreateAsync(navigationToCreate);
-            
+
             return _mapper.Map<NavigationResponse>(createdNavigation);
         }
     }

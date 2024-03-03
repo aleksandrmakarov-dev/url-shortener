@@ -1,17 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Server.API.Attributes;
+﻿using Microsoft.AspNetCore.Mvc;
 using Server.Infrastructure.Exceptions;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models.Responses;
-using Server.Infrastructure.Services;
 
 namespace Server.API.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class StatisticsController : ControllerBase
     {
+
         private readonly IStatisticsService _statisticsService;
         private readonly IShortUrlsService _shortUrlsService;
 
@@ -19,6 +18,7 @@ namespace Server.API.Controllers
         {
             _statisticsService = statisticsService;
             _shortUrlsService = shortUrlsService;
+
         }
 
         [HttpGet("{shortUrlId:guid}")]

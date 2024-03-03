@@ -3,7 +3,7 @@ using Server.Infrastructure.Models.Filters;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
 
-namespace Server.Infrastructure.Services;
+namespace Server.Infrastructure.Interfaces;
 
 public interface IShortUrlsService
 {

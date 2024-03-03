@@ -1,6 +1,4 @@
-﻿
-
-namespace Server.Infrastructure.Services
+﻿namespace Server.Infrastructure.Interfaces
 {
     public interface IPasswordsService
     {

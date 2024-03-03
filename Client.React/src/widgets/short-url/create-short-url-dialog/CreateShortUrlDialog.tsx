@@ -3,7 +3,7 @@ import { shortUrlsKeys } from "@/entities/short-url/api";
 import { copyShortUrlToClipboard } from "@/features/short-url";
 import { useCreateShortUrl } from "@/features/short-url";
 import { EditShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
-import { isNullOrEmpty } from "@/lib/utils";
+import { LocalToUTC } from "@/lib/utils";
 import { DialogBase } from "@/shared/components/DialogBase";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,12 +25,9 @@ export function CreateShortUrlDialog({
   const [open, setOpen] = useState<boolean>(false);
   const { mutate, isPending, isError, error } = useCreateShortUrl();
 
-  const onSubmit = (data: EditShortUrlRequest) => {
+  const onSubmit = (request: EditShortUrlRequest) => {
     mutate(
-      {
-        ...data,
-        expiresAt: isNullOrEmpty(data.expiresAt) ? undefined : data.expiresAt,
-      },
+      { ...request, expiresAt: LocalToUTC(request.expiresAt) },
       {
         onSuccess: (data) => {
           setOpen(false);
@@ -46,6 +43,7 @@ export function CreateShortUrlDialog({
             },
           });
         },
+        onError: (e) => console.log(e),
       }
     );
   };

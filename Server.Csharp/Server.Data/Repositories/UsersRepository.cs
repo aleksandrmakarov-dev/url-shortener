@@ -6,9 +6,11 @@ namespace Server.Data.Repositories;
 
 public class UsersRepository(ApplicationDbContext context) :GenericRepository<User>(context),IUsersRepository
 {
+    private readonly ApplicationDbContext _context = context;
+
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
 }

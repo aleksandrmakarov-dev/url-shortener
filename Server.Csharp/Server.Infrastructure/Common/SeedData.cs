@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Server.Data.Database;
+﻿using Server.Data.Database;
 using Server.Data.Entities;
-using Server.Data.Repositories;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models;
-using Server.Infrastructure.Services;
 
 namespace Server.Infrastructure.Common
 {
     public class Country
     {
         public string CountryName { get; set; }
-        public string CountryCode { get; set; }
     }
 
     public class Url
@@ -33,27 +26,22 @@ namespace Server.Infrastructure.Common
                 new Country
                 {
                     CountryName = "Russia",
-                    CountryCode = "RU"
                 },
                 new Country
                 {
                     CountryName = "Finland",
-                    CountryCode = "FI"
                 },
                 new Country
                 {
                     CountryName = "Germany",
-                    CountryCode = "GE"
                 },
                 new Country
                 {
                     CountryName = "France",
-                    CountryCode = "FR"
                 },
                 new Country
                 {
                     CountryName = "Spain",
-                    CountryCode = "SP"
                 }
             };
 
@@ -151,8 +139,7 @@ namespace Server.Infrastructure.Common
 
                         navigations.Add(new Navigation
                         {
-                            CountryCode = country.CountryCode,
-                            CountryName = country.CountryName,
+                            Country = country.CountryName,
                             Browser = browser,
                             Platform = platform,
                             IpAddress = $"{r.Next(0, 255)}.{r.Next(0, 255)}.{r.Next(0, 255)}.{r.Next(0, 255)}",

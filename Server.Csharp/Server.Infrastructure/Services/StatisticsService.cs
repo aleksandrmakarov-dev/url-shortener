@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Server.Data.Database;
-using Server.Data.Entities;
-using Server.Data.Repositories;
+﻿using Server.Data.Repositories;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models.Responses;
 
 namespace Server.Infrastructure.Services;
@@ -24,7 +22,7 @@ public class StatisticsService:IStatisticsService
 
         // calculate number of navigation from different countries
         IEnumerable<KeyValuePair<string, int>> countryAndClicksList =
-            await _navigationRepository.CountByShortUrlIdAndGroupAsync(id, n => n.CountryName);
+            await _navigationRepository.CountByShortUrlIdAndGroupAsync(id, n => n.Country);
 
         // calculate number of navigation from different platforms
         IEnumerable<KeyValuePair<string, int>> platformAndClicksList =

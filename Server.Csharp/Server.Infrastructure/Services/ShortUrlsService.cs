@@ -1,12 +1,11 @@
 ﻿using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
-using System.Transactions;
 using AutoMapper;
 using LinqKit;
 using Server.Data.Common;
 using Server.Data.Entities;
 using Server.Data.Repositories;
 using Server.Infrastructure.Exceptions;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models;
 using Server.Infrastructure.Models.Filters;
 using Server.Infrastructure.Models.Requests;
@@ -72,7 +71,7 @@ namespace Server.Infrastructure.Services
             ShortUrl createdShortUrl = await _shortUrlsRepository.CreateAsync(shortUrl);
 
             // cache short url value
-            await _shortUrlsCacheRepository.SetAsync(createdShortUrl.Alias, createdShortUrl);
+            await _shortUrlsCacheRepository.SetAsync(createdShortUrl.Alias, createdShortUrl,Constants.CacheTimeToLive);
 
             ShortUrlResponse shortUrlResponse = _mapper.Map<ShortUrl, ShortUrlResponse>(createdShortUrl);
 

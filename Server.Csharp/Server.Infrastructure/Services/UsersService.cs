@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Server.Data.Entities;
 using Server.Data.Repositories;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models.Responses;
 
 namespace Server.Infrastructure.Services;

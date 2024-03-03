@@ -42,7 +42,7 @@ export function MenuBase(props: MenuBaseProps) {
             </DropdownMenuLabel>
           )}
           {React.Children.map(children, (child) => (
-            <DropdownMenuItem>{child}</DropdownMenuItem>
+            <DropdownMenuItem asChild>{child}</DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -62,9 +62,9 @@ export function MenuBase(props: MenuBaseProps) {
           {React.Children.map(children, (child) => (
             <Button
               onClick={() => setOpen(false)}
-              asChild
               className="w-full"
               variant="outline"
+              asChild
             >
               {child}
             </Button>

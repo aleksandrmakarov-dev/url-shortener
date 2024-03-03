@@ -11,10 +11,8 @@ namespace Server.Data.Entities
     {
         [MaxLength(16)]
         public required string IpAddress { get; set; }
-        [MaxLength(5)]
-        public required string CountryCode { get; set; }
         [MaxLength(64)]
-        public required string CountryName { get; set; }
+        public required string Country { get; set; }
         [MaxLength(64)]
         public required string Platform { get; set; }
         [MaxLength(64)]

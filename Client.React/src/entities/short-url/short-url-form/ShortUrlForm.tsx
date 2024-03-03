@@ -36,6 +36,7 @@ export function ShortUrlForm({
     defaultValues: {
       original: "",
       customAlias: "",
+      expiresAt: "",
     },
     values: shortUrl,
   });
@@ -59,47 +60,50 @@ export function ShortUrlForm({
             </FormItem>
           )}
         />
-        <div className="flex flex-col sm:grid grid-cols-5 gap-x-3">
-          <div className="col-span-3">
-            <FormField
-              control={form.control}
-              name="customAlias"
-              render={({ field: { disabled, ...other } }) => (
-                <FormItem>
-                  <FormLabel>Alias (optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="example: favorite-link"
-                      disabled={disabled || !session}
-                      {...other}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {session && (
+          <div className="flex flex-col sm:grid grid-cols-5 gap-x-3">
+            <div className="col-span-3">
+              <FormField
+                control={form.control}
+                name="customAlias"
+                render={({ field: { disabled, ...other } }) => (
+                  <FormItem>
+                    <FormLabel>Alias (optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="example: favorite-link"
+                        disabled={disabled || !session}
+                        {...other}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="col-span-2">
+              <FormField
+                control={form.control}
+                name="expiresAt"
+                render={({ field: { value, onChange, disabled } }) => (
+                  <FormItem>
+                    <FormLabel>Expires At (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="datetime-local"
+                        placeholder="example: favorite-link"
+                        disabled={disabled || !session}
+                        value={value}
+                        onChange={onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
-          <div className="col-span-2">
-            <FormField
-              control={form.control}
-              name="expiresAt"
-              render={({ field: { disabled, ...other } }) => (
-                <FormItem>
-                  <FormLabel>Expires At (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      placeholder="example: favorite-link"
-                      disabled={disabled || !session}
-                      {...other}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
+        )}
         <div className="flex justify-end">
           <Button className="w-full sm:w-auto" loading={isLoading}>
             {btnLabel ?? "Shorten URL"}

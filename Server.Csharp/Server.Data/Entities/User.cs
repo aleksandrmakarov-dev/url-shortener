@@ -1,6 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-using Server.Data.Common;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Server.Data.Entities
 {

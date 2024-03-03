@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Server.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class addroletotheuser : Migration
+    public partial class removecontrycodefromNavigationtable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,7 +34,7 @@ namespace Server.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    RefreshToken = table.Column<string>(type: "TEXT", nullable: false),
+                    RefreshToken = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UserId = table.Column<Guid>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
@@ -71,6 +71,34 @@ namespace Server.Data.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Navigations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IpAddress = table.Column<string>(type: "TEXT", maxLength: 16, nullable: false),
+                    CountryName = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
+                    Platform = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
+                    Browser = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
+                    ShortUrlId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Navigations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Navigations_ShortUrls_ShortUrlId",
+                        column: x => x.ShortUrlId,
+                        principalTable: "ShortUrls",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Navigations_ShortUrlId",
+                table: "Navigations",
+                column: "ShortUrlId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_RefreshToken",
                 table: "Sessions",
@@ -103,6 +131,9 @@ namespace Server.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Navigations");
+
             migrationBuilder.DropTable(
                 name: "Sessions");
 

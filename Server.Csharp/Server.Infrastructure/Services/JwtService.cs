@@ -3,9 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Server.Infrastructure.Common;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models;
-using JwtPayload = Server.Infrastructure.Models.JwtPayload;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Server.Infrastructure.Services;
 
@@ -19,7 +18,7 @@ public class JwtService : IJwtService
         _jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
     }
 
-    public string GetToken(JwtPayload payload)
+    public string GetToken(Models.JwtPayload payload)
     {
         // generate symmetric security key
         SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
@@ -45,7 +44,7 @@ public class JwtService : IJwtService
         return _jwtSecurityTokenHandler.WriteToken(token);
     }
 
-    public JwtPayload? ValidateToken(string token)
+    public Models.JwtPayload? ValidateToken(string token)
     {
         SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
 
@@ -65,7 +64,7 @@ public class JwtService : IJwtService
 
             JwtSecurityToken jwtSecurityToken = (JwtSecurityToken)validatedToken;
 
-            JwtPayload payload = new JwtPayload
+            Models.JwtPayload payload = new Models.JwtPayload
             {
                 Id = Guid.Parse(jwtSecurityToken.Claims.First(c => c.Type == JwtNameConstants.JwtId).Value),
                 Role = Enum.Parse<Role>(

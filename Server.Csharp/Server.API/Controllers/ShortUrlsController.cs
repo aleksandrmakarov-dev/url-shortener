@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Server.API.Attributes;
 using Server.API.Common;
-using Server.Data.Entities;
 using Server.Infrastructure.Exceptions;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models;
 using Server.Infrastructure.Models.Filters;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
-using Server.Infrastructure.Services;
 
 namespace Server.API.Controllers
 {
@@ -19,11 +17,13 @@ namespace Server.API.Controllers
     {
         private readonly IShortUrlsService _shortUrlsService;
         private readonly INavigationsService _navigationService;
+        private readonly ILocationService _locationService;
 
-        public ShortUrlsController(IShortUrlsService shortUrlsService, INavigationsService navigationService)
+        public ShortUrlsController(IShortUrlsService shortUrlsService, INavigationsService navigationService, ILocationService locationService)
         {
             _shortUrlsService = shortUrlsService;
             _navigationService = navigationService;
+            _locationService = locationService;
         }
 
         [AllowAnonymous]
@@ -64,22 +64,34 @@ namespace Server.API.Controllers
                 ThrowOnExpire = throwOnExpire
             });
 
-            await _navigationService.CreateAsync(new CreateNavigationRequest
-            {
-                IpAddress = "192.168.0.1",
-                CountryName = "Finland",
-                CountryCode = "FI",
-                Browser = "Google Chrome",
-                Platform = "Windows",
-                ShortUrlId = shortUrlResponse.Id
+            string? ipAddress = Helpers.GetIpAddress(HttpContext);
 
-            });
+            CreateNavigationRequest createNavigationRequest = new CreateNavigationRequest
+            {
+                IpAddress = ipAddress,
+                Country = "Unknown",
+                Browser = "Unknown",
+                Platform = "Unknown",
+                ShortUrlId = shortUrlResponse.Id
+            };
+
+            if (ipAddress != null)
+            {
+                LocationResponse? locationResponse = await _locationService.GetByIpAddressAsync(ipAddress);
+
+                if (locationResponse != null && locationResponse.Status != "failed")
+                {
+                    createNavigationRequest.Country = locationResponse.Country ?? "Unknown";
+                }
+            }
+
+            await _navigationService.CreateAsync(createNavigationRequest);
 
             return Ok(shortUrlResponse);
         }
 
         [HttpGet("id/{id:guid}")]
-        public async Task<IActionResult> GetByAlias([FromRoute] Guid id)
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             ShortUrlResponse shortUrlResponse = await _shortUrlsService.GetByIdAsync(id);
 

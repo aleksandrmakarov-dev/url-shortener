@@ -2,6 +2,7 @@
 using Server.Data.Entities;
 using Server.Data.Repositories;
 using Server.Infrastructure.Exceptions;
+using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;

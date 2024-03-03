@@ -1,8 +1,10 @@
 import { ErrorResponse } from "@/lib/dto/common/error.response";
 import { ShortUrlResponse } from "@/lib/dto/short-url/short-url.response";
 import { cn } from "@/lib/utils";
+import { EmptyViewBase } from "@/shared/components/EmptyViewBase";
 import { FormAlert } from "@/shared/components/FormAlert";
-import { FolderSearch, Loader, Loader2, TextSearch } from "lucide-react";
+import { LoadingViewBase } from "@/shared/components/LoadingViewBase";
+import { FolderSearch, Loader2 } from "lucide-react";
 import React, { HTMLAttributes } from "react";
 
 interface ShortUrlListProps extends HTMLAttributes<HTMLDivElement> {
@@ -24,11 +26,11 @@ export function ShortUrlList({
 }: ShortUrlListProps) {
   if (isLoading) {
     return (
-      <div className="text-center flex flex-col items-center py-10">
-        <Loader2 className="w-12 h-12 text-muted-foreground animate-spin" />
-        <h5 className="text-lg font-medium">Please wait...</h5>
-        <p className="text-muted-foreground">We are loading your Short URLs.</p>
-      </div>
+      <LoadingViewBase
+        icon={<Loader2 className="w-12 h-12 animate-spin" />}
+        title="Please wait"
+        description="We are loading your Short URLs..."
+      />
     );
   }
 
@@ -38,13 +40,11 @@ export function ShortUrlList({
 
   if (shortUrls?.length == 0) {
     return (
-      <div className="text-center flex flex-col items-center py-10">
-        <FolderSearch className="w-24 h-24" />
-        <h5 className="text-lg font-medium">Couldn't find any Short URLs</h5>
-        <p className="text-muted-foreground">
-          Shorten your long URL or clear filter to see them here.
-        </p>
-      </div>
+      <EmptyViewBase
+        icon={<FolderSearch className="w-20 h-20" />}
+        title="Couldn't find any Short URLs"
+        description="Shorten your long URL or clear filter to see them here."
+      />
     );
   }
 
