@@ -17,7 +17,7 @@
         |            ----------------------                   ------------------
         |                                       
 ------------------                         
-|   Browser      |                         
+|   key      |                         
 ------------------                         
 ```
 
@@ -298,9 +298,8 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
     "pagination": {
         "page": 1,
         "size": 10,
-        "query": "optional_query_string",
-        "userId": "optional_user_id_string",
-        "hasNextPage": true
+        "hasNextPage": true,
+        "hasPreviousPage": false
     }
 }
 ```
@@ -341,3 +340,50 @@ The `ShortUrlsController` class manages short URL operations in the API. Below i
 - **UnauthorizedException:** Indicates that the user is not authorized to perform the operation.
 - **BadRequestException:** Indicates a malformed request.
 - **NotFoundException:** Indicates that a requested resource was not found.
+
+# Statistics Controller API
+
+This controller provides endpoints for retrieving statistics related to short URLs.
+
+## Get Statistics by Short URL ID
+
+Retrieve statistics for a short URL by its ID.
+
+### Request
+
+- **Method:** GET
+- **URL:** `/api/v1/statistics/{shortUrlId}`
+- **Headers:**
+  - Authorization: Bearer {token}
+- **Parameters:**
+  - `shortUrlId`: GUID (required) - The ID of the short URL for which statistics are requested.
+
+### Response
+
+- **Status Code:** 200 OK
+- **Body:**
+
+```json
+{
+  "navigationCount": 100,
+  "countries": [
+    {"key": "United States", "value": 50},
+    {"key": "Canada", "value": 30},
+    {"key": "United Kingdom", "value": 20}
+  ],
+  "platforms": [
+    {"key": "Windows", "value": 60},
+    {"key": "iOS", "value": 25},
+    {"key": "Android", "value": 15}
+  ],
+  "browsers": [
+    {"key": "Chrome", "value": 40},
+    {"key": "Firefox", "value": 30},
+  ],
+}
+````
+
+### Errors
+
+- **Status Code:** 404 Not Found
+- **Body:** Short URL not found
