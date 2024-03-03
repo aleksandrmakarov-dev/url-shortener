@@ -379,6 +379,8 @@ Retrieve statistics for a short URL by its ID.
   "browsers": [
     {"key": "Chrome", "value": 40},
     {"key": "Firefox", "value": 30},
+  ],
+}
 ````
 
 ### Errors
