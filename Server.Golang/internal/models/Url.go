@@ -3,12 +3,13 @@ package models
 import "time"
 
 type Url struct {
-	ID          int
-	Alias       string
-	RedirectUrl string
-	UserID      int
-	CreatedAt   time.Time
-	ExpiresAt   time.Time
+	ID          int       `json:"id"`
+	Alias       string    `json:"alias"`
+	RedirectUrl string    `json:"original"`
+	Domain      string    `json:"domain"`
+	UserID      int       `json:"userId"`
+	CreatedAt   time.Time `json:"createdAt"`
+	ExpiresAt   time.Time `json:"expiresAt"`
 }
 
 func (u *Url) IsExpired() bool {

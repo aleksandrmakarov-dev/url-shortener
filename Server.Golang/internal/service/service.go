@@ -20,6 +20,7 @@ type Url interface {
 	CreateShortUrl(u *models.Url) (string, error)
 	GetUrl(alias string) (models.Url, error)
 	GetUrlById(id, userId int) (models.Url, error)
+	GetAllUrls(userId, page, size int, query, domain string) ([]models.Url, models.Pagination)
 	UpdateURLAliasByID(id int, alias string, userId int) error
 	UpdateURLOriginalByID(id int, original string, userId int) error
 	DeleteURLByID(id, userId int) error

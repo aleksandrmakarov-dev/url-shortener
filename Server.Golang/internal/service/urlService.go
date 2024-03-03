@@ -28,6 +28,10 @@ func (s *UrlService) GetUrlById(id, userId int) (models.Url, error) {
 	return s.repo.GetUrlById(id, userId)
 }
 
+func (s *UrlService) GetAllUrls(userId, page, size int, query, domain string) ([]models.Url, models.Pagination) {
+	return s.repo.GetAllUrls(userId, page, size, query, domain)
+}
+
 func (s *UrlService) UpdateURLAliasByID(id int, alias string, userId int) error {
 	return s.repo.UpdateUrlAliasByID(id, alias, userId)
 }
