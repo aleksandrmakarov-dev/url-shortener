@@ -7,6 +7,6 @@ public class TokensService : ITokensService
 {
     public string GetToken(int count)
     {
-        return Convert.ToHexString(RandomNumberGenerator.GetBytes(count));
+        return RandomNumberGenerator.GetHexString(count, true);
     }
 }
