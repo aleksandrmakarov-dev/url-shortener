@@ -23,7 +23,7 @@
 
 # API Documentation
 
-### Example of appsettings.json for the C# server implementation
+### Example Server.Csharp appsettings.json
 ```
 {
   "Logging": {
