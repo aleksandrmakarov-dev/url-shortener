@@ -1,27 +1,30 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Server.Infrastructure.Common;
 using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models;
+using Server.Infrastructure.Options;
 
 namespace Server.Infrastructure.Services;
 
 public class JwtService : IJwtService
 {
-    private readonly string _jwtKey = "f96fbd347b356def28510a0d20006509726143a0367fbb5f1f2190ab306ee0786ffac377816d1352a65839aa22987b381f7558dad73ea1b4f0c845f5773f4bdd";
+    private readonly JsonWebTokenOptions _options;
     private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
 
-    public JwtService()
+    public JwtService(IOptions<JsonWebTokenOptions> options)
     {
+        _options = options.Value;
         _jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
     }
 
     public string GetToken(Models.JwtPayload payload)
     {
         // generate symmetric security key
-        SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
+        SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
 
         // create signing credentials
         SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -46,7 +49,7 @@ public class JwtService : IJwtService
 
     public Models.JwtPayload? ValidateToken(string token)
     {
-        SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
+        SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
 
         TokenValidationParameters tokenValidationParameters = new TokenValidationParameters
         {

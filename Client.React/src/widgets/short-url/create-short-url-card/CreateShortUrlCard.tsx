@@ -1,11 +1,14 @@
 import { useSession } from "@/context/session-provider/SessionProvider";
 import { ShortUrlForm, ShortenedUrl } from "@/entities/short-url";
+import { copyShortUrlToClipboard } from "@/features/short-url";
 import { useCreateShortUrl } from "@/features/short-url/create";
 import { EditShortUrlRequest } from "@/lib/dto/short-url/edit-short-url.request";
 import { LocalToUTC } from "@/lib/utils";
 import { CardContainer } from "@/shared/components/CardContainer";
 import { FormAlert } from "@/shared/components/FormAlert";
+import { CheckCircle } from "lucide-react";
 import { HTMLAttributes } from "react";
+import { toast } from "sonner";
 
 interface CreateShortUrlCardProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -16,7 +19,21 @@ export function CreateShortUrlCard(props: CreateShortUrlCardProps) {
     useCreateShortUrl();
 
   const onSubmit = (request: EditShortUrlRequest) => {
-    mutate({ ...request, expiresAt: LocalToUTC(request.expiresAt) });
+    mutate(
+      { ...request, expiresAt: LocalToUTC(request.expiresAt) },
+      {
+        onSuccess: (data) => {
+          toast("Short URL created", {
+            description: "A new Short URL has been created successfully",
+            icon: <CheckCircle className="pr-1.5 text-green-500" />,
+            action: {
+              label: "Copy",
+              onClick: () => copyShortUrlToClipboard(data.domain, data.alias),
+            },
+          });
+        },
+      }
+    );
   };
 
   return (
@@ -45,6 +62,7 @@ export function CreateShortUrlCard(props: CreateShortUrlCardProps) {
             shortUrl={{
               original: "",
               customAlias: "",
+              expiresAt: "",
               userId: session?.userId,
             }}
           />

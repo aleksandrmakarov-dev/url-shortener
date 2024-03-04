@@ -1,4 +1,3 @@
-import { useSession } from "@/context/session-provider/SessionProvider";
 import { Header } from "@/shared/components/Header";
 import { Button } from "@/shared/ui/button";
 import {
@@ -9,8 +8,6 @@ import {
 import { Link } from "lucide-react";
 
 export default function LinksPage() {
-  const { session } = useSession();
-
   return (
     <>
       <Header
@@ -33,10 +30,6 @@ export default function LinksPage() {
                   <span>Shorten my URL</span>
                 </Button>
               }
-              shortUrl={{
-                original: "",
-                userId: session?.userId,
-              }}
             />
           </div>
         </div>

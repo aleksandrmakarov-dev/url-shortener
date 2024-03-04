@@ -1,4 +1,3 @@
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { Button } from "../ui/button";
 import {
@@ -52,7 +51,7 @@ export function MenuBase(props: MenuBaseProps) {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+        {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
@@ -72,7 +71,7 @@ export function MenuBase(props: MenuBaseProps) {
         </div>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="default">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

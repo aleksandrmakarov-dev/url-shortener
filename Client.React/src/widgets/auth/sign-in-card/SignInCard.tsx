@@ -46,7 +46,20 @@ export function SignInCard() {
         isError={isError}
         error={{
           title: error?.response?.data.error,
-          message: error?.response?.data.message,
+          message:
+            error?.response?.data.statusCode === 422 ? (
+              <>
+                {error?.response?.data.message}{" "}
+                <a
+                  className="font-medium underline underline-offset-2"
+                  href="/auth/new-email-verification"
+                >
+                  Re-send code
+                </a>
+              </>
+            ) : (
+              error?.response?.data.message
+            ),
         }}
       />
       <SignInForm isLoading={isPending} onSubmit={onSubmit} />

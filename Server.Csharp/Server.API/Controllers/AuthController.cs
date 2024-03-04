@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Server.API.Attributes;
 using Server.API.Common;
 using Server.Infrastructure.Exceptions;
 using Server.Infrastructure.Interfaces;
 using Server.Infrastructure.Models.Requests;
 using Server.Infrastructure.Models.Responses;
+using Server.Infrastructure.Options;
 
 namespace Server.API.Controllers
 {
@@ -13,10 +15,13 @@ namespace Server.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
+        private readonly IMailingService _mailingService;
+        private readonly ApplicationOptions _applicationOptions;
+        public AuthController(IAuthService authService, IMailingService mailingService, IOptions<ApplicationOptions> applicationOptions)
         {
             _authService = authService;
+            _mailingService = mailingService;
+            _applicationOptions = applicationOptions.Value;
         }
 
         [HttpPost("sign-up")]
@@ -25,7 +30,12 @@ namespace Server.API.Controllers
             EmailVerificationResponse emailVerification = await _authService.SignUpAsync(request);
 
             // send verification token
-            Console.WriteLine(emailVerification.EmailVerificationToken);
+
+            string verificationUrl =
+                $"{_applicationOptions.ClientBaseUrl}/auth/verify-email?email={emailVerification.Email}&token={emailVerification.EmailVerificationToken}";
+
+            await _mailingService.SendAsync(emailVerification.Email,
+                "SHRT.COM: Verify you account", $"Verify your account: {verificationUrl}");
 
             // message that user is created and needs to be verified
             MessageResponse response =  new MessageResponse
@@ -109,7 +119,11 @@ namespace Server.API.Controllers
 
             // send email verification
 
-            Console.WriteLine(emailVerification.EmailVerificationToken);
+            string verificationUrl =
+                $"{_applicationOptions.ClientBaseUrl}/auth/verify-email?email={emailVerification.Email}&token={emailVerification.EmailVerificationToken}";
+
+            await _mailingService.SendAsync(emailVerification.Email,
+                "SHRT.COM: Verify you account with", $"Verify your account: {verificationUrl}");
 
             MessageResponse response = new MessageResponse
             {

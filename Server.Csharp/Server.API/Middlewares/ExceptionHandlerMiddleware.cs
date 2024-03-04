@@ -46,6 +46,10 @@ namespace Server.API.Middlewares
                         errorResponse.StatusCode = (int)HttpStatusCode.NotFound;
                         errorResponse.Error = "Not Found";
                         break;
+                    case UnprocessableEntityException:
+                        errorResponse.StatusCode = (int)HttpStatusCode.UnprocessableEntity;
+                        errorResponse.Error = "Unprocessable Entity";
+                        break;
                     default:
                         errorResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
                         errorResponse.Error = "Internal Server Error";

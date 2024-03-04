@@ -82,7 +82,7 @@ export function UpdateShortUrlDialog({
         isLoading={isGetLoading || isUpdateLoading}
         shortUrl={{
           original: shortUrl?.original ?? "",
-          customAlias: shortUrl?.alias,
+          customAlias: shortUrl?.alias ?? "",
           expiresAt: UTCToLocal(shortUrl?.expiresAt),
           userId: shortUrl?.userId,
         }}

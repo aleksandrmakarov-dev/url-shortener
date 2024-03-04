@@ -54,7 +54,7 @@ export function DialogBase(props: DialogBaseProps) {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+        {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">

@@ -8,8 +8,8 @@ export default function HomePage() {
       <div className="text-center pb-10">
         <h1 className="text-5xl font-semibold mb-5">Free URL Shortener</h1>
         <p className="text-xl">
-          Create short links, QR Codes, and Link-in-bio pages. Share them
-          anywhere. Track what’s working, and what’s not.
+          Create short links, set custom alias and expiration time, monitor
+          navigation statistics. Share them anywhere.
         </p>
       </div>
       <CreateShortUrlCard className="mb-10 p-8" />
@@ -19,10 +19,12 @@ export default function HomePage() {
             Need more features? <br /> Create free account!
           </h1>
           <p className="mb-5 max-w-md mx-auto">
-            Custom short links, powerful dashboard, detailed analytics, API, UTM
-            builder, QR codes, browser extension, app integrations and support
+            After creating account you unlock features like custom aliases,
+            expiration time and navigation statistics
           </p>
-          <Button>Create Account</Button>
+          <Button asChild>
+            <a href="/auth/sign-up">Create Account</a>
+          </Button>
         </div>
       </CardContainer>
     </div>

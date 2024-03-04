@@ -1,3 +1,4 @@
+import { useSession } from "@/context/session-provider/SessionProvider";
 import { ShortUrlForm } from "@/entities/short-url";
 import { shortUrlsKeys } from "@/entities/short-url/api";
 import { copyShortUrlToClipboard } from "@/features/short-url";
@@ -13,14 +14,11 @@ import { toast } from "sonner";
 
 interface CreateShortUrlDialogProps {
   trigger: JSX.Element;
-  shortUrl?: EditShortUrlRequest;
 }
 
-export function CreateShortUrlDialog({
-  trigger,
-  shortUrl,
-}: CreateShortUrlDialogProps) {
+export function CreateShortUrlDialog({ trigger }: CreateShortUrlDialogProps) {
   const queryClient = useQueryClient();
+  const { session } = useSession();
 
   const [open, setOpen] = useState<boolean>(false);
   const { mutate, isPending, isError, error } = useCreateShortUrl();
@@ -64,7 +62,12 @@ export function CreateShortUrlDialog({
       <ShortUrlForm
         onSubmit={onSubmit}
         isLoading={isPending}
-        shortUrl={shortUrl}
+        shortUrl={{
+          original: "",
+          customAlias: "",
+          expiresAt: "",
+          userId: session?.userId,
+        }}
         btnLabel="Create URL"
       />
     </DialogBase>

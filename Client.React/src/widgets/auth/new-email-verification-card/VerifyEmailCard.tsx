@@ -31,13 +31,14 @@ export function NewEmailVerificationCard({
           message: (
             <>
               You have been send verification link to your email or enter token
-              manually at
+              manually at{" "}
               <a
                 className="underline underline-offset-2"
                 href="/auth/verify-email"
               >
                 Verify email
               </a>
+              .
             </>
           ),
         }}

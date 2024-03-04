@@ -21,7 +21,7 @@ namespace Server.API
             // add db context
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlite("Data Source=mydb.db");
+                options.UseSqlite(builder.Configuration.GetConnectionString("Database"));
             });
 
             // add automapper
@@ -32,7 +32,7 @@ namespace Server.API
 
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = "localhost:6379";
+                options.Configuration = builder.Configuration.GetConnectionString("Cache");
             });
 
             builder.Services.AddHttpClient<ILocationService>();
@@ -51,6 +51,9 @@ namespace Server.API
                 // ignore omitted parameters on models to enable optional params (e.g. User update)
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
+
+            // configure options that take parameters from appsettings.json
+            builder.AddOptions();
 
             builder.Services.Configure<ForwardedHeadersOptions>(options => {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;

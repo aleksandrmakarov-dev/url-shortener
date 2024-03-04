@@ -76,14 +76,21 @@ public class AuthService : IAuthService
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        // implement user is locked out feature
+        // check password
+
+        bool isPasswordValid = _passwordsService.Verify(request.Password, foundUser.PasswordHash);
+
+        if (!isPasswordValid)
+        {
+            throw new UnauthorizedException("Invalid email or password");
+        }
 
         // check if email is verified
 
         if (foundUser.EmailVerifiedAt == null)
         {
             // if not throw exception
-            throw new BadRequestException("Email is not verified. User can sign in to account only after email verification");
+            throw new UnprocessableEntityException("Email is not verified. User can sign in to account only after email verification");
         }
 
         // generate session refresh token

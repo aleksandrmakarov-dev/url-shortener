@@ -43,7 +43,7 @@ export function ShortUrlForm({
 
   return (
     <Form {...form}>
-      <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="original"
@@ -61,7 +61,7 @@ export function ShortUrlForm({
           )}
         />
         {session && (
-          <div className="flex flex-col sm:grid grid-cols-5 gap-x-3">
+          <div className="flex flex-col sm:grid grid-cols-5 gap-3">
             <div className="col-span-3">
               <FormField
                 control={form.control}

@@ -72,7 +72,7 @@ export function DeleteShortUrlDialog({
           No, keep it
         </Button>
         <Button
-          className="w-full"
+          className="w-full md:w-auto"
           loading={isPending}
           type="button"
           variant="destructive"

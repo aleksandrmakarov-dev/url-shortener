@@ -1,4 +1,8 @@
-import { StatisticsAgent, StatisticsLocation } from "@/entities/statistics";
+import {
+  StatisticsAgent,
+  StatisticsLocation,
+  StatisticsNavigationCount,
+} from "@/entities/statistics";
 import { useStatisticsById } from "@/entities/statistics/api";
 import { FormAlert } from "@/shared/components/FormAlert";
 import { LoadingViewBase } from "@/shared/components/LoadingViewBase";
@@ -39,6 +43,10 @@ export function ShortUrlStatistics({ id }: ShortUrlStatisticsProps) {
 
   return (
     <>
+      <StatisticsNavigationCount
+        className="mb-5"
+        navigationCount={statisticsData?.navigationCount}
+      />
       <StatisticsLocation
         className="mb-5"
         data={statisticsData?.countries}
