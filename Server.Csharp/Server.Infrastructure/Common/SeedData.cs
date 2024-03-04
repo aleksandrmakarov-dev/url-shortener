@@ -19,87 +19,102 @@ namespace Server.Infrastructure.Common
 
     public static class SeedData
     {
-        public static void Seed(ApplicationDbContext dbContext, IPasswordsService passwordsService)
+        public static void Seed(ApplicationDbContext dbContext, IPasswordsService passwordsService,ITokensService tokenService)
         {
-            Country[] countries =
-            {
-                new Country
-                {
-                    CountryName = "Russia",
-                },
-                new Country
-                {
-                    CountryName = "Finland",
-                },
-                new Country
-                {
-                    CountryName = "Germany",
-                },
-                new Country
-                {
-                    CountryName = "France",
-                },
-                new Country
-                {
-                    CountryName = "Spain",
-                }
-            };
+            string[] countries =
+            [
+                "Russia",
+                "Finland",
+                "Germany",
+                "France",
+                "Spain"
+            ];
 
             string[] browsers =
-            {
+            [
                 "Google Chrome",
                 "Firefox",
                 "Safari",
                 "Internet Explorer",
                 "Edge",
                 "Opera"
-            };
+            ];
 
             string[] platforms =
-            {
+            [
                 "Windows",
                 "MacOS",
                 "Android",
                 "Linux"
-            };
+            ];
 
             dbContext.Database.EnsureCreated();
 
             if (!dbContext.Users.Any())
             {
-                dbContext.Users.Add(new User
-                {
-                    Email = "admin@example.com",
-                    Role = Role.Admin.ToString(),
-                    PasswordHash = passwordsService.Hash("123456"),
-                    EmailVerifiedAt = DateTime.UtcNow
-                });
+                dbContext.Users.AddRange([new User
+                    {
+                        Email = "admin@example.com",
+                        Role = Role.Admin.ToString(),
+                        PasswordHash = passwordsService.Hash("admin123"),
+                        EmailVerifiedAt = DateTime.UtcNow
+                    },
+                    new User
+                    {
+                        Email = "user@example.com",
+                        Role = Role.User.ToString(),
+                        PasswordHash = passwordsService.Hash("user123"),
+                        EmailVerifiedAt = DateTime.UtcNow
+                    }
+                ]);
 
                 dbContext.SaveChanges();
             }
 
             User adminUser = dbContext.Users.First(u=>u.Role == Role.Admin.ToString());
+            User regularUser = dbContext.Users.First(u => u.Role == Role.User.ToString());
 
             Url[] urls =
-            {
-                new Url
+            [
+                new()
+                {
+                    Original = "https://github.com",
+                    Alias = tokenService.GetToken(8),
+                    ExpiresAt = DateTime.UtcNow.AddDays(10)
+                },
+                new()
+                {
+                    Original = "https://www.google.co.uk",
+                    Alias = "google"
+                },
+                new()
+                {
+                    Original = "https://www.youtube.com",
+                    Alias = "youtube",
+                    ExpiresAt = DateTime.UtcNow.AddHours(-10)
+                }
+            ];
+
+            Url[] urls2 =
+            [
+                new()
                 {
                     Original = "https://github.com",
                     Alias = "github",
                     ExpiresAt = DateTime.UtcNow.AddDays(10)
                 },
-                new Url
+                new()
                 {
                     Original = "https://www.google.co.uk",
-                    Alias = "Xc8zja"
+                    Alias = tokenService.GetToken(8)
                 },
-                new Url()
+                new()
                 {
                     Original = "https://www.youtube.com",
-                    Alias = "Kix90bk",
-                    ExpiresAt = DateTime.UtcNow.AddHours(-10)
+                    Alias = tokenService.GetToken(8),
+                    ExpiresAt = DateTime.UtcNow.AddHours(-20)
                 }
-            };
+            ];
 
             if (!dbContext.ShortUrls.Any())
             {
@@ -111,6 +126,17 @@ namespace Server.Infrastructure.Common
                         Alias = item.Alias,
                         ExpiresAt = item.ExpiresAt,
                         UserId = adminUser.Id
+                    });
+                }
+
+                foreach (var item in urls2)
+                {
+                    dbContext.ShortUrls.Add(new ShortUrl
+                    {
+                        Original = item.Original,
+                        Alias = item.Alias,
+                        ExpiresAt = item.ExpiresAt,
+                        UserId = regularUser.Id
                     });
                 }
 
@@ -131,15 +157,15 @@ namespace Server.Infrastructure.Common
                     int browsersLength = browsers.Length;
                     int platformsLength = platforms.Length;
 
-                    for (int i = 0; i < 100; i++)
+                    for (int i = 0; i < r.Next(50,100); i++)
                     {
-                        Country country = countries[r.Next(0, countriesLength)];
+                        string country = countries[r.Next(0, countriesLength)];
                         string browser = browsers[r.Next(0, browsersLength)];
                         string platform = platforms[r.Next(0, platformsLength)];
 
                         navigations.Add(new Navigation
                         {
-                            Country = country.CountryName,
+                            Country = country,
                             Browser = browser,
                             Platform = platform,
                             IpAddress = $"{r.Next(0, 255)}.{r.Next(0, 255)}.{r.Next(0, 255)}.{r.Next(0, 255)}",

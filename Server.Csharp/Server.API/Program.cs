@@ -72,6 +72,15 @@ namespace Server.API
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    SeedData.Seed(
+                        scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(),
+                        scope.ServiceProvider.GetRequiredService<IPasswordsService>(),
+                        scope.ServiceProvider.GetRequiredService<ITokensService>()
+                    );
+                }
             }
 
             // app.UseHttpsRedirection();
@@ -91,14 +100,6 @@ namespace Server.API
             
             // user extractor middleware
             app.UseMiddleware<UserExtractorMiddleware>();
-
-            using (var scope = app.Services.CreateScope())
-            {
-                SeedData.Seed(
-                    scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(),
-                    scope.ServiceProvider.GetRequiredService<IPasswordsService>()
-                );
-            }
 
             app.Run();
         }
