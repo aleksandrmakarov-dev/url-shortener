@@ -23,6 +23,35 @@
 
 # API Documentation
 
+## Example of appsettings.json for the C# server implementation
+```
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "Database": "DATABASE-CONNECTION-URL",
+    "Cache": "CACHE-CONNECTION-URL"
+  },
+  "Application": {
+    "ClientBaseUrl": "YOUR-CLIENT-BASE-URL"
+  },
+  "JsonWebToken": {
+    "SecretKey": "YOUR-VERY-SECRET-KEY"
+  },
+  "Mailing": {
+    "From": "MAIL-SERVICE-FROM"
+  },
+  "Location": {
+    "BaseUrl": "http://ip-api.com/json"
+  }
+}
+```
+
 ## Structure
 
 ```
