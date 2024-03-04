@@ -23,7 +23,8 @@
 
 # API Documentation
 
-## Example of appsettings.json for the C# server implementation
+### Example of appsettings.json for the C# server implementation
+**Redis is required to use C# Server**
 ```
 {
   "Logging": {
