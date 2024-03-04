@@ -1,5 +1,5 @@
 import RedirectPage from "@/pages/(main)/[alias]/page";
-import AccessDeniedPage from "@/pages/(main)/access-denied/page";
+import AccessDeniedPage from "@/pages/access-denied/page";
 import HomePage from "@/pages/(main)/home/page";
 import MainLayout from "@/pages/(main)/layout";
 import LinksPage from "@/pages/(main)/links/u/[userId]/page";
@@ -20,14 +20,16 @@ import {
   RouterProvider as ReactDOMRouterProvider,
   Route,
 } from "react-router-dom";
+import { ErrorBoundaryView } from "@/shared/components/ErrorBoundaryView";
+import AdminPage from "@/pages/(main)/admin/test/page";
+import { Role } from "@/lib/utils";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <>
+    <Route errorElement={<ErrorBoundaryView />}>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path=":alias" element={<RedirectPage />} />
-        <Route path="access-denied" element={<AccessDeniedPage />} />
         <Route path="links">
           <Route element={<RouteRoleGuard />}>
             <Route path="u">
@@ -39,6 +41,9 @@ const router = createBrowserRouter(
           <Route path="stats">
             <Route path=":id" element={<StatsPage />} />
           </Route>
+        </Route>
+        <Route path="admin" element={<RouteRoleGuard roles={[Role.Admin]} />}>
+          <Route path="test" element={<AdminPage />} />
         </Route>
       </Route>
       <Route path="/auth" element={<AuthLayout />}>
@@ -53,7 +58,8 @@ const router = createBrowserRouter(
         />
         <Route path="sign-out" element={<SignOutPage />} />
       </Route>
-    </>
+      <Route path="access-denied" element={<AccessDeniedPage />} />
+    </Route>
   )
 );
 
