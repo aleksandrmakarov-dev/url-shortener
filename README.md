@@ -5,7 +5,9 @@
 - Server.Golang - [Crysta1Cat](https://github.com/Crysta1Cat)
 - Client.React and Server.Csharp - [Alex](https://github.com/aleksandrmakarov-dev)
 ## Video
-[![Example](https://img.youtube.com/vi/74xoeOYhfX8/0.jpg)](https://www.youtube.com/watch?v=74xoeOYhfX8)
+
+
+[![Example](https://img.youtube.com/vi/74xoeOYhfX8/0.jpg)](https://www.youtube.com/watch?v=l5toTQrJ1rY&list=PLwfyMEDWsaKNkNC93vcW9WIPF-7pGf-Z1)
 
 ## Application Structure
 
