@@ -7,7 +7,7 @@
 ## Video
 
 
-[![Example](https://img.youtube.com/vi/74xoeOYhfX8/0.jpg)](https://www.youtube.com/watch?v=l5toTQrJ1rY&list=PLwfyMEDWsaKNkNC93vcW9WIPF-7pGf-Z1)
+[![Example](https://img.youtube.com/vi/74xoeOYhfX8/0.jpg)](https://www.youtube.com/watch?v=74xoeOYhfX8)
 
 ## Application Structure
 
